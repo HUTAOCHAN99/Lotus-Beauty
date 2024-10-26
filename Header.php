@@ -47,7 +47,7 @@
         <!-- Right Side (Icons) -->
         <div class="flex items-center space-x-6">
             <button class="text-green-900 hover:text-black">
-                <i class="ri-user-line ri-lg"></i>
+                <a href="dashboard.php"><i class="ri-user-line ri-lg"></i></a>
             </button>
 
             <button class="text-green-900 hover:text-black">

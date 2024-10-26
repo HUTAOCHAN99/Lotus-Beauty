@@ -58,8 +58,13 @@
                 <label for="password" class="flex items-center text-slate-200 mb-1">
                     <i class="ri-lock-line mr-2"></i>Password
                 </label>
-                <input type="password" id="password" name="password"
-                    class="w-full p-3 bg-white bg-opacity-20 text-gray-100 border border-transparent rounded-lg placeholder-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-200">
+                <div class="relative">
+                    <input type="password" id="password" name="password"
+                        class="w-full p-3 bg-white bg-opacity-20 text-gray-100 border border-transparent rounded-lg placeholder-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-200">
+                    <span class="absolute right-3 top-3 cursor-pointer" id="togglePassword">
+                        <i class="ri-eye-line" id="togglePasswordIcon"></i>
+                    </span>
+                </div>
                 <span class="error-message" id="passwordError"></span>
             </div>
 
@@ -116,6 +121,19 @@
     </div>
 
     <script>
+        // JavaScript for showing/hiding password
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            togglePasswordIcon.classList.toggle('ri-eye-line');
+            togglePasswordIcon.classList.toggle('ri-eye-off-line');
+        });
+
+        // Form validation script
         document.getElementById('createAccountForm').addEventListener('submit', function (event) {
             event.preventDefault();
             let isValid = true;
