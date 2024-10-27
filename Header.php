@@ -38,7 +38,7 @@
                 <a href="Home.php" class="text-green-900 hover:font-bold">Home</a>
                 <a href="Product_Page.php" class="text-green-900 hover:font-bold">Produk</a>
                 <a href="#" class="text-green-900 hover:font-bold">Shop</a>
-                <a href="#" class="text-green-900 hover:font-bold">Konsultasi</a>
+                <a href="Consultation_Page.php" class="text-green-900 hover:font-bold">Konsultasi</a>
                 <a href="Recipe.php" class="text-green-900 hover:font-bold">Resep</a>
                 <a href="#" class="text-green-900 hover:font-bold">About Us</a>
             </div>
@@ -85,7 +85,7 @@
         <a href="Home.php" class="block py-2 text-green-900 hover:font-bold">Home</a>
         <a href="Product_Page.php" class="block py-2 text-green-900 hover:font-bold">Produk</a>
         <a href="Purchase.php" class="block py-2 text-green-900 hover:font-bold">Shop</a>
-        <a href="#" class="block py-2 text-green-900 hover:font-bold">Konsultasi</a>
+        <a href="Consultation_Page.php" class="block py-2 text-green-900 hover:font-bold">Konsultasi</a>
         <a href="Recipe.php" class="block py-2 text-green-900 hover:font-bold">Resep</a>
         <a href="#" class="block py-2 text-green-900 hover:font-bold">About Us</a>
     </div>

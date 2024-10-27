@@ -19,6 +19,9 @@ if ($result->num_rows > 0) {
     exit();
 }
 
+// Inisialisasi kuantiti pesanan
+$order_quantity = 1; // Default kuantiti
+
 // Contoh data ulasan
 $reviews = [
     [
@@ -97,7 +100,18 @@ $reviews = [
                         <span class="text-sm font-semibold">Terjual:</span>
                         <span class="text-sm font-semibold"><?= htmlspecialchars($product['terjual']); ?>0+</span>
                     </div>
-                    <div class="flex w-full"><button class="bg-blue-500 ml-auto w-10">Buy</button></div>
+                    <!-- Modifikasi bagian tombol Buy -->
+                    <div class="flex w-full mt-2">
+                        <div class="flex items-center">
+                            <span class="text-sm font-semibold">Jumlah Pesanan:</span>
+                            <div class="flex items-center mx-2">
+                                <button id="decrease-quantity" class="bg-gray-200 text-gray-700 rounded-l-md px-2" onclick="changeQuantity(-1)">-</button>
+                                <input id="order-quantity" type="number" value="<?= $order_quantity; ?>" min="1" class="border text-center w-16 mx-1" readonly>
+                                <button id="increase-quantity" class="bg-gray-200 text-gray-700 rounded-r-md px-2" onclick="changeQuantity(1)">+</button>
+                            </div>
+                            <a href="detail_purchase.php?product_id=<?= htmlspecialchars($product['product_id']); ?>&quantity=" + document.getElementById('order-quantity').value class="bg-blue-500 text-white ml-auto px-4 py-2 rounded">Buy</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -109,6 +123,17 @@ $reviews = [
                 details.classList.toggle("expanded");
                 card.classList.toggle("expanded");
                 image.classList.toggle("rotated");
+            }
+
+            function changeQuantity(amount) {
+                var quantityInput = document.getElementById('order-quantity');
+                var currentQuantity = parseInt(quantityInput.value);
+                var newQuantity = currentQuantity + amount;
+                
+                // Pastikan kuantiti tidak kurang dari 1
+                if (newQuantity >= 1) {
+                    quantityInput.value = newQuantity;
+                }
             }
         </script>
     </div>

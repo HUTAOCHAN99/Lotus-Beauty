@@ -140,7 +140,7 @@
             <p class="text-xs text-gray-700">Resep</p>
         </div>
         <div class="flex flex-col items-center">
-            <a href=""><i class="ri-message-line text-xl text-gray-700"></i></a>
+            <a href="Consultation_Page.php"><i class="ri-message-line text-xl text-gray-700"></i></a>
             <p class="text-xs text-gray-700">Konsultasi</p>
         </div>
         <div class="flex flex-col items-center">
