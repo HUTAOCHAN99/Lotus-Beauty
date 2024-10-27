@@ -8,56 +8,55 @@
 </head>
 <body class="bg-gray-100">
 <?php include('Header.php'); ?>
-    <section class="max-w-4xl mx-auto p-4">
-        <h2 class="text-2xl font-bold mb-6">Obat Resep</h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-            <!-- Item 1 -->
-            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                <img src="src/images/obat-1.png" alt="Obat Intraven & Larutan Steril" class="w-16 h-16 mb-3">
-                <p class="text-center text-sm font-semibold">Obat Intraven & Larutan Steril</p>
-            </div>
-            <!-- Item 2 -->
-            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                <img src="src/images/obat-2.png" alt="Diabetes" class="w-16 h-16 mb-3">
-                <p class="text-center text-sm font-semibold">Diabetes</p>
-            </div>
-            <!-- Item 3 -->
-            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                <img src="src/images/obat-3.png" alt="Darah Tinggi" class="w-16 h-16 mb-3">
-                <p class="text-center text-sm font-semibold">Darah Tinggi</p>
-            </div>
-            <!-- Item 4 -->
-            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                <img src="src/images/obat-4.png" alt="Kolesterol" class="w-16 h-16 mb-3">
-                <p class="text-center text-sm font-semibold">Kolesterol</p>
-            </div>
-            <!-- Item 5 -->
-            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                <img src="src/images/obat-5.png" alt="Jantung" class="w-16 h-16 mb-3">
-                <p class="text-center text-sm font-semibold">Jantung</p>
-            </div>
-            <!-- Item 6 -->
-            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                <img src="src/images/obat-6.png" alt="Asam Urat" class="w-16 h-16 mb-3">
-                <p class="text-center text-sm font-semibold">Asam Urat</p>
-            </div>
-            <!-- Item 7 -->
-            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                <img src="src/images/obat-7.png" alt="Disfungsi Ereksi" class="w-16 h-16 mb-3">
-                <p class="text-center text-sm font-semibold">Disfungsi Ereksi</p>
-            </div>
-            <!-- Item 8 -->
-            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                <img src="src/images/obat-8.png" alt="Flu, Pusing dan Demam" class="w-16 h-16 mb-3">
-                <p class="text-center text-sm font-semibold">Flu, Pusing dan Demam</p>
-            </div>
-            <!-- Item 9 -->
-            <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                <img src="src/images/obat-9.png" alt="Anti Infeksi" class="w-16 h-16 mb-3">
-                <p class="text-center text-sm font-semibold">Anti Infeksi</p>
-            </div>
-        </div>
-    </section>
-    <?php include('Footer.php'); ?>
+<section class="max-w-4xl mx-auto p-4">
+    <h2 class="text-2xl font-bold mb-6">Obat Resep</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+        <?php
+        include('db.php'); // Pastikan Anda sudah menghubungkan ke database
+
+        // Ambil data semua resep dari database
+        $result = $konek->query("SELECT nama_resep, image_url FROM prescription");
+
+        // Periksa apakah query berhasil
+        if ($result === false) {
+            echo "<p>Error fetching data: " . $konek->error . "</p>";
+            exit();
+        }
+
+        // Cek jumlah hasil
+        if ($result->num_rows === 0) {
+            echo "<p>Tidak ada resep yang ditemukan.</p>";
+        } else {
+            // Tampilkan resep
+            while ($row = $result->fetch_assoc()): 
+                // Pastikan ada gambar
+                $image_url = !empty($row['image_url']) ? htmlspecialchars($row['image_url']) : 'path/to/default-image.png';
+                // Encode nama resep untuk URL
+                $encoded_name = urlencode($row['nama_resep']);
+                ?>
+                <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
+                    <img src="<?php echo $image_url; ?>" alt="<?php echo htmlspecialchars($row['nama_resep']); ?>" class="w-16 h-16 mb-3">
+                    <a href="Detail_Resep.php?nama_resep=<?php echo $encoded_name; ?>" class="text-center text-sm font-semibold text-blue-500 hover:underline">
+                        <?php echo htmlspecialchars($row['nama_resep']); ?>
+                    </a>
+                </div>
+            <?php endwhile; 
+        }
+        ?>
+    </div>
+</section>
+<?php include('Footer.php'); ?>
 </body>
 </html>
+
+
+
+
+
+<!-- 
+// Ambil nama resep dari URL
+$nama_resep = isset($_GET['nama_resep']) ? urldecode($_GET['nama_resep']) : '';
+
+// Lakukan query ke database untuk mendapatkan detail resep berdasarkan $nama_resep
+// Lanjutkan dengan logika untuk menampilkan detail resep... -->
+
