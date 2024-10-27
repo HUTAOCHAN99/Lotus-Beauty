@@ -2,17 +2,20 @@
 session_start();
 include 'db.php';
 
-// Pastikan pengguna telah login
+// Ensure the user is logged in
 if (!isset($_SESSION['username'])) {
     header("Location: Landing_Page.php");
     exit();
 }
 
-// Ambil informasi pengguna dari database
+// Retrieve user information from the database
 $username = $_SESSION['username'];
 $sql = "SELECT * FROM users WHERE username = '$username'";
 $result = $konek->query($sql);
 $user = $result->fetch_assoc();
+
+// Cek jika ada parameter 'success' di URL
+$success = isset($_GET['success']) ? $_GET['success'] : '';
 ?>
 
 <!DOCTYPE html>
@@ -54,12 +57,14 @@ $user = $result->fetch_assoc();
             color: #2563eb;
         }
 
-        .back-button, .logout-button {
+        .back-button,
+        .logout-button {
             font-weight: 500;
             transition: background-color 0.2s ease;
         }
 
-        .back-button:hover, .logout-button:hover {
+        .back-button:hover,
+        .logout-button:hover {
             background-color: #374151;
         }
 
@@ -67,11 +72,22 @@ $user = $result->fetch_assoc();
             .dashboard-card {
                 padding: 1rem;
             }
+
             .card-title {
                 font-size: 1.25rem;
             }
         }
     </style>
+
+    <script>
+        // Check if success parameter is set and show alert
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('success')) {
+                alert("Data berhasil ditambahkan!");
+            }
+        };
+    </script>
 </head>
 
 <body class="flex items-center justify-center min-h-screen">
@@ -81,12 +97,10 @@ $user = $result->fetch_assoc();
             <p class="text-gray-500">Selamat datang, <?php echo htmlspecialchars($user['full_name']); ?>!</p>
         </div>
 
-        <!-- Informasi Profil Pengguna -->
+        <!-- User Profile Information -->
         <div class="dashboard-card">
             <h3 class="card-title">Informasi Profil</h3>
             <table class="min-w-full bg-white">
-                <thead>
-                </thead>
                 <tbody>
                     <tr>
                         <td class="py-2 px-4 border-b"><strong>Nama Lengkap</strong></td>
@@ -120,21 +134,33 @@ $user = $result->fetch_assoc();
             </table>
         </div>
 
-        <!-- Navigasi dan Akses Cepat -->
+        <!-- Navigation Links -->
         <div class="dashboard-card">
             <h3 class="card-title">Navigasi</h3>
             <ul class="space-y-2 pl-4 list-disc">
                 <li><a href="profile.php" class="nav-link">Pengaturan Profil</a></li>
                 <li><a href="transactions.php" class="nav-link">Riwayat Transaksi</a></li>
                 <li><a href="setting.php" class="nav-link">Pengaturan Akun</a></li>
+
+                <!-- Additional options for admin -->
                 <?php if ($user['role'] == 'admin'): ?>
                     <li><a href="user_management.php" class="nav-link">Manajemen Pengguna</a></li>
                     <li><a href="reports.php" class="nav-link">Laporan dan Statistik</a></li>
+                    <!-- Place this code where you want the buttons to be displayed on the dashboard -->
+                    <div class="dashboard-card flex space-x-4 mt-6">
+                        <a href="upload.php?category=resep" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                            Upload Resep
+                        </a>
+                        <a href="upload.php?category=obat-herbal" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                            Upload Obat Herbal
+                        </a>
+                    </div>
+
                 <?php endif; ?>
             </ul>
         </div>
 
-        <!-- Pengaturan Akun dan Keamanan -->
+        <!-- Account Settings and Security -->
         <div class="dashboard-card flex items-center justify-between">
             <a href="logout.php" class="logout-button text-red-600 hover:bg-red-500 bg-red-100 rounded-md px-4 py-2">Logout</a>
             <a href="Home.php" class="back-button bg-gray-800 text-white rounded-md px-4 py-2 hover:bg-gray-700">
