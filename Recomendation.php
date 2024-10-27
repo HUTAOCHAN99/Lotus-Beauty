@@ -10,8 +10,8 @@
     <style>
         .swiper-container-recommendation {
             width: 100%;
-            height: auto;
             padding: 0 20px;
+            overflow: hidden; /* Menghilangkan scrollbar horizontal */
         }
 
         .swiper-slide-recommendation {
@@ -58,7 +58,7 @@
                 <a href="#" class="text-orange-500">Lihat semua</a>
             </div>
 
-            <div class="swiper-container recommendation-swiper">
+            <div class="swiper-container swiper-container-recommendation recommendation-swiper">
                 <div class="swiper-wrapper">
                     <?php
                     foreach ($products as $product) {
@@ -83,94 +83,94 @@
             <?php
         }
 
-        // Contoh data produk
-        $products = [
-            [
-                'image' => 'src/images/product1.jpg',
-                'name' => 'Bioderma Sensibio H2O Pump 500 ml',
-                'price' => 'Rp 338.960',
-                'discount_price' => 'Rp 455.000',
-                'sold' => '6,8k+ Terjual'
-            ],
-            // Tambahkan produk lainnya di sini untuk total 12 produk
-            [
-                'image' => 'src/images/product2.jpg',
-                'name' => 'Bioderma Sensibio H2O 500 ml',
-                'price' => 'Rp 352.640',
-                'discount_price' => 'Rp 455.000',
-                'sold' => '6,2k+ Terjual'
-            ],
-            [
-                'image' => 'src/images/product3.jpg',
-                'name' => 'Serum Vitamin C',
-                'price' => 'Rp 200.000',
-                'discount_price' => 'Rp 250.000',
-                'sold' => '3k+ Terjual'
-            ],
-            [
-                'image' => 'src/images/product4.jpg',
-                'name' => 'Moisturizer Hydrating Gel',
-                'price' => 'Rp 150.000',
-                'discount_price' => 'Rp 200.000',
-                'sold' => '2k+ Terjual'
-            ],
-            [
-                'image' => 'src/images/product5.jpg',
-                'name' => 'Produk 5',
-                'price' => 'Rp 100.000',
-                'discount_price' => 'Rp 150.000',
-                'sold' => '1k+ Terjual'
-            ],
-            [
-                'image' => 'src/images/product6.jpg',
-                'name' => 'Produk 6',
-                'price' => 'Rp 120.000',
-                'discount_price' => 'Rp 170.000',
-                'sold' => '1.5k+ Terjual'
-            ],
-            [
-                'image' => 'src/images/product7.jpg',
-                'name' => 'Produk 7',
-                'price' => 'Rp 250.000',
-                'discount_price' => 'Rp 300.000',
-                'sold' => '800+ Terjual'
-            ],
-            [
-                'image' => 'src/images/product8.jpg',
-                'name' => 'Produk 8',
-                'price' => 'Rp 180.000',
-                'discount_price' => 'Rp 230.000',
-                'sold' => '500+ Terjual'
-            ],
-            [
-                'image' => 'src/images/product9.jpg',
-                'name' => 'Produk 9',
-                'price' => 'Rp 75.000',
-                'discount_price' => 'Rp 100.000',
-                'sold' => '600+ Terjual'
-            ],
-            [
-                'image' => 'src/images/product10.jpg',
-                'name' => 'Produk 10',
-                'price' => 'Rp 300.000',
-                'discount_price' => 'Rp 400.000',
-                'sold' => '200+ Terjual'
-            ],
-            [
-                'image' => 'src/images/product11.jpg',
-                'name' => 'Produk 11',
-                'price' => 'Rp 400.000',
-                'discount_price' => 'Rp 500.000',
-                'sold' => '150+ Terjual'
-            ],
-            [
-                'image' => 'src/images/product12.jpg',
-                'name' => 'Produk 12',
-                'price' => 'Rp 200.000',
-                'discount_price' => 'Rp 300.000',
-                'sold' => '300+ Terjual'
-            ]
-        ];
+       // Contoh data produk
+       $products = [
+        [
+            'image' => 'src/images/product1.jpg',
+            'name' => 'Bioderma Sensibio H2O Pump 500 ml',
+            'price' => 'Rp 338.960',
+            'discount_price' => 'Rp 455.000',
+            'sold' => '6,8k+ Terjual'
+        ],
+        // Tambahkan produk lainnya di sini untuk total 12 produk
+        [
+            'image' => 'src/images/product2.jpg',
+            'name' => 'Bioderma Sensibio H2O 500 ml',
+            'price' => 'Rp 352.640',
+            'discount_price' => 'Rp 455.000',
+            'sold' => '6,2k+ Terjual'
+        ],
+        [
+            'image' => 'src/images/product3.jpg',
+            'name' => 'Serum Vitamin C',
+            'price' => 'Rp 200.000',
+            'discount_price' => 'Rp 250.000',
+            'sold' => '3k+ Terjual'
+        ],
+        [
+            'image' => 'src/images/product4.jpg',
+            'name' => 'Moisturizer Hydrating Gel',
+            'price' => 'Rp 150.000',
+            'discount_price' => 'Rp 200.000',
+            'sold' => '2k+ Terjual'
+        ],
+        [
+            'image' => 'src/images/product5.jpg',
+            'name' => 'Produk 5',
+            'price' => 'Rp 100.000',
+            'discount_price' => 'Rp 150.000',
+            'sold' => '1k+ Terjual'
+        ],
+        [
+            'image' => 'src/images/product6.jpg',
+            'name' => 'Produk 6',
+            'price' => 'Rp 120.000',
+            'discount_price' => 'Rp 170.000',
+            'sold' => '1.5k+ Terjual'
+        ],
+        [
+            'image' => 'src/images/product7.jpg',
+            'name' => 'Produk 7',
+            'price' => 'Rp 250.000',
+            'discount_price' => 'Rp 300.000',
+            'sold' => '800+ Terjual'
+        ],
+        [
+            'image' => 'src/images/product8.jpg',
+            'name' => 'Produk 8',
+            'price' => 'Rp 180.000',
+            'discount_price' => 'Rp 230.000',
+            'sold' => '500+ Terjual'
+        ],
+        [
+            'image' => 'src/images/product9.jpg',
+            'name' => 'Produk 9',
+            'price' => 'Rp 75.000',
+            'discount_price' => 'Rp 100.000',
+            'sold' => '600+ Terjual'
+        ],
+        [
+            'image' => 'src/images/product10.jpg',
+            'name' => 'Produk 10',
+            'price' => 'Rp 300.000',
+            'discount_price' => 'Rp 400.000',
+            'sold' => '200+ Terjual'
+        ],
+        [
+            'image' => 'src/images/product11.jpg',
+            'name' => 'Produk 11',
+            'price' => 'Rp 400.000',
+            'discount_price' => 'Rp 500.000',
+            'sold' => '150+ Terjual'
+        ],
+        [
+            'image' => 'src/images/product12.jpg',
+            'name' => 'Produk 12',
+            'price' => 'Rp 200.000',
+            'discount_price' => 'Rp 300.000',
+            'sold' => '300+ Terjual'
+        ]
+    ];
 
         renderProductRecommendations($products);
         ?>
@@ -180,7 +180,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var swiper = new Swiper('.recommendation-swiper', {
-                slidesPerView: 1, // Tampilkan 1 slide secara default
+                slidesPerView: 1,
                 spaceBetween: 10,
                 breakpoints: {
                     300: {
