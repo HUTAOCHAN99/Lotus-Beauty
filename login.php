@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $password = $_POST['password'];
 
     // Cek apakah username ada
-    $stmt = $konek->prepare("SELECT id, email, password FROM users WHERE username = ?");
+    $stmt = $konek->prepare("SELECT user_id, email, password FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
