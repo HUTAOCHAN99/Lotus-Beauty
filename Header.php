@@ -51,7 +51,7 @@
             </button>
 
             <button class="text-green-900 hover:text-black">
-                <i class="ri-shopping-bag-line ri-lg"></i>
+                <a href="cart.php"><i class="ri-shopping-bag-line ri-lg"></i></a>
             </button>
 
             <!-- Search Icon Button -->
