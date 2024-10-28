@@ -62,46 +62,48 @@ $totalPrice = 0;
     <div class="max-w-4xl w-full mx-auto p-6">
         <h2 class="text-3xl font-bold text-gray-800">Keranjang Belanja</h2>
 
+
+        <table class="min-w-full mt-6 bg-white border border-gray-200">
+            <thead>
+                <tr>
+                    <th class="py-2 px-4 border-b">Pilih</th>
+                    <th class="py-2 px-4 border-b">Produk</th>
+                    <th class="py-2 px-4 border-b">Kuantitas</th>
+                    <th class="py-2 px-4 border-b">Harga</th>
+                    <th class="py-2 px-4 border-b">Total</th>
+                    <th class="py-2 px-4 border-b">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php while ($row = $cartResult->fetch_assoc()):
+                    $itemTotal = $row['quantity'] * $row['price'];
+                    $totalPrice += $itemTotal; // Accumulate total price
+                ?>
+                    <tr>
+                        <td class="py-2 px-4 border-b">
+                            <input type="checkbox" name="selected_products[]" value="<?= $row['cart_id'] ?>" onchange="updateTotal()">
+                            <input type="hidden" name="product_ids[<?= $row['cart_id'] ?>]" value="<?= $row['product_id'] ?>">
+                            <input type="hidden" name="quantities[<?= $row['cart_id'] ?>]" value="<?= $row['quantity'] ?>">
+                        </td>
+                        <td class="py-2 px-4 border-b"><?= htmlspecialchars($row['name']) ?></td>
+                        <td class="py-2 px-4 border-b"><?= htmlspecialchars($row['quantity']) ?></td>
+                        <td class="py-2 px-4 border-b">Rp <?= number_format($row['price'], 2, ',', '.') ?></td>
+                        <td class="py-2 px-4 border-b">Rp <?= number_format($itemTotal, 2, ',', '.') ?></td>
+                        <td class="py-2 px-4 border-b">
+                            <!-- bagian ini yang salah dia form dalam form -->
+                            <form action="remove_from_cart.php" method="POST" style="display: inline;">
+                                <input type="hidden" name="cart_id" value="<?= $row['cart_id'] ?>">
+                                <button type="submit" class="text-red-500 hover:underline">Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                <?php endwhile; ?>
+            </tbody>
+        </table>
         <!-- Checkout Form -->
         <form action="checkout.php" method="POST">
             <!-- Cart items display -->
             <?php if ($cartResult->num_rows > 0): ?>
-                <table class="min-w-full mt-6 bg-white border border-gray-200">
-                    <thead>
-                        <tr>
-                            <th class="py-2 px-4 border-b">Pilih</th>
-                            <th class="py-2 px-4 border-b">Produk</th>
-                            <th class="py-2 px-4 border-b">Kuantitas</th>
-                            <th class="py-2 px-4 border-b">Harga</th>
-                            <th class="py-2 px-4 border-b">Total</th>
-                            <th class="py-2 px-4 border-b">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($row = $cartResult->fetch_assoc()):
-                            $itemTotal = $row['quantity'] * $row['price'];
-                            $totalPrice += $itemTotal; // Accumulate total price
-                        ?>
-                            <tr>
-                                <td class="py-2 px-4 border-b">
-                                    <input type="checkbox" name="selected_products[]" value="<?= $row['cart_id'] ?>" onchange="updateTotal()">
-                                    <input type="hidden" name="product_ids[<?= $row['cart_id'] ?>]" value="<?= $row['product_id'] ?>">
-                                    <input type="hidden" name="quantities[<?= $row['cart_id'] ?>]" value="<?= $row['quantity'] ?>">
-                                </td>
-                                <td class="py-2 px-4 border-b"><?= htmlspecialchars($row['name']) ?></td>
-                                <td class="py-2 px-4 border-b"><?= htmlspecialchars($row['quantity']) ?></td>
-                                <td class="py-2 px-4 border-b">Rp <?= number_format($row['price'], 2, ',', '.') ?></td>
-                                <td class="py-2 px-4 border-b">Rp <?= number_format($itemTotal, 2, ',', '.') ?></td>
-                                <td class="py-2 px-4 border-b">
-                                    <form action="remove_from_cart.php" method="POST">
-                                        <input type="hidden" name="cart_id" value="<?= $row['cart_id'] ?>">
-                                        <button type="submit" class="text-red-500 hover:underline">Hapus</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
-                    </tbody>
-                </table>
                 <div class="mt-4">
                     <strong>Total Pembayaran:</strong> Rp <span id="total-payment"><?= number_format($totalPrice, 2, ',', '.') ?></span>
                 </div>
@@ -110,6 +112,7 @@ $totalPrice = 0;
                 <p class="mt-6">Keranjang Anda kosong.</p>
             <?php endif; ?>
         </form>
+
     </div>
 
     <script>
@@ -130,7 +133,7 @@ $totalPrice = 0;
             });
         }
     </script>
-     <?php include('Footer.php'); ?>
+    <?php include('Footer.php'); ?>
 </body>
 
 </html>
