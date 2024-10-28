@@ -113,7 +113,7 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" name="submit"
+            <button type="button" name="submitbutton" id="submitbutton"
                 class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg transition duration-200 transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50">
                 <i class="ri-check-line mr-2"></i>Create Account
             </button>
@@ -126,31 +126,58 @@
         const passwordInput = document.getElementById('password');
         const togglePasswordIcon = document.getElementById('togglePasswordIcon');
 
-        togglePassword.addEventListener('click', function () {
+        togglePassword.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
             togglePasswordIcon.classList.toggle('ri-eye-line');
             togglePasswordIcon.classList.toggle('ri-eye-off-line');
         });
 
-        // Form validation script
-        document.getElementById('createAccountForm').addEventListener('submit', function (event) {
-            event.preventDefault();
+        document.getElementById('submitbutton').addEventListener('click', function(event) {
+            event.preventDefault(); // Mencegah pengiriman form secara langsung
             let isValid = true;
 
-            const fields = [
-                { id: 'username', errorId: 'usernameError', message: 'Username is required' },
-                { id: 'email', errorId: 'emailError', message: 'Email is required' },
-                { id: 'password', errorId: 'passwordError', message: 'Password is required' },
-                { id: 'full_name', errorId: 'fullNameError', message: 'Full name is required' },
-                { id: 'phone_number', errorId: 'phoneError', message: 'Phone number is required' },
-                { id: 'address', errorId: 'addressError', message: 'Address is required' },
-                { id: 'role', errorId: 'roleError', message: 'Role is required' }
+            const fields = [{
+                    id: 'username',
+                    errorId: 'usernameError',
+                    message: 'Username is required'
+                },
+                {
+                    id: 'email',
+                    errorId: 'emailError',
+                    message: 'Email is required'
+                },
+                {
+                    id: 'password',
+                    errorId: 'passwordError',
+                    message: 'Password is required'
+                },
+                {
+                    id: 'full_name',
+                    errorId: 'fullNameError',
+                    message: 'Full name is required'
+                },
+                {
+                    id: 'phone_number',
+                    errorId: 'phoneError',
+                    message: 'Phone number is required'
+                },
+                {
+                    id: 'address',
+                    errorId: 'addressError',
+                    message: 'Address is required'
+                },
+                {
+                    id: 'role',
+                    errorId: 'roleError',
+                    message: 'Role is required'
+                }
             ];
 
             fields.forEach(field => {
                 const input = document.getElementById(field.id);
                 const error = document.getElementById(field.errorId);
+
                 if (input.value.trim() === '') {
                     error.textContent = field.message;
                     isValid = false;
@@ -160,7 +187,10 @@
             });
 
             if (isValid) {
-                event.target.submit();
+                console.log("Form is valid, submitting...");
+                document.getElementById('createAccountForm').submit(); // Memanggil submit secara manual jika valid
+            } else {
+                console.warn("Form submission prevented due to validation errors.");
             }
         });
     </script>
