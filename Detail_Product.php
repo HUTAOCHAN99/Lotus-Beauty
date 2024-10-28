@@ -22,6 +22,10 @@ if ($result->num_rows > 0) {
 // Inisialisasi kuantiti pesanan
 $order_quantity = 1; // Default kuantiti
 
+// Dapatkan user_id dari sesi jika ada
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
+
 // Contoh data ulasan
 $reviews = [
     [
@@ -49,6 +53,7 @@ $reviews = [
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,24 +66,29 @@ $reviews = [
             overflow: hidden;
             transition: flex-basis 0.5s ease-in-out;
         }
+
         .product-details.expanded {
             flex-basis: 50%;
         }
+
         .card {
             transition: all 0.5s ease-in-out;
             display: flex;
             width: 250px;
             height: 300px;
         }
+
         .card.expanded {
             width: 600px;
         }
+
         .rotated {
             transform: rotate(-45deg);
             transition: transform 0.5s ease-in-out;
         }
     </style>
 </head>
+
 <body>
     <?php include('Header.php'); ?>
     <div class="bg-gray-100 flex items-center justify-center p-2">
@@ -103,13 +113,7 @@ $reviews = [
                     <!-- Modifikasi bagian tombol Buy -->
                     <div class="flex w-full mt-2">
                         <div class="flex items-center">
-                            <span class="text-sm font-semibold">Jumlah Pesanan:</span>
-                            <div class="flex items-center mx-2">
-                                <button id="decrease-quantity" class="bg-gray-200 text-gray-700 rounded-l-md px-2" onclick="changeQuantity(-1)">-</button>
-                                <input id="order-quantity" type="number" value="<?= $order_quantity; ?>" min="1" class="border text-center w-16 mx-1" readonly>
-                                <button id="increase-quantity" class="bg-gray-200 text-gray-700 rounded-r-md px-2" onclick="changeQuantity(1)">+</button>
-                            </div>
-                            <a href="detail_purchase.php?product_id=<?= htmlspecialchars($product['product_id']); ?>&quantity=" + document.getElementById('order-quantity').value class="bg-blue-500 text-white ml-auto px-4 py-2 rounded">Buy</a>
+                            <a href="javascript:void(0);" onclick="openModal()" class="bg-blue-500 text-white ml-auto px-4 py-2 rounded">Buy</a>
                         </div>
                     </div>
                 </div>
@@ -129,11 +133,83 @@ $reviews = [
                 var quantityInput = document.getElementById('order-quantity');
                 var currentQuantity = parseInt(quantityInput.value);
                 var newQuantity = currentQuantity + amount;
-                
+
                 // Pastikan kuantiti tidak kurang dari 1
                 if (newQuantity >= 1) {
                     quantityInput.value = newQuantity;
                 }
+            }
+
+            // script pengurangan stock,kerangjang,checkout
+            // Buka modal ketika tombol "Buy" ditekan
+            function openModal() {
+                document.getElementById('buyModal').classList.remove('hidden');
+            }
+
+            // Tutup modal
+            function closeModal() {
+                document.getElementById('buyModal').classList.add('hidden');
+            }
+
+            // Function to add product to cart
+            function addToCart() {
+                var quantity = document.getElementById('order-quantity').value;
+                var productId = <?= $product_id ?>; // Getting product_id from PHP to JavaScript
+
+                var formData = new FormData();
+                formData.append('product_id', productId);
+                formData.append('quantity', quantity);
+
+                fetch('add_order_product.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json()) // Parse JSON response
+                    .then(data => {
+                        if (data.success) {
+                            alert("Pesanan berhasil ditambahkan!"); // Alert for success
+                            closeModal();
+                            window.location.reload(); // Reload page to update stock
+                            // Optionally redirect to cart.php
+                            window.location.href = 'cart.php'; // Redirect to cart.php after successful addition
+                        } else {
+                            alert(data.message); // Alert for failure with specific message
+                        }
+                    })
+                    .catch(error => {
+                        alert("Error: " + error); // Handle any errors
+                    });
+            }
+
+
+
+
+
+            // Fungsi untuk melakukan checkout langsung
+            function checkout() {
+                var quantity = document.getElementById('order-quantity').value;
+                var productId = <?= $product_id ?>; // Mendapatkan product_id dari PHP
+
+                // Mempersiapkan URL untuk dikirim ke checkout.php
+                var checkoutUrl = 'checkout.php?checkout_product=' + productId + '&quantity=' + quantity;
+
+                // Menggunakan fetch dengan metode GET
+                fetch(checkoutUrl, {
+                        method: 'GET',
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("Pembelian berhasil!");
+                            closeModal();
+                            window.location.reload(); // Reload halaman untuk memperbarui stok
+                        } else {
+                            alert("Gagal melakukan pembelian: " + data.message); // Menampilkan pesan kegagalan
+                        }
+                    })
+                    .catch(error => {
+                        alert("Error: " + error); // Tangani error
+                    });
             }
         </script>
     </div>
@@ -158,6 +234,33 @@ $reviews = [
             <?php endforeach; ?>
         </div>
     </div>
+
+    <!-- event buy modal -->
+    // Modifications to the modal to include a checkbox
+    <div id="buyModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Confirm Purchase</h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">&times;</button>
+            </div>
+            <div class="mb-4">
+                <p><strong>Product:</strong> <?= htmlspecialchars($product['name']); ?></p>
+                <span class="text-sm font-semibold">Jumlah Pesanan:</span>
+                <div class="flex items-center mx-2">
+                    <button id="decrease-quantity" class="bg-gray-200 text-gray-700 rounded-l-md px-2" onclick="changeQuantity(-1)">-</button>
+                    <input id="order-quantity" type="number" value="<?= $order_quantity; ?>" min="1" class="border text-center w-16 mx-1" readonly>
+                    <button id="increase-quantity" class="bg-gray-200 text-gray-700 rounded-r-md px-2" onclick="changeQuantity(1)">+</button>
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button onclick="addToCart()" class="bg-gray-300 text-gray-700 py-2 px-4 mr-2 rounded">Add to Cart</button>
+                <button onclick="checkout()" class="bg-blue-500 text-white py-2 px-4 rounded">Checkout</button>
+            </div>
+        </div>
+    </div>
+
+
     <?php include('Footer.php'); ?>
 </body>
+
 </html>

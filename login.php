@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $password = $_POST['password'];
 
     // Cek apakah username ada
-    $stmt = $konek->prepare("SELECT email, password FROM users WHERE username = ?");
+    $stmt = $konek->prepare("SELECT id, email, password FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -33,7 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             // Simpan email dan username untuk verifikasi
             $_SESSION['reset_email'] = $user['email'];
             $_SESSION['username'] = $username;
-            $_SESSION['action'] = 'login'; // Tambahkan ini agar halaman verifikasi tahu ini proses login
+            $_SESSION['user_id'] = $user['id']; // Menyimpan ID pengguna
+            $_SESSION['action'] = 'login'; // Menandakan proses login
 
             // Buat dan simpan token untuk verifikasi
             $token = bin2hex(random_bytes(4));
@@ -46,7 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $mail->Host = 'smtp.gmail.com';
                 $mail->SMTPAuth = true;
                 $mail->Username = 'hallmaster677@gmail.com';
-                $mail->Password = 'emyh qqcr nqoa nuck';
+                $mail->Password = 'emyh qqcr nqoa nuck'; // Pertimbangkan untuk tidak mengekspose password ini
                 $mail->SMTPSecure = 'tls';
                 $mail->Port = 587;
 
@@ -68,3 +69,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         echo "<script>alert('Username tidak ditemukan.'); window.history.back();</script>";
     }
 }
+?>
