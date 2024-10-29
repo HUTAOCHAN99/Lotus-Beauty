@@ -19,7 +19,9 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-
+        .bg-glass{
+            background-color: #133E87;
+        }
         .error-message {
             color: #ff6b6b;
             font-size: 0.875rem;
@@ -29,13 +31,13 @@
 
 <body class="bg-gray-200 flex items-center justify-center min-h-screen">
     <!-- Glassmorphic Card -->
-    <div class="relative z-10 max-w-md w-full p-8 glass rounded-lg shadow-lg backdrop-blur-lg bg-opacity-60">
-        <h2 class="text-center text-2xl font-semibold mb-6 text-slate-600">Create Account</h2>
+    <div class="bg-glass bg-opacity-10 relative z-10 max-w-md w-full p-8 glass rounded-lg shadow-lg backdrop-blur-lg ">
+        <h2 class="text-center text-2xl font-semibold mb-6 text-white">Create Account</h2>
 
         <form id="createAccountForm" method="POST" action="create_account_process.php" class="space-y-5">
             <!-- Username Field -->
             <div>
-                <label for="username" class="flex items-center text-slate-200 mb-1">
+                <label for="username" class="flex items-center text-white mb-1">
                     <i class="ri-user-line mr-2"></i>Username
                 </label>
                 <input type="text" id="username" name="username"
@@ -45,7 +47,7 @@
 
             <!-- Email Field -->
             <div>
-                <label for="email" class="flex items-center text-slate-200 mb-1">
+                <label for="email" class="flex items-center text-white mb-1">
                     <i class="ri-mail-line mr-2"></i>Email
                 </label>
                 <input type="email" id="email" name="email"
@@ -55,13 +57,13 @@
 
             <!-- Password Field -->
             <div>
-                <label for="password" class="flex items-center text-slate-200 mb-1">
+                <label for="password" class="flex items-center text-white mb-1">
                     <i class="ri-lock-line mr-2"></i>Password
                 </label>
                 <div class="relative">
                     <input type="password" id="password" name="password"
                         class="w-full p-3 bg-white bg-opacity-20 text-gray-100 border border-transparent rounded-lg placeholder-gray-300 focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-200">
-                    <span class="absolute right-3 top-3 cursor-pointer" id="togglePassword">
+                    <span class="absolute right-3 top-3 cursor-pointer text-white" id="togglePassword">
                         <i class="ri-eye-line" id="togglePasswordIcon"></i>
                     </span>
                 </div>
@@ -70,7 +72,7 @@
 
             <!-- Full Name Field -->
             <div>
-                <label for="full_name" class="flex items-center text-slate-200 mb-1">
+                <label for="full_name" class="flex items-center text-white mb-1">
                     <i class="ri-user-3-line mr-2"></i>Full Name
                 </label>
                 <input type="text" id="full_name" name="full_name"
@@ -80,7 +82,7 @@
 
             <!-- Phone Number Field -->
             <div>
-                <label for="phone_number" class="flex items-center text-slate-200 mb-1">
+                <label for="phone_number" class="flex items-center text-white mb-1">
                     <i class="ri-phone-line mr-2"></i>Phone Number
                 </label>
                 <input type="text" id="phone_number" name="phone_number"
@@ -90,7 +92,7 @@
 
             <!-- Address Field -->
             <div>
-                <label for="address" class="flex items-center text-slate-200 mb-1">
+                <label for="address" class="flex items-center text-white mb-1">
                     <i class="ri-map-pin-line mr-2"></i>Address
                 </label>
                 <input type="text" id="address" name="address"
@@ -100,7 +102,7 @@
 
             <!-- Role Field -->
             <div>
-                <label for="role" class="flex items-center text-slate-200 mb-1">
+                <label for="role" class="flex items-center text-white mb-1">
                     <i class="ri-shield-user-line mr-2"></i>Role
                 </label>
                 <select id="role" name="role"

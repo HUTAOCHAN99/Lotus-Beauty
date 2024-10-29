@@ -27,27 +27,51 @@
             opacity: 1;
         }
 
+        /* Mengatur ukuran elemen Swiper dengan kelas .home */
+        .swiper-container.home {
+            max-width: 800px;
+            /* Sesuaikan ukuran yang diinginkan */
+            height: 500px;
+            /* Tinggi sesuai kebutuhan */
+        }
+
+        .swiper-container.home img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+
         /* Style untuk arrow buttons */
         .swiper-button-next,
         .swiper-button-prev {
-            color: white; /* Warna tombol */
-            width: 40px; /* Lebar tombol */
-            height: 40px; /* Tinggi tombol */
-            background: rgba(0, 0, 0, 0.5); /* Warna latar belakang */
-            border-radius: 50%; /* Membuat tombol bulat */
+            color: white;
+            /* Warna tombol */
+            width: 36px;
+            /* Lebar tombol */
+            height: 36px;
+            /* Tinggi tombol */
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1.5rem;
+            /* Warna latar belakang */
+            border-radius: 100%;
+            /* Membuat tombol bulat */
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 10; /* Pastikan tombol di atas */
+            z-index: 10;
+            /* Pastikan tombol di atas */
         }
+
 
         /* Posisi tombol panah */
         .swiper-button-next {
-            right: 10px; /* Adjust as needed */
+            right: 10px;
+            /* Adjust as needed */
         }
 
         .swiper-button-prev {
-            left: 10px; /* Adjust as needed */
+            left: 10px;
+            /* Adjust as needed */
         }
     </style>
 </head>
@@ -55,9 +79,9 @@
 <body class="bg-gray-100">
     <!-- Bagian Atas -->
     <?php include('Header.php'); ?>
-    <header class="bg-blue-500 p-4">
-        <!-- Bagian Carousel -->
-        <div class="swiper-container home-swiper m-auto max-w-4xl rounded-lg shadow-lg overflow-hidden relative">
+    <header class="bg-gray-100 p-4">
+        <!-- Carousel Utama -->
+        <div class="swiper-container home-swiper home m-auto max-w-4xl rounded-lg shadow-lg overflow-hidden relative">
             <div class="swiper-wrapper">
                 <?php
                 $directory = "src/images/carousel/";
@@ -69,23 +93,19 @@
                 }
                 ?>
             </div>
-
-            <!-- Tombol "Lihat Semua" diposisikan dengan z-index lebih tinggi -->
             <div class="absolute bottom-4 right-4 z-20">
                 <button class="mt-2 px-4 py-2 bg-orange-500 rounded-lg text-white">Lihat Semua</button>
             </div>
-
-            <!-- Tombol Panah -->
             <div class="swiper-button-next"></div>
             <div class="swiper-button-prev"></div>
-
-            <!-- Pagination -->
             <div class="swiper-pagination"></div>
         </div>
+
     </header>
 
+
     <!-- Bagian Ikon Grid -->
-    <section class="grid grid-cols-3 gap-4 p-4">
+    <section class="grid grid-cols-3 gap-4 p-4 border-lg bg-gray-200">
         <div class="flex flex-col items-center">
             <i class="ri-file-upload-line text-3xl text-blue-500"></i>
             <p class="text-sm text-gray-700 mt-2">Upload Resep</p>
@@ -99,36 +119,30 @@
             <p class="text-sm text-gray-700 mt-2">Obat Herbal</p>
         </div>
     </section>
-        <!-- Bagian Carousel 2-->
-        <div class="swiper-container home-swiper m-auto max-w-4xl rounded-lg shadow-lg overflow-hidden relative">
-            <div class="swiper-wrapper">
-                <?php
-                $directory = "src/images/carousel/";
-                $images = glob($directory . "*.{jpg,jpeg,png,gif}", GLOB_BRACE);
-                foreach ($images as $image) {
-                    echo '<div class="swiper-slide">';
-                    echo '<img src="' . $image . '" alt="Gambar Promo" class="w-full h-auto object-cover rounded-lg">';
-                    echo '</div>';
-                }
-                ?>
-            </div>
-
-            <!-- Tombol "Lihat Semua" diposisikan dengan z-index lebih tinggi -->
-            <div class="absolute bottom-4 right-4 z-20">
-                <button class="mt-2 px-4 py-2 bg-orange-500 rounded-lg text-white">Lihat Semua</button>
-            </div>
-
-            <!-- Tombol Panah -->
-            <div class="swiper-button-next"></div>
-            <div class="swiper-button-prev"></div>
-
-            <!-- Pagination -->
-            <div class="swiper-pagination"></div>
+    <!-- Carousel Utama -->
+    <div class="swiper-container home-swiper home m-auto max-w-4xl rounded-lg shadow-lg overflow-hidden relative p-4">
+        <div class="swiper-wrapper">
+            <?php
+            $directory = "src/images/carousel/";
+            $images = glob($directory . "*.{jpg,jpeg,png,gif}", GLOB_BRACE);
+            foreach ($images as $image) {
+                echo '<div class="swiper-slide">';
+                echo '<img src="' . $image . '" alt="Gambar Promo" class="w-full h-auto object-cover rounded-lg">';
+                echo '</div>';
+            }
+            ?>
         </div>
+        <div class="absolute bottom-4 right-4 z-20">
+            <button class="mt-2 px-4 py-2 bg-orange-500 rounded-lg text-white">Lihat Semua</button>
+        </div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-pagination"></div>
+    </div>
     <!-- Recomendation -->
-    <?php include('Recomendation.php'); ?> 
+    <?php include('Recomendation.php'); ?>
     <!-- Recomemdation End-->
-     
+
     <!-- Navigasi Bawah -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-md p-4 flex justify-around z-1000">
         <div class="flex flex-col items-center">

@@ -9,10 +9,15 @@
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-PewterBlue{
+            background-color: #8aa6b3;
+        }
+    </style>
 </head>
 
 <body>
-    <footer class="bg-green-900 text-white pl-4 pr-4 py-10">
+    <footer class="bg-PewterBlue text-white pl-4 pr-4 py-10">
         <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
             <!-- Address and Join as Reseller -->
             <div class="flex flex-col justify-between">

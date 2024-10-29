@@ -3,7 +3,7 @@
 include('db.php'); // Pastikan ini menghubungkan ke database Anda
 
 // Ambil product_id dari URL
-$product_id = isset($_GET['product_id']) ? (int)$_GET['product_id'] : 0;
+$product_id = isset($_GET['product_id']) ? (int) $_GET['product_id'] : 0;
 
 // Query untuk mendapatkan detail produk
 $query = $konek->prepare("SELECT * FROM product WHERE product_id = ?");
@@ -57,7 +57,9 @@ $reviews = [
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title><?= htmlspecialchars($product['name']); ?></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Custom animation styles */
@@ -93,8 +95,10 @@ $reviews = [
     <?php include('Header.php'); ?>
     <div class="bg-gray-100 flex items-center justify-center p-2">
         <div id="product-card" class="relative bg-white shadow-lg rounded-lg overflow-hidden card">
-            <div class="bg-blue-500 h-70 flex items-center justify-center flex-1 cursor-pointer" onclick="toggleDetails()">
-                <img id="product-image" src="<?= htmlspecialchars($product['image']); ?>" alt="<?= htmlspecialchars($product['name']); ?>" class="h-32">
+            <div class="bg-blue-500 h-70 flex items-center justify-center flex-1 cursor-pointer"
+                onclick="toggleDetails()">
+                <img id="product-image" src="<?= htmlspecialchars($product['image']); ?>"
+                    alt="<?= htmlspecialchars($product['name']); ?>" class="h-32">
             </div>
             <div id="product-details" class="product-details bg-white shadow-lg">
                 <div class="p-2">
@@ -105,7 +109,7 @@ $reviews = [
                     <div class="mt-2">
                         <div>
                             <span class="text-sm font-semibold">Stock Tersedia:</span>
-                            <span class="text-sm"><?= implode(', ', (array)$product['stock']); ?></span>
+                            <span class="text-sm"><?= implode(', ', (array) $product['stock']); ?></span>
                         </div>
                         <span class="text-sm font-semibold">Terjual:</span>
                         <span class="text-sm font-semibold"><?= htmlspecialchars($product['terjual']); ?>0+</span>
@@ -113,7 +117,8 @@ $reviews = [
                     <!-- Modifikasi bagian tombol Buy -->
                     <div class="flex w-full mt-2">
                         <div class="flex items-center">
-                            <a href="javascript:void(0);" onclick="openModal()" class="bg-blue-500 text-white ml-auto px-4 py-2 rounded">Buy</a>
+                            <a href="javascript:void(0);" onclick="openModal()"
+                                class="bg-blue-500 text-white ml-auto px-4 py-2 rounded">Buy</a>
                         </div>
                     </div>
                 </div>
@@ -161,9 +166,9 @@ $reviews = [
                 formData.append('quantity', quantity);
 
                 fetch('add_order_product.php', {
-                        method: 'POST',
-                        body: formData
-                    })
+                    method: 'POST',
+                    body: formData
+                })
                     .then(response => response.json()) // Parse JSON response
                     .then(data => {
                         if (data.success) {
@@ -195,8 +200,8 @@ $reviews = [
 
                 // Menggunakan fetch dengan metode GET
                 fetch(checkoutUrl, {
-                        method: 'GET',
-                    })
+                    method: 'GET',
+                })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
@@ -216,7 +221,7 @@ $reviews = [
     <div class="bg-gray-100 py-8 px-4">
         <div class="max-w-2xl mx-auto bg-white p-6 shadow-md rounded-md">
             <div class="mb-4">
-                <h2 class="text-lg font-semibold">ULASAN PILIHAN</h2>
+                <h2 class="text-xl font-semibold text-center">ULASAN PILIHAN</h2>
             </div>
             <?php foreach ($reviews as $review): ?>
                 <div class="border-b border-gray-200 py-4">
@@ -224,7 +229,8 @@ $reviews = [
                     <div class="flex items-center mb-2">
                         <?php for ($i = 0; $i < $review['rating']; $i++): ?>
                             <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.717 5.3h5.564c.969 0 1.371 1.24.588 1.81l-4.507 3.356 1.718 5.299c.3.921-.755 1.688-1.539 1.118L10 14.347l-4.507 3.356c-.784.57-1.838-.197-1.539-1.118l1.718-5.299-4.507-3.356c-.784-.57-.38-1.81.588-1.81h5.564l1.717-5.3z" />
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.717 5.3h5.564c.969 0 1.371 1.24.588 1.81l-4.507 3.356 1.718 5.299c.3.921-.755 1.688-1.539 1.118L10 14.347l-4.507 3.356c-.784.57-1.838-.197-1.539-1.118l1.718-5.299-4.507-3.356c-.784-.57-.38-1.81.588-1.81h5.564l1.717-5.3z" />
                             </svg>
                         <?php endfor; ?>
                         <span class="text-sm text-gray-500 ml-2"><?= htmlspecialchars($review['time']); ?></span>
@@ -236,24 +242,31 @@ $reviews = [
     </div>
 
     <!-- event buy modal -->
-    // Modifications to the modal to include a checkbox
     <div id="buyModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
         <div class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-semibold">Confirm Purchase</h3>
-                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">&times;</button>
+                <button onclick="closeModal()"
+                    class="bg-red-500 rounded-full border-0 w-6 h-6 flex items-center justify-center focus:outline-none transition-transform duration-200 ease-in-out hover:scale-110 active:scale-90">
+                    <i class="ri-close-line text-white text-3xl"></i>
+                </button>
+
             </div>
             <div class="mb-4">
                 <p><strong>Product:</strong> <?= htmlspecialchars($product['name']); ?></p>
                 <span class="text-sm font-semibold">Jumlah Pesanan:</span>
-                <div class="flex items-center mx-2">
-                    <button id="decrease-quantity" class="bg-gray-200 text-gray-700 rounded-l-md px-2" onclick="changeQuantity(-1)">-</button>
-                    <input id="order-quantity" type="number" value="<?= $order_quantity; ?>" min="1" class="border text-center w-16 mx-1" readonly>
-                    <button id="increase-quantity" class="bg-gray-200 text-gray-700 rounded-r-md px-2" onclick="changeQuantity(1)">+</button>
+                <div class="flex items-center mx-0">
+                    <button id="decrease-quantity" class="bg-gray-200 text-gray-700 rounded-l-md px-2"
+                        onclick="changeQuantity(-1)">-</button>
+                    <input id="order-quantity" type="number" value="<?= $order_quantity; ?>" min="1"
+                        class="border text-center w-16 mx-1" readonly>
+                    <button id="increase-quantity" class="bg-gray-200 text-gray-700 rounded-r-md px-2"
+                        onclick="changeQuantity(1)">+</button>
                 </div>
             </div>
             <div class="flex justify-end">
-                <button onclick="addToCart()" class="bg-gray-300 text-gray-700 py-2 px-4 mr-2 rounded">Add to Cart</button>
+                <button onclick="addToCart()" class="bg-gray-300 text-gray-700 py-2 px-4 mr-2 rounded">Add to
+                    Cart</button>
                 <button onclick="checkout()" class="bg-blue-500 text-white py-2 px-4 rounded">Checkout</button>
             </div>
         </div>
