@@ -1,111 +1,61 @@
 <?php
-include('db.php');
+session_start();
+include('db.php'); // Pastikan koneksi database terhubung
 
-// Get the request method
-$requestMethod = $_SERVER['REQUEST_METHOD'];
+// Ambil input JSON yang dikirim dari JavaScript
+$data = json_decode(file_get_contents('php://input'), true);
 
-if ($requestMethod == 'POST') {
-    // Check if products are selected for checkout
-    if (isset($_POST['selected_products']) && !empty($_POST['selected_products'])) {
-        $selectedProducts = $_POST['selected_products'];
-        $productIds = $_POST['product_ids'];
-        $quantities = $_POST['quantities'];
+if (isset($data['order_id']) && isset($data['user_id']) && isset($data['items']) && isset($data['payment_method'])) {
+    $transaksi_id = time(); // Generate ID untuk transaksi
+    $user_id = $data['user_id'];
+    $items = $data['items'];
+    $payment_method = $data['payment_method']; // Ambil metode pembayaran dari data
+    $total_harga = 0; // Inisialisasi total harga
 
-        $success = true;
-        $messages = [];
-
-        foreach ($selectedProducts as $cartId) {
-            $productId = $productIds[$cartId];
-            $quantity = $quantities[$cartId];
-
-            // Check stock availability and get product name
-            $productQuery = $konek->prepare("SELECT name, stock FROM product WHERE product_id = ?");
-            $productQuery->bind_param("i", $productId);
-            $productQuery->execute();
-            $productResult = $productQuery->get_result();
-
-            if ($productResult->num_rows > 0) {
-                $productRow = $productResult->fetch_assoc();
-                $productName = $productRow['name'];
-                $availableStock = $productRow['stock'];
-
-                if ($availableStock >= $quantity) {
-                    // Reduce stock in the database
-                    $updateStockQuery = $konek->prepare("UPDATE product SET stock = stock - ? WHERE product_id = ?");
-                    $updateStockQuery->bind_param("ii", $quantity, $productId);
-
-                    if ($updateStockQuery->execute() && $updateStockQuery->affected_rows > 0) {
-                        // Successfully reduced stock
-                        $messages[] = "$productName Berhasil Dicheckout.";
-
-                        // Optional: Remove from cart after successful checkout
-                        $removeQuery = $konek->prepare("DELETE FROM cart WHERE cart_id = ?");
-                        $removeQuery->bind_param("i", $cartId);
-                        $removeQuery->execute();
-                    } else {
-                        $success = false;
-                        $messages[] = "Failed to checkout $productName: Error occurred.";
-                    }
-                } else {
-                    $success = false;
-                    $messages[] = "Insufficient stock for $productName.";
-                }
-            } else {
-                $success = false;
-                $messages[] = "Product ID $productId not found.";
-            }
-        }
-
-        // Redirect to Home.php if checkout was successful
-        if ($success) {
-            // Prepare the success message
-            $successMessage = implode(", ", $messages);
-            echo "<script>
-                      alert('$successMessage');
-                      window.location.href = 'Home.php';
-                    </script>";
-        } else {
-            echo json_encode(['success' => false, 'messages' => $messages]);
-        }
-    } else {
-        echo json_encode(['success' => false, 'message' => 'No products selected for checkout']);
+    // Hitung total harga berdasarkan item
+    foreach ($items as $item) {
+        $total_harga += $item['price'] * $item['quantity'];
     }
-} elseif ($requestMethod == 'GET') {
-    // If it's a direct checkout for a specific product
-    $product_id = isset($_GET['checkout_product']) ? (int)$_GET['checkout_product'] : null;
-    $quantity = isset($_GET['quantity']) ? (int)$_GET['quantity'] : null;
 
-    if ($product_id && $quantity) {
-        // Check stock availability
-        $stockQuery = $konek->prepare("SELECT stock FROM product WHERE product_id = ?");
-        $stockQuery->bind_param("i", $product_id);
-        $stockQuery->execute();
-        $stockResult = $stockQuery->get_result();
+    // Mulai transaksi database
+    $konek->begin_transaction();
 
-        if ($stockResult->num_rows > 0) {
-            $stockRow = $stockResult->fetch_assoc();
-            $availableStock = $stockRow['stock'];
+    try {
+        // 1. Tambahkan data transaksi ke tabel riwayat_transaksi
+        $transaksiQuery = $konek->prepare("INSERT INTO riwayat_transaksi (transaksi_id, user_id, tanggal, total_harga, status, metode_pembayaran, alamat_pengiriman, catatan) VALUES (?, ?, NOW(), ?, 'completed', ?, '', '')");
+        $transaksiQuery->bind_param("iids", $transaksi_id, $user_id, $total_harga, $payment_method);
+        $transaksiQuery->execute();
 
-            if ($availableStock >= $quantity) {
-                // Reduce stock in the database
-                $updateStockQuery = $konek->prepare("UPDATE product SET stock = stock - ? WHERE product_id = ?");
-                $updateStockQuery->bind_param("ii", $quantity, $product_id);
+        // 2. Loop melalui setiap item untuk mengurangi stok dan menambahkan detail transaksi
+        foreach ($items as $item) {
+            $product_id = $item['id'];
+            $quantity = $item['quantity'];
 
-                if ($updateStockQuery->execute() && $updateStockQuery->affected_rows > 0) {
-                    // Successfully reduced stock
-                    echo json_encode(['success' => true, 'message' => "Product ID $product_id checked out successfully."]);
-                } else {
-                    echo json_encode(['success' => false, 'message' => "Failed to checkout Product ID $product_id: Error occurred."]);
-                }
-            } else {
-                echo json_encode(['success' => false, 'message' => "Insufficient stock for Product ID $product_id."]);
-            }
-        } else {
-            echo json_encode(['success' => false, 'message' => "Product ID $product_id not found."]);
+            // 2.1 Kurangi stok dari tabel produk
+            $updateStockQuery = $konek->prepare("UPDATE product SET stock = stock - ? WHERE product_id = ?");
+            $updateStockQuery->bind_param("ii", $quantity, $product_id);
+            $updateStockQuery->execute();
+
+            // 2.2 Tambahkan detail transaksi ke tabel detail_transaksi
+            $detailQuery = $konek->prepare("INSERT INTO detail_transaksi (transaksi_id, product_id, jumlah, harga_satuan) VALUES (?, ?, ?, ?)");
+            $harga_satuan = $item['price'];
+            $detailQuery->bind_param("iidi", $transaksi_id, $product_id, $quantity, $harga_satuan);
+            $detailQuery->execute();
         }
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Product ID and quantity are required for direct checkout.']);
+
+        // 3. Hapus item dari tabel cart
+        $deleteCartQuery = $konek->prepare("DELETE FROM cart WHERE user_id = ?");
+        $deleteCartQuery->bind_param("i", $user_id);
+        $deleteCartQuery->execute();
+
+        // Commit transaksi
+        $konek->commit();
+        echo json_encode(['success' => true, 'message' => 'Transaksi berhasil diproses!']);
+    } catch (Exception $e) {
+        // Rollback transaksi jika ada yang gagal
+        $konek->rollback();
+        echo json_encode(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()]);
     }
 } else {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+    echo json_encode(['success' => false, 'message' => 'Data tidak lengkap.']);
 }

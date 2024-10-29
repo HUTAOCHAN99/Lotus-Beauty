@@ -139,7 +139,7 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
             <h3 class="card-title">Navigasi</h3>
             <ul class="space-y-2 pl-4 list-disc">
                 <li><a href="profile.php" class="nav-link">Pengaturan Profil</a></li>
-                <li><a href="transactions.php" class="nav-link">Riwayat Transaksi</a></li>
+                <li><a href="transaction.php" class="nav-link">Riwayat Transaksi</a></li>
                 <li><a href="setting.php" class="nav-link">Pengaturan Akun</a></li>
 
                 <!-- Additional options for admin -->

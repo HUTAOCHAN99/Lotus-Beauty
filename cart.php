@@ -100,8 +100,9 @@ $totalPrice = 0;
                 <?php endwhile; ?>
             </tbody>
         </table>
+        
         <!-- Checkout Form -->
-        <form action="checkout.php" method="POST">
+        <form action="placeOrder.php" method="POST">
             <!-- Cart items display -->
             <?php if ($cartResult->num_rows > 0): ?>
                 <div class="mt-4">
