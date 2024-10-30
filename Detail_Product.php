@@ -77,7 +77,7 @@ $reviews = [
             transition: all 0.5s ease-in-out;
             display: flex;
             width: 250px;
-            height: 300px;
+            height: 320px;
         }
 
         .card.expanded {
@@ -115,13 +115,14 @@ $reviews = [
                         <span class="text-sm font-semibold"><?= htmlspecialchars($product['terjual']); ?>0+</span>
                     </div>
                     <!-- Modifikasi bagian tombol Buy -->
-                    <div class="flex w-full mt-2">
+                    <div class="flex w-full py-4">
                         <div class="flex items-center">
                             <a href="javascript:void(0);" onclick="openModal()"
                                 class="bg-blue-500 text-white ml-auto px-4 py-2 rounded">Buy</a>
                         </div>
                     </div>
                 </div>
+                
             </div>
         </div>
         <script>

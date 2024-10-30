@@ -26,6 +26,7 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css">
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -51,10 +52,19 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
             color: #3b82f6;
             font-weight: 500;
             transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
         }
 
         .nav-link:hover {
             color: #2563eb;
+        }
+
+        .nav-icon {
+            margin-right: 0.5rem;
+            font-size: 1.25rem;
+            /* Adjust icon size */
         }
 
         .back-button,
@@ -81,7 +91,7 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
 
     <script>
         // Check if success parameter is set and show alert
-        window.onload = function() {
+        window.onload = function () {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('success')) {
                 alert("Data berhasil ditambahkan!");
@@ -137,21 +147,29 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
         <!-- Navigation Links -->
         <div class="dashboard-card">
             <h3 class="card-title">Navigasi</h3>
-            <ul class="space-y-2 pl-4 list-disc">
-                <li><a href="profile.php" class="nav-link">Pengaturan Profil</a></li>
-                <li><a href="transaction.php" class="nav-link">Riwayat Transaksi</a></li>
-                <li><a href="setting.php" class="nav-link">Pengaturan Akun</a></li>
+            <ul class="space-y-2 pl-">
+                <li><a href="profile.php" class="nav-link"><i class="ri-user-fill nav-icon"></i> Pengaturan Profil</a>
+                </li>
+                <li><a href="transaction.php" class="nav-link"><i class="ri-history-fill nav-icon"></i> Riwayat
+                        Transaksi</a></li>
+                <li><a href="setting.php" class="nav-link"><i class="ri-settings-3-fill nav-icon"></i> Pengaturan
+                        Akun</a></li>
 
                 <!-- Additional options for admin -->
                 <?php if ($user['role'] == 'admin'): ?>
-                    <li><a href="user_management.php" class="nav-link">Manajemen Pengguna</a></li>
-                    <li><a href="reports.php" class="nav-link">Laporan dan Statistik</a></li>
-                    <!-- Place this code where you want the buttons to be displayed on the dashboard -->
-                    <div class="dashboard-card flex space-x-4 mt-6">
-                        <a href="upload.php?category=resep" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                    <li><a href="user_management.php" class="nav-link"><i class="ri-admin-fill nav-icon"></i> Manajemen
+                            Pengguna</a></li>
+                    <li><a href="reports.php" class="nav-link"><i class="ri-file-list-3-fill nav-icon"></i> Laporan dan
+                            Statistik</a></li>
+                    <div class="dashboard-card flex space-x-4 mt-6 p-4 border border-gray-300 rounded-lg shadow-md">
+                        <a href="upload.php?category=resep"
+                            class="flex items-center bg-blue-500 text-white rounded-lg px-4 py-2 transition duration-300 ease-in-out hover:bg-blue-600 transform hover:scale-105">
+                            <i class="ri-upload-2-line mr-2"></i> <!-- Ikon untuk Upload Resep -->
                             Upload Resep
                         </a>
-                        <a href="upload.php?category=obat-herbal" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+                        <a href="upload.php?category=obat-herbal"
+                            class="flex items-center bg-green-500 text-white rounded-lg px-4 py-2 transition duration-300 ease-in-out hover:bg-green-600 transform hover:scale-105">
+                            <i class="ri-upload-2-line mr-2"></i> <!-- Ikon untuk Upload Obat Herbal -->
                             Upload Obat Herbal
                         </a>
                     </div>
@@ -161,12 +179,20 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
         </div>
 
         <!-- Account Settings and Security -->
-        <div class="dashboard-card flex items-center justify-between">
-            <a href="logout.php" class="logout-button text-red-600 hover:bg-red-500 bg-red-100 rounded-md px-4 py-2">Logout</a>
-            <a href="Home.php" class="back-button bg-gray-800 text-white rounded-md px-4 py-2 hover:bg-gray-700">
+        <div
+            class="dashboard-card flex items-center justify-between p-4 border border-gray-300 rounded-lg shadow-md mt-6">
+            <a href="logout.php"
+                class="flex items-center text-red-600 bg-red-100 hover:bg-red-500 rounded-md px-4 py-2 transition duration-300 ease-in-out">
+                <i class="ri-logout-box-line mr-2"></i> <!-- Ikon Logout -->
+                Logout
+            </a>
+            <a href="Home.php"
+                class="flex items-center bg-gray-800 text-white rounded-md px-4 py-2 hover:bg-gray-700 transition duration-300 ease-in-out">
+                <i class="ri-home-2-line mr-2"></i> <!-- Ikon Kembali ke Halaman Utama -->
                 Kembali ke Halaman Utama
             </a>
         </div>
+
     </div>
 </body>
 

@@ -32,27 +32,44 @@ $result_transaksi = $stmt_transaksi->get_result();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>Riwayat Transaksi</title>
     <link rel="stylesheet" href="style.css"> <!-- Link ke file CSS jika diperlukan -->
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
         table {
-            width: 100%;
+            width: 90%;
+            margin: 20px auto;
             border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: left;
+            border-bottom: 1px solid #ddd;
+            justify-items: center;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #7AB2D3;
+            color: white;
         }
         .btn-detail {
-            background-color: #4CAF50; /* Hijau */
+            background-color: #7AB2D3; 
             color: white;
             padding: 5px 10px;
             text-decoration: none;
             border-radius: 5px;
+            border: none;
             cursor: pointer;
         }
         /* Modal styles */
@@ -65,15 +82,15 @@ $result_transaksi = $stmt_transaksi->get_result();
             width: 100%; /* Full width */
             height: 100%; /* Full height */
             overflow: auto; /* Enable scroll if needed */
-            background-color: rgb(0,0,0); /* Fallback color */
-            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
         }
         .modal-content {
             background-color: #fefefe;
             margin: 15% auto; /* 15% from the top and centered */
             padding: 20px;
-            border: 1px solid #888;
+            border-radius: 5px;
             width: 80%; /* Could be more or less, depending on screen size */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         .close {
             color: #aaa;
@@ -84,14 +101,36 @@ $result_transaksi = $stmt_transaksi->get_result();
         .close:hover,
         .close:focus {
             color: black;
-            text-decoration: none;
             cursor: pointer;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            table {
+                width: 100%;
+            }
+            .modal-content {
+                width: 90%; /* Lebar modal lebih kecil pada perangkat mobile */
+            }
+            th, td {
+                padding: 8px; /* Mengurangi padding di tabel untuk tampilan mobile */
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem; /* Ukuran font lebih kecil pada perangkat mobile */
+            }
+            .btn-detail {
+                padding: 8px 5px; /* Mengurangi padding pada tombol untuk perangkat kecil */
+                font-size: 0.9rem; /* Ukuran font tombol lebih kecil */
+            }
         }
     </style>
 </head>
 <body>
 <?php include('Header.php'); ?>
-<h1>Riwayat Transaksi</h1>
+<h2 class="font-semibold text-center text-lg pt-4">Riwayat Transaksi</h2>
 
 <table>
     <thead>
@@ -124,7 +163,7 @@ $result_transaksi = $stmt_transaksi->get_result();
             <?php endwhile; ?>
         <?php else: ?>
             <tr>
-                <td colspan="8">Tidak ada riwayat transaksi ditemukan.</td>
+                <td colspan="8" style="text-align:center;">Tidak ada riwayat transaksi ditemukan.</td>
             </tr>
         <?php endif; ?>
     </tbody>
@@ -143,7 +182,6 @@ $result_transaksi = $stmt_transaksi->get_result();
 
 <script>
 function showModal(transaksi_id) {
-    // Ambil detail transaksi dari server menggunakan AJAX
     var xhr = new XMLHttpRequest();
     xhr.open('GET', 'detail_transaksi.php?transaksi_id=' + transaksi_id, true);
     xhr.onload = function() {

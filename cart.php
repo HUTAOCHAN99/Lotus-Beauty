@@ -48,7 +48,7 @@ $totalPrice = 0;
 
     <script>
         // Check if success parameter is set and show alert
-        window.onload = function() {
+        window.onload = function () {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('success')) {
                 alert("Data berhasil ditambahkan!");
@@ -59,30 +59,31 @@ $totalPrice = 0;
 
 <body>
     <?php include('Header.php'); ?>
-    <div class="max-w-4xl w-full mx-auto p-6">
+    <div class="max-w-4xl w-full mx-auto p-6 bg-white shadow-md rounded-lg mt-6">
         <h2 class="text-3xl font-bold text-gray-800">Keranjang Belanja</h2>
 
-
-        <table class="min-w-full mt-6 bg-white border border-gray-200">
-            <thead>
+        <table class="min-w-full mt-6 ">
+            <thead class="bg-gray-200">
                 <tr>
-                    <th class="py-2 px-4 border-b">Pilih</th>
-                    <th class="py-2 px-4 border-b">Produk</th>
-                    <th class="py-2 px-4 border-b">Kuantitas</th>
-                    <th class="py-2 px-4 border-b">Harga</th>
-                    <th class="py-2 px-4 border-b">Total</th>
-                    <th class="py-2 px-4 border-b">Aksi</th>
+                    <th class="py-2 px-4 border-b text-left">Pilih</th>
+                    <th class="py-2 px-4 border-b text-left">Produk</th>
+                    <th class="py-2 px-4 border-b text-left">Kuantitas</th>
+                    <th class="py-2 px-4 border-b text-left">Harga</th>
+                    <th class="py-2 px-4 border-b text-left">Total</th>
+                    <th class="py-2 px-4 border-b text-left">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 <?php while ($row = $cartResult->fetch_assoc()):
                     $itemTotal = $row['quantity'] * $row['price'];
                     $totalPrice += $itemTotal; // Accumulate total price
-                ?>
-                    <tr>
+                    ?>
+                    <tr class="hover:bg-gray-100">
                         <td class="py-2 px-4 border-b">
-                            <input type="checkbox" name="selected_products[]" value="<?= $row['cart_id'] ?>" onchange="updateTotal()">
-                            <input type="hidden" name="product_ids[<?= $row['cart_id'] ?>]" value="<?= $row['product_id'] ?>">
+                            <input type="checkbox" name="selected_products[]" value="<?= $row['cart_id'] ?>"
+                                onchange="updateTotal()">
+                            <input type="hidden" name="product_ids[<?= $row['cart_id'] ?>]"
+                                value="<?= $row['product_id'] ?>">
                             <input type="hidden" name="quantities[<?= $row['cart_id'] ?>]" value="<?= $row['quantity'] ?>">
                         </td>
                         <td class="py-2 px-4 border-b"><?= htmlspecialchars($row['name']) ?></td>
@@ -90,7 +91,6 @@ $totalPrice = 0;
                         <td class="py-2 px-4 border-b">Rp <?= number_format($row['price'], 2, ',', '.') ?></td>
                         <td class="py-2 px-4 border-b">Rp <?= number_format($itemTotal, 2, ',', '.') ?></td>
                         <td class="py-2 px-4 border-b">
-                            <!-- bagian ini yang salah dia form dalam form -->
                             <form action="remove_from_cart.php" method="POST" style="display: inline;">
                                 <input type="hidden" name="cart_id" value="<?= $row['cart_id'] ?>">
                                 <button type="submit" class="text-red-500 hover:underline">Hapus</button>
@@ -100,19 +100,26 @@ $totalPrice = 0;
                 <?php endwhile; ?>
             </tbody>
         </table>
-        
+
         <!-- Checkout Form -->
-        <form action="placeOrder.php" method="POST">
+        <form action="placeOrder.php" method="POST" class="py-4">
             <!-- Cart items display -->
             <?php if ($cartResult->num_rows > 0): ?>
                 <div class="mt-4">
-                    <strong>Total Pembayaran:</strong> Rp <span id="total-payment"><?= number_format($totalPrice, 2, ',', '.') ?></span>
+                    <strong>Total Pembayaran:</strong> Rp <span
+                        id="total-payment"><?= number_format($totalPrice, 2, ',', '.') ?></span>
                 </div>
-                <button type="submit" class="mt-4 bg-blue-500 text-white py-2 px-4 rounded">Checkout</button>
+                <button type="submit"
+                    class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">Checkout</button>
             <?php else: ?>
-                <p class="mt-6">Keranjang Anda kosong.</p>
+                <p class="mt-6 text-red-500">Keranjang Anda kosong.</p>
             <?php endif; ?>
         </form>
+        <a href="Product_Page.php"
+            class="flex items-center bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
+            <i class="ri-shopping-cart-fill mr-2"></i>
+            Belanja Sekarang
+        </a>
 
     </div>
 

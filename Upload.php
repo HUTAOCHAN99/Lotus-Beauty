@@ -30,8 +30,6 @@ $herbalCategories = [
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $created_at = date("Y-m-d H:i:s");
     $updated_at = date("Y-m-d H:i:s");
-
-    // Retrieve the selected herbal category
     $selected_category = htmlspecialchars($_POST['herbal_category']);
 
     if ($category === 'obat-herbal') {
@@ -40,18 +38,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $price = htmlspecialchars($_POST['price']);
         $description = htmlspecialchars($_POST['description']);
         $stock = htmlspecialchars($_POST['stock']);
-        
+
         // Handle image upload
         $image = $_FILES['image'];
-        $imagePath = 'img/product/' . basename($image['name']); // Set image path for products
+        $imagePath = 'img/product/' . basename($image['name']);
 
-        // Move the uploaded file to the desired directory
         if (move_uploaded_file($image['tmp_name'], $imagePath)) {
-            // Insert herbal medicine data with image path
-            $sql = "INSERT INTO product (name, category, price, description, stock, image, created_at, updated_at)
-                    VALUES ('$name', '$selected_category', '$price', '$description', '$stock', '$imagePath', '$created_at', '$updated_at')";
+            $stmt = $konek->prepare("INSERT INTO product (name, category, price, description, stock, image, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssississ", $name, $selected_category, $price, $description, $stock, $imagePath, $created_at, $updated_at);
+            $stmt->execute();
         } else {
-            echo "<p>Error uploading image.</p>";
+            echo "<p class='text-red-500'>Error uploading image.</p>";
             exit();
         }
     } elseif ($category === 'resep') {
@@ -60,30 +57,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $doctor_name = htmlspecialchars($_POST['doctor_name']);
         $patient_name = htmlspecialchars($_POST['patient_name']);
         $usage_instructions = htmlspecialchars($_POST['usage_instructions']);
-        $product_id = htmlspecialchars($_POST['product_id']); // Ambil product_id yang dipilih
-        
-        // Handle image upload for prescription
-        $image = $_FILES['image']; // Get the uploaded image for the prescription
-        $imagePath = 'img/resep/' . basename($image['name']); // Set image path for prescriptions
+        $product_id = htmlspecialchars($_POST['product_id']);
 
-        // Move the uploaded file to the desired directory
+        $image = $_FILES['image'];
+        $imagePath = 'img/resep/' . basename($image['name']);
+
         if (move_uploaded_file($image['tmp_name'], $imagePath)) {
-            // Insert prescription data with image path
-            $sql = "INSERT INTO prescription (nama_resep, doctor_name, patient_name, usage_instructions, product_id, created_at, updated_at, image_url)
-                    VALUES ('$nama_resep', '$doctor_name', '$patient_name', '$usage_instructions', '$product_id', '$created_at', '$updated_at', '$imagePath')";
+            $stmt = $konek->prepare("INSERT INTO prescription (nama_resep, doctor_name, patient_name, usage_instructions, product_id, created_at, updated_at, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssiiss", $nama_resep, $doctor_name, $patient_name, $usage_instructions, $product_id, $created_at, $updated_at, $imagePath);
+            $stmt->execute();
         } else {
-            echo "<p>Error uploading image.</p>";
+            echo "<p class='text-red-500'>Error uploading image.</p>";
             exit();
         }
     }
 
-    // Execute SQL query and redirect to dashboard
-    if ($konek->query($sql) === TRUE) {
-        header("Location: dashboard.php?success=1"); // Redirect ke dashboard dengan parameter success
-        exit();
-    } else {
-        echo "<p>Error: " . $sql . "<br>" . $konek->error . "</p>";
-    }
+    header("Location: dashboard.php?success=1");
+    exit();
 }
 ?>
 
@@ -132,24 +122,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
 
                 <div class="mb-4">
-                    <label class="block text-gray-700">Doctor Name</label>
+                    <label class="block text-gray-700">Nama Dokter</label>
                     <input type="text" name="doctor_name" class="w-full px-4 py-2 border rounded-lg" required>
                 </div>
 
                 <div class="mb-4">
-                    <label class="block text-gray-700">Patient Name</label>
+                    <label class="block text-gray-700">Nama Pasien</label>
                     <input type="text" name="patient_name" class="w-full px-4 py-2 border rounded-lg" required>
                 </div>
 
                 <div class="mb-4">
-                    <label class="block text-gray-700">Usage Instructions</label>
+                    <label class="block text-gray-700">Petunjuk Penggunaan</label>
                     <textarea name="usage_instructions" class="w-full px-4 py-2 border rounded-lg" required></textarea>
                 </div>
 
                 <div class="mb-4">
-                    <label class="block text-gray-700">Select Herbal Product</label>
+                    <label class="block text-gray-700">Pilih Produk Herbal</label>
                     <select name="product_id" class="w-full px-4 py-2 border rounded-lg" required>
-                        <option value="">-- Choose a product --</option>
+                        <option value="">-- Pilih Produk --</option>
                         <?php foreach ($products as $product): ?>
                             <option value="<?php echo $product['product_id']; ?>"><?php echo $product['name']; ?></option>
                         <?php endforeach; ?>
@@ -188,13 +178,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="file" name="image" accept="image/*" class="w-full px-4 py-2 border rounded-lg" required>
                 </div>
 
-            <?php else: ?>
-                <p class="text-center text-red-500">Invalid category selected.</p>
             <?php endif; ?>
 
-            <div class="text-center">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Upload</button>
-            </div>
+            <button type="submit" class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 rounded-lg">
+                Unggah
+            </button>
         </form>
     </div>
 </body>

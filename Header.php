@@ -10,13 +10,20 @@
     <style>
         /* Smooth transition for search bar */
         .search-bar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             width: 0;
+            opacity: 0;
+            visibility: hidden;
             overflow: hidden;
-            transition: width 0.3s ease-in-out;
+            transition: width 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
         }
 
         .search-bar-container.open {
-            width: 250px; /* Adjust width as needed */
+            width: 250px; /* Sesuaikan dengan lebar yang diinginkan */
+            opacity: 1;
+            visibility: visible;
         }
 
         .bg-powderBlue {
@@ -64,7 +71,6 @@
             <div class="hidden md:flex space-x-6">
                 <a href="Home.php" class="text-green-900 hover:font-bold">Home</a>
                 <a href="Product_Page.php" class="text-green-900 hover:font-bold">Produk</a>
-                <a href="#" class="text-green-900 hover:font-bold">Shop</a>
                 <a href="Consultation_Page.php" class="text-green-900 hover:font-bold">Konsultasi</a>
                 <a href="Recipe.php" class="text-green-900 hover:font-bold">Resep</a>
                 <a href="#" class="text-green-900 hover:font-bold">About Us</a>
@@ -74,10 +80,10 @@
         <!-- Right Side (Icons + Search Bar) -->
         <div class="flex items-center space-x-4">
             <!-- Search Bar (Initially Hidden) -->
-            <div id="search-bar" class="search-bar-container flex items-center bg-white shadow-md rounded-md p-1">
+            <div id="search-bar" class="search-bar-container bg-white shadow-md rounded-md p-1">
                 <input type="text" class="w-full border-none focus:outline-none rounded-md p-2" placeholder="Search for products...">
                 <button id="search-submit" class="text-green-900 hover:text-black ml-2">
-                    <i class="ri-check-line ri-lg"></i>
+                    <i class="ri-search-line ri-lg"></i>
                 </button>
                 <button id="search-cancel" class="text-green-900 hover:text-black ml-2">
                     <i class="ri-close-line ri-lg"></i>
@@ -127,24 +133,23 @@
             mobileMenu.classList.toggle("open");
         });
 
-        // Toggle search bar
+        // Menampilkan search bar saat search icon diklik
         searchToggle.addEventListener("click", () => {
-            searchBar.classList.toggle("open");
-            searchToggle.classList.add("hidden"); // Hide the search icon
+            searchBar.classList.add("open");
+            searchToggle.classList.add("hidden"); // Sembunyikan icon search
         });
 
-        // Handle search submit (to be implemented)
-        document.getElementById("search-submit").addEventListener("click", () => {
-            alert("Searching for: " + document.querySelector('#search-bar input').value);
-        });
-
-        // Handle cancel search
+        // Menyembunyikan search bar saat tombol cancel diklik
         searchCancel.addEventListener("click", () => {
-            searchBar.classList.remove("open");
-            searchToggle.classList.remove("hidden"); // Show the search icon again
-            document.querySelector('#search-bar input').value = ""; // Clear the input
+            // Tambahkan penundaan sebelum menyembunyikan search bar dan menampilkan ikon kembali
+            setTimeout(() => {
+                searchBar.classList.remove("open");
+                searchToggle.classList.remove("hidden"); // Tampilkan kembali icon search
+                document.querySelector('#search-bar input').value = ""; // Kosongkan input
+            }, 300); // Sesuaikan dengan durasi transisi CSS
         });
     </script>
+
 </body>
 
 </html>

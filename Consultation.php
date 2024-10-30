@@ -13,6 +13,7 @@ $type = isset($_GET['type']) ? $_GET['type'] : '';
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
+
 <div class="w-full max-w-md bg-white shadow-lg rounded-lg overflow-hidden">
   
   <!-- Header -->
