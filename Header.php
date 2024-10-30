@@ -8,26 +8,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
-        /* For smooth mobile menu and search bar toggle */
-        .mobile-menu,
-        .search-bar {
-            display: none;
-            transition: max-height 0.3s ease-in-out;
-            margin-top: 1rem; /* Add margin to create space below the navbar */
+        /* Smooth transition for search bar */
+        .search-bar-container {
+            width: 0;
+            overflow: hidden;
+            transition: width 0.3s ease-in-out;
         }
 
-        .mobile-menu.open,
-        .search-bar.open {
-            display: block;
-            max-height: 300px;
+        .search-bar-container.open {
+            width: 250px; /* Adjust width as needed */
         }
 
         .bg-powderBlue {
             background-color: #B0E0E6;
-        }
-
-        .text-creamyBeige {
-            color: #FFF5E1;
         }
 
         /* Fixed navbar styling */
@@ -36,26 +29,23 @@
             top: 0;
             left: 0;
             right: 0;
-            z-index: 50; /* Ensure it's above other content */
+            z-index: 50;
         }
 
-        /* Add padding to the top of the body to avoid overlap with the fixed navbar */
         body {
-            padding-top: 4rem; /* Adjust based on the height of your navbar */
+            padding-top: 4rem;
         }
 
-        /* Style for the mobile menu */
+        /* Mobile menu */
         .mobile-menu {
-            position: fixed; /* Make the mobile menu fixed */
-            top: 4rem; /* Position below the navbar */
-            left: 0;
-            right: 0;
-            z-index: 40; /* Ensure it's below the search bar */
+            display: none;
+            transition: max-height 0.3s ease-in-out;
+            margin-top: 1rem;
         }
 
-        /* Style for the search bar */
-        .search-bar {
-            z-index: 45; /* Ensure it's below the navbar but above other content */
+        .mobile-menu.open {
+            display: block;
+            max-height: 300px;
         }
     </style>
 </head>
@@ -81,19 +71,29 @@
             </div>
         </div>
 
-        <!-- Right Side (Icons) -->
-        <div class="flex items-center space-x-6">
-            <button class="text-green-900 hover:text-black">
-                <a href="dashboard.php"><i class="ri-user-line ri-lg"></i></a>
+        <!-- Right Side (Icons + Search Bar) -->
+        <div class="flex items-center space-x-4">
+            <!-- Search Bar (Initially Hidden) -->
+            <div id="search-bar" class="search-bar-container flex items-center bg-white shadow-md rounded-md p-1">
+                <input type="text" class="w-full border-none focus:outline-none rounded-md p-2" placeholder="Search for products...">
+                <button id="search-submit" class="text-green-900 hover:text-black ml-2">
+                    <i class="ri-check-line ri-lg"></i>
+                </button>
+                <button id="search-cancel" class="text-green-900 hover:text-black ml-2">
+                    <i class="ri-close-line ri-lg"></i>
+                </button>
+            </div>
+
+            <!-- Search Icon Button -->
+            <button id="search-toggle" class="text-green-900 hover:text-black">
+                <i class="ri-search-line ri-lg"></i>
             </button>
 
             <button class="text-green-900 hover:text-black">
                 <a href="cart.php"><i class="ri-shopping-bag-line ri-lg"></i></a>
             </button>
-
-            <!-- Search Icon Button -->
-            <button id="search-button" class="text-green-900 hover:text-black">
-                <i class="ri-search-line ri-lg"></i>
+            <button class="text-green-900 hover:text-black">
+                <a href="dashboard.php"><i class="ri-user-line ri-lg"></i></a>
             </button>
 
             <!-- Mobile Menu Icon (only visible on mobile) -->
@@ -102,18 +102,6 @@
             </button>
         </div>
     </nav>
-
-    <!-- Search Bar (Initially Hidden) -->
-    <div id="search-bar" class="search-bar bg-white shadow-md py-4 px-8">
-        <div class="max-w-2xl mx-auto flex items-center space-x-4">
-            <!-- Search Input -->
-            <input type="text" class="w-full border border-gray-300 rounded-md p-2" placeholder="Search for products...">
-            <!-- Search Icon inside Search Bar -->
-            <button class="text-green-900 hover:text-black">
-                <i class="ri-search-line ri-2x"></i>
-            </button>
-        </div>
-    </div>
 
     <!-- Mobile Menu (Initially Hidden) -->
     <div id="mobile-menu" class="mobile-menu md:hidden bg-white shadow-md py-4 px-8">
@@ -125,12 +113,14 @@
         <a href="#" class="block py-2 text-green-900 hover:font-bold">About Us</a>
     </div>
     <div class="block p-4"></div>
+
     <script>
         const mobileMenuButton = document.getElementById("mobile-menu-button");
         const mobileMenu = document.getElementById("mobile-menu");
 
-        const searchButton = document.getElementById("search-button");
+        const searchToggle = document.getElementById("search-toggle");
         const searchBar = document.getElementById("search-bar");
+        const searchCancel = document.getElementById("search-cancel");
 
         // Toggle mobile menu
         mobileMenuButton.addEventListener("click", () => {
@@ -138,8 +128,21 @@
         });
 
         // Toggle search bar
-        searchButton.addEventListener("click", () => {
+        searchToggle.addEventListener("click", () => {
             searchBar.classList.toggle("open");
+            searchToggle.classList.add("hidden"); // Hide the search icon
+        });
+
+        // Handle search submit (to be implemented)
+        document.getElementById("search-submit").addEventListener("click", () => {
+            alert("Searching for: " + document.querySelector('#search-bar input').value);
+        });
+
+        // Handle cancel search
+        searchCancel.addEventListener("click", () => {
+            searchBar.classList.remove("open");
+            searchToggle.classList.remove("hidden"); // Show the search icon again
+            document.querySelector('#search-bar input').value = ""; // Clear the input
         });
     </script>
 </body>

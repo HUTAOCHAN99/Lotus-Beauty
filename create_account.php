@@ -13,15 +13,20 @@
             background-size: cover;
         }
 
-        /* Additional styling for glassmorphism effect */
+        /* Glassmorphism effect */
         .glass {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(19, 62, 135, 0.3);
+            /* Menggunakan warna yang sama (#133E87) dengan transparansi */
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
         }
-        .bg-glass{
-            background-color: #133E87;
+
+        .bg-glass {
+            background-color: rgba(19, 62, 135, 0.3);
+            /* Menyesuaikan dengan warna dan transparansi */
         }
+
         .error-message {
             color: #ff6b6b;
             font-size: 0.875rem;
@@ -128,52 +133,52 @@
         const passwordInput = document.getElementById('password');
         const togglePasswordIcon = document.getElementById('togglePasswordIcon');
 
-        togglePassword.addEventListener('click', function() {
+        togglePassword.addEventListener('click', function () {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
             togglePasswordIcon.classList.toggle('ri-eye-line');
             togglePasswordIcon.classList.toggle('ri-eye-off-line');
         });
 
-        document.getElementById('submitbutton').addEventListener('click', function(event) {
+        document.getElementById('submitbutton').addEventListener('click', function (event) {
             event.preventDefault(); // Mencegah pengiriman form secara langsung
             let isValid = true;
 
             const fields = [{
-                    id: 'username',
-                    errorId: 'usernameError',
-                    message: 'Username is required'
-                },
-                {
-                    id: 'email',
-                    errorId: 'emailError',
-                    message: 'Email is required'
-                },
-                {
-                    id: 'password',
-                    errorId: 'passwordError',
-                    message: 'Password is required'
-                },
-                {
-                    id: 'full_name',
-                    errorId: 'fullNameError',
-                    message: 'Full name is required'
-                },
-                {
-                    id: 'phone_number',
-                    errorId: 'phoneError',
-                    message: 'Phone number is required'
-                },
-                {
-                    id: 'address',
-                    errorId: 'addressError',
-                    message: 'Address is required'
-                },
-                {
-                    id: 'role',
-                    errorId: 'roleError',
-                    message: 'Role is required'
-                }
+                id: 'username',
+                errorId: 'usernameError',
+                message: 'Username is required'
+            },
+            {
+                id: 'email',
+                errorId: 'emailError',
+                message: 'Email is required'
+            },
+            {
+                id: 'password',
+                errorId: 'passwordError',
+                message: 'Password is required'
+            },
+            {
+                id: 'full_name',
+                errorId: 'fullNameError',
+                message: 'Full name is required'
+            },
+            {
+                id: 'phone_number',
+                errorId: 'phoneError',
+                message: 'Phone number is required'
+            },
+            {
+                id: 'address',
+                errorId: 'addressError',
+                message: 'Address is required'
+            },
+            {
+                id: 'role',
+                errorId: 'roleError',
+                message: 'Role is required'
+            }
             ];
 
             fields.forEach(field => {
