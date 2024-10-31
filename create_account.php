@@ -113,7 +113,9 @@
                 <select id="role" name="role"
                     class="w-full p-3 bg-white bg-opacity-20 text-gray-100 border border-transparent rounded-lg focus:ring-2 focus:ring-green-400 focus:outline-none transition duration-200">
                     <option value="" disabled selected class="text-gray-300">Select Role</option>
-                    <option value="admin" class="text-gray-700">Apoteker</option>
+                    <option value="dokter" class="text-gray-700">dokter</option>
+                    <option value="cs" class="text-gray-700">customer-service</option>
+                    <option value="apoteker" class="text-gray-700">Apoteker</option>
                     <option value="customer" class="text-gray-700">User</option>
                 </select>
                 <span class="error-message" id="roleError"></span>
