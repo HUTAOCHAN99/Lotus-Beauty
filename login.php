@@ -10,7 +10,6 @@ $password_db = "";
 $database = "lotusbeauty";
 $konek = new mysqli($hostname, $username_db, $password_db, $database);
 
-// Periksa koneksi ke database
 if ($konek->connect_error) {
     die("Koneksi gagal: " . $konek->connect_error);
 }
@@ -19,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // Cek apakah username ada
     $stmt = $konek->prepare("SELECT user_id, email, password FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -28,26 +26,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
 
-        // Verifikasi password
         if (password_verify($password, $user['password'])) {
-            // Simpan email dan username untuk verifikasi
             $_SESSION['reset_email'] = $user['email'];
             $_SESSION['username'] = $username;
-            $_SESSION['user_id'] = $user['user_id']; // Menyimpan ID pengguna
-            $_SESSION['action'] = 'login'; // Menandakan proses login
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['action'] = 'login';
+            
 
-            // Buat dan simpan token untuk verifikasi
             $token = bin2hex(random_bytes(4));
             $_SESSION['token'] = $token;
 
-            // Kirim token via email
             $mail = new PHPMailer\PHPMailer\PHPMailer(true);
             try {
                 $mail->isSMTP();
                 $mail->Host = 'smtp.gmail.com';
                 $mail->SMTPAuth = true;
                 $mail->Username = 'hallmaster677@gmail.com';
-                $mail->Password = 'emyh qqcr nqoa nuck'; // Pertimbangkan untuk tidak mengekspose password ini
+                $mail->Password = 'emyh qqcr nqoa nuck';
                 $mail->SMTPSecure = 'tls';
                 $mail->Port = 587;
 
@@ -58,15 +53,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $mail->Body = "Kode verifikasi Anda adalah: <b>$token</b>";
 
                 $mail->send();
-                echo "<script>alert('Kode verifikasi telah dikirim ke email Anda.'); window.location.href='verify_token.php?action=login';</script>";
+                $_SESSION['success_message'] = 'Kode verifikasi telah dikirim ke email Anda.';
+                header('Location: verify_token.php?action=login');
+                exit();
             } catch (Exception $e) {
                 echo "Mailer Error: {$mail->ErrorInfo}";
             }
         } else {
-            echo "<script>alert('Username atau kata sandi salah.'); window.history.back();</script>";
+            $_SESSION['error_message'] = 'Username atau kata sandi salah.';
+            header('Location: Landing_Page.php#login-section');
+            exit();
         }
     } else {
-        echo "<script>alert('Username tidak ditemukan.'); window.history.back();</script>";
+        $_SESSION['error_message'] = 'Username tidak ditemukan.';
+        header('Location: Landing_Page.php#login-section');
+        exit();
     }
 }
 ?>

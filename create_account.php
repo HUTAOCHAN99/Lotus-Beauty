@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,6 +10,7 @@
     <title>Create Account</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             background: url('./src/images/background/bg-create-account.jpg') no-repeat center center fixed;
@@ -130,7 +134,36 @@
     </div>
 
     <script>
-        // JavaScript for showing/hiding password
+        document.addEventListener('DOMContentLoaded', function () {
+    <?php
+    if (isset($_SESSION['success_message'])) {
+        echo "Swal.fire({
+            title: 'Sukses!',
+            text: '" . $_SESSION['success_message'] . "',
+            icon: 'success',
+            confirmButtonText: 'Silahkan Login'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = 'Landing_Page.php'; // Redirect ke Landing_Page
+            }
+        });";
+        unset($_SESSION['success_message']); // Hapus pesan setelah ditampilkan
+    }
+
+    if (isset($_SESSION['error_message'])) {
+        echo "Swal.fire({
+            title: 'Error!',
+            text: '" . $_SESSION['error_message'] . "',
+            icon: 'error',
+            confirmButtonText: 'Tutup'
+        });";
+        unset($_SESSION['error_message']); // Hapus pesan setelah ditampilkan
+    }
+    ?>
+});
+
+
+        // JavaScript untuk menampilkan/menyembunyikan password
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
         const togglePasswordIcon = document.getElementById('togglePasswordIcon');
@@ -146,41 +179,14 @@
             event.preventDefault(); // Mencegah pengiriman form secara langsung
             let isValid = true;
 
-            const fields = [{
-                id: 'username',
-                errorId: 'usernameError',
-                message: 'Username is required'
-            },
-            {
-                id: 'email',
-                errorId: 'emailError',
-                message: 'Email is required'
-            },
-            {
-                id: 'password',
-                errorId: 'passwordError',
-                message: 'Password is required'
-            },
-            {
-                id: 'full_name',
-                errorId: 'fullNameError',
-                message: 'Full name is required'
-            },
-            {
-                id: 'phone_number',
-                errorId: 'phoneError',
-                message: 'Phone number is required'
-            },
-            {
-                id: 'address',
-                errorId: 'addressError',
-                message: 'Address is required'
-            },
-            {
-                id: 'role',
-                errorId: 'roleError',
-                message: 'Role is required'
-            }
+            const fields = [
+                { id: 'username', errorId: 'usernameError', message: 'Username wajib diisi' },
+                { id: 'email', errorId: 'emailError', message: 'Email wajib diisi' },
+                { id: 'password', errorId: 'passwordError', message: 'Password wajib diisi' },
+                { id: 'full_name', errorId: 'fullNameError', message: 'Nama lengkap wajib diisi' },
+                { id: 'phone_number', errorId: 'phoneError', message: 'Nomor telepon wajib diisi' },
+                { id: 'address', errorId: 'addressError', message: 'Alamat wajib diisi' },
+                { id: 'role', errorId: 'roleError', message: 'Peran wajib dipilih' }
             ];
 
             fields.forEach(field => {
@@ -203,6 +209,7 @@
             }
         });
     </script>
+
 </body>
 
 </html>

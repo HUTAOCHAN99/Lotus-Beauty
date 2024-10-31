@@ -1,6 +1,7 @@
 <?php
 // Include koneksi database
 include 'db.php';
+session_start(); // Memulai sesi
 
 // Simpan data ke database jika form di-submit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -13,21 +14,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $address = isset($_POST['address']) ? $_POST['address'] : '';
     $role = isset($_POST['role']) ? $_POST['role'] : '';
 
+    // SQL query untuk memeriksa apakah username atau email sudah ada
+    $checkQuery = "SELECT * FROM users WHERE username='$username' OR email='$email'";
+    $checkResult = $konek->query($checkQuery);
+
+    if ($checkResult->num_rows > 0) {
+        $_SESSION['error_message'] = 'Username atau email sudah terdaftar!';
+        header("Location: create_account.php");
+        exit();
+    }
+
     // SQL query untuk memasukkan data user baru
     $sql = "INSERT INTO users (username, email, password, full_name, phone_number, address, role)
             VALUES ('$username', '$email', '$password', '$full_name', '$phone_number', '$address', '$role')";
 
     // Cek apakah query berhasil
     if ($konek->query($sql) === TRUE) {
-        echo "Akun baru berhasil dibuat!";
-        header("Location: Landing_Page.php"); // Redirect ke halaman lain
-        exit(); // Menghentikan eksekusi setelah redirect
+        $_SESSION['success_message'] = 'Akun baru berhasil dibuat!';
     } else {
-        // Menampilkan pesan error jika query gagal
-        echo "Terjadi kesalahan: " . $sql . "<br>" . $konek->error;
+        $_SESSION['error_message'] = 'Terjadi kesalahan: ' . $konek->error; // Simpan pesan error
     }
-
-    $konek->close();
+    
+    // Redirect kembali ke halaman create_account
+    header("Location: create_account.php");
+    exit();
 } else {
     echo "Form tidak dikirim dengan metode POST.";
 }
+
+$konek->close();
