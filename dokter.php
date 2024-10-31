@@ -1,6 +1,6 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) {
-    session_start(); // Only start session if it is not already started
+    session_start();
 }
 
 // Koneksi ke database
@@ -24,9 +24,11 @@ $userResult = $userStmt->get_result();
 
 // Mengambil pesan dari pengguna yang dipilih
 $selectedUserId = isset($_GET['user_id']) ? $_GET['user_id'] : null;
-$messageQuery = "SELECT m.*, u.username FROM messages m JOIN users u ON m.user_id = u.user_id WHERE m.recipient_id = ? AND m.user_id = ? ORDER BY m.created_at ASC";
+$messageQuery = "SELECT m.*, u.username FROM messages m JOIN users u ON m.user_id = u.user_id 
+                 WHERE (m.user_id = ? AND m.recipient_id = ?) OR (m.user_id = ? AND m.recipient_id = ?) 
+                 ORDER BY m.created_at ASC";
 $messageStmt = $konek->prepare($messageQuery);
-$messageStmt->bind_param("ii", $_SESSION['user_id'], $selectedUserId);
+$messageStmt->bind_param("iiii", $_SESSION['user_id'], $selectedUserId, $selectedUserId, $_SESSION['user_id']);
 $messageStmt->execute();
 $messageResult = $messageStmt->get_result();
 
@@ -55,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
 
     $insertStmt->close();
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -66,6 +67,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
     <title>Dokter Chat</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .message-user {
+            text-align: left;
+            background-color: #f0f9ff; /* Light blue for user messages */
+        }
+        .message-doctor {
+            text-align: right;
+            background-color: #e0f7fa; /* Light cyan for doctor messages */
+        }
+    </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
@@ -95,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
                     $stmt->execute();
                     $selectedUserResult = $stmt->get_result();
                     $selectedUser = $selectedUserResult->fetch_assoc();
-                    echo "Chat with " . htmlspecialchars($selectedUser['username']);
+                    echo "Chat dengan " . htmlspecialchars($selectedUser['username']);
                     $stmt->close();
                 } else {
                     echo "Pilih pengguna untuk memulai chat.";
@@ -106,7 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
         <div class="p-4 h-80 overflow-y-auto bg-gray-50">
             <?php
                 while ($message = $messageResult->fetch_assoc()) {
-                    echo "<div class='p-2 my-2 border-b'>";
+                    $messageClass = ($message['user_id'] == $_SESSION['user_id']) ? 'message-doctor' : 'message-user';
+                    echo "<div class='p-2 my-2 border-b $messageClass'>";
                     echo "<strong>" . htmlspecialchars($message['username']) . ":</strong> " . htmlspecialchars($message['message_text']);
                     echo "</div>";
                 }

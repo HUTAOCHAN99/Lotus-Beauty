@@ -7,6 +7,8 @@ if (!isset($_SESSION['token']) || !isset($_SESSION['action'])) {
     exit;
 }
 
+
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['token'])) {
     $input_token = $_POST['token'];
 

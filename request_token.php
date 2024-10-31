@@ -16,6 +16,8 @@ if ($konek->connect_error) {
     die("Koneksi gagal: " . $konek->connect_error);
 }
 
+$swal_script = ""; // Variabel untuk menyimpan pesan SweetAlert2
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
     $email = $_POST['email'];
 
@@ -50,12 +52,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
             $mail->Body = "Kode verifikasi Anda adalah: <b>$token</b>";
 
             $mail->send();
-            echo "<script>alert('Kode verifikasi telah dikirim ke email Anda.'); window.location.href='verify_token.php';</script>";
+            // SweetAlert untuk sukses
+            $swal_script = "Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil!',
+                                text: 'Kode verifikasi telah dikirim ke email Anda.',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                window.location.href='verify_token.php';
+                            });";
         } catch (Exception $e) {
-            echo "<script>alert('Gagal mengirim email. Silakan coba lagi nanti.');</script>";
+            // SweetAlert untuk gagal
+            $swal_script = "Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal mengirim!',
+                                text: 'Gagal mengirim email. Silakan coba lagi nanti.',
+                                confirmButtonText: 'OK'
+                            });";
         }
     } else {
-        echo "<script>alert('Email tidak ditemukan.');</script>";
+        // SweetAlert untuk email tidak ditemukan
+        $swal_script = "Swal.fire({
+                            icon: 'warning',
+                            title: 'Email tidak ditemukan!',
+                            text: 'Email tidak ditemukan di sistem.',
+                            confirmButtonText: 'OK'
+                        });";
     }
 }
 ?>
@@ -68,6 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Request Token</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body class="flex items-center justify-center h-screen bg-gray-900">
@@ -78,6 +101,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['email'])) {
             <button type="submit" class="w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Kirim Token</button>
         </form>
     </div>
+
+    <!-- Menjalankan SweetAlert jika ada script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            <?php echo $swal_script; ?>
+        });
+    </script>
 </body>
 
 </html>
