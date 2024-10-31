@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             // Simpan email dan username untuk verifikasi
             $_SESSION['reset_email'] = $user['email'];
             $_SESSION['username'] = $username;
-            $_SESSION['user_id'] = $user['id']; // Menyimpan ID pengguna
+            $_SESSION['user_id'] = $user['user_id']; // Menyimpan ID pengguna
             $_SESSION['action'] = 'login'; // Menandakan proses login
 
             // Buat dan simpan token untuk verifikasi

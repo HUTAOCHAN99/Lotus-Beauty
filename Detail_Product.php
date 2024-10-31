@@ -11,6 +11,14 @@ $query->bind_param("i", $product_id);
 $query->execute();
 $result = $query->get_result();
 
+$reviewQuery = $konek->prepare("SELECT users.username, reviews.rating, reviews.comment 
+                                FROM reviews 
+                                JOIN users ON reviews.user_id = users.user_id 
+                                WHERE product_id = ?");
+$reviewQuery->bind_param("i", $product_id);
+$reviewQuery->execute();
+$reviews = $reviewQuery->get_result();
+
 // Periksa apakah produk ditemukan
 if ($result->num_rows > 0) {
     $product = $result->fetch_assoc();
@@ -25,30 +33,8 @@ $order_quantity = 1; // Default kuantiti
 // Dapatkan user_id dari sesi jika ada
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
+$error = '';
 
-// Contoh data ulasan
-$reviews = [
-    [
-        'name_customer' => 'Kapal Lawd',
-        'time' => '2 minggu lalu',
-        'comment' => 'tks semoga berhasil',
-        'rating' => 5,
-        'replies' => []
-    ],
-    [
-        'name_customer' => 'Budiono Siregar',
-        'time' => '1 bulan lalu',
-        'comment' => 'Pertama kali cobain suplemen ini. Komposisi active ingredients nya komplit utk kesehatan persendian. Cocok buat usia 40++ Minus nya cuma satu si, di komposisinya ada pewarna.',
-        'rating' => 5,
-        'replies' => [
-            [
-                'name_replier' => 'Reply User',
-                'time' => '3 minggu lalu',
-                'comment' => 'Terima kasih atas ulasannya!',
-            ]
-        ]
-    ]
-];
 ?>
 
 <!DOCTYPE html>
@@ -88,7 +74,47 @@ $reviews = [
             transform: rotate(-45deg);
             transition: transform 0.5s ease-in-out;
         }
+
+        /* Styling untuk bintang */
+        .star {
+            font-size: 1.5rem;
+            /* Ukuran bintang */
+            color: gray;
+            /* Warna default untuk bintang */
+            cursor: pointer;
+            /* Mengubah kursor saat hover */
+            transition: color 0.3s ease;
+            /* Transisi warna halus */
+        }
+
+        /* Warna bintang saat dipilih atau saat di-hover */
+        .star.selected,
+        .star:hover,
+        .star:hover~.star {
+            color: gold;
+            /* Warna untuk bintang yang dipilih atau saat di-hover */
+        }
+
+        /* Mengembalikan warna bintang setelah hover */
+        .star:hover~.star {
+            color: gray;
+            /* Warna default untuk bintang yang tidak di-hover */
+        }
+
+        .review {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+
+        .review-rating {
+            font-weight: bold;
+        }
+
+        .reviews-section {
+            margin-top: 20px;
+        }
     </style>
+
 </head>
 
 <body>
@@ -122,7 +148,7 @@ $reviews = [
                         </div>
                     </div>
                 </div>
-                
+
             </div>
         </div>
         <script>
@@ -219,28 +245,145 @@ $reviews = [
             }
         </script>
     </div>
-    <div class="bg-gray-100 py-8 px-4">
-        <div class="max-w-2xl mx-auto bg-white p-6 shadow-md rounded-md">
-            <div class="mb-4">
-                <h2 class="text-xl font-semibold text-center">ULASAN PILIHAN</h2>
-            </div>
-            <?php foreach ($reviews as $review): ?>
-                <div class="border-b border-gray-200 py-4">
-                    <span class="font-semibold text-gray-700"><?= htmlspecialchars($review['name_customer']); ?></span>
-                    <div class="flex items-center mb-2">
-                        <?php for ($i = 0; $i < $review['rating']; $i++): ?>
-                            <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.717 5.3h5.564c.969 0 1.371 1.24.588 1.81l-4.507 3.356 1.718 5.299c.3.921-.755 1.688-1.539 1.118L10 14.347l-4.507 3.356c-.784.57-1.838-.197-1.539-1.118l1.718-5.299-4.507-3.356c-.784-.57-.38-1.81.588-1.81h5.564l1.717-5.3z" />
-                            </svg>
-                        <?php endfor; ?>
-                        <span class="text-sm text-gray-500 ml-2"><?= htmlspecialchars($review['time']); ?></span>
-                    </div>
-                    <p class="text-gray-700 mb-2"><?= htmlspecialchars($review['comment']); ?></p>
-                </div>
-            <?php endforeach; ?>
+
+
+
+
+    <!-- Input Rating Bintang (di luar modal) -->
+    <div class="w-1/2 mx-auto">
+        <div class="w-1/2 flex justify-center mx-auto">
+            <label class="font-semibold">Rate this Product</label>
+        </div>
+        <div id="outerStarRating" class="w-1/2 mx-auto text-center">
+            <span class="star" onclick="openReviewModal(1)">&#9733;</span>
+            <span class="star" onclick="openReviewModal(2)">&#9733;</span>
+            <span class="star" onclick="openReviewModal(3)">&#9733;</span>
+            <span class="star" onclick="openReviewModal(4)">&#9733;</span>
+            <span class="star" onclick="openReviewModal(5)">&#9733;</span>
         </div>
     </div>
+
+    <!-- Review Modal (pop-up) - Hidden initially -->
+    <div id="reviewModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div id="reviewModalContent" class="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold">Beri Ulasan</h3>
+                <button onclick="closeReviewModal()"
+                    class="bg-red-500 rounded-full border-0 w-6 h-6 flex items-center justify-center focus:outline-none transition-transform duration-200 ease-in-out hover:scale-110 active:scale-90">
+                    <i class="ri-close-line text-white text-3xl"></i>
+                </button>
+            </div>
+            <form action="review_module.php" method="POST">
+                <input type="hidden" name="product_id" value="<?= htmlspecialchars($product_id); ?>">
+                <input type="hidden" name="user_id" value="<?= htmlspecialchars($user_id); ?>">
+                <input type="hidden" id="selectedRating" name="rating">
+
+                <!-- Bagian Rating Bintang di Modal -->
+                <div class="mb-4 flex">
+                    <label class="font-semibold mr-2">Rating:</label>
+                    <div id="modalStarRating" class="flex">
+                        <span class="star" onclick="setRating(1)">&#9733;</span>
+                        <span class="star" onclick="setRating(2)">&#9733;</span>
+                        <span class="star" onclick="setRating(3)">&#9733;</span>
+                        <span class="star" onclick="setRating(4)">&#9733;</span>
+                        <span class="star" onclick="setRating(5)">&#9733;</span>
+                    </div>
+                </div>
+
+                <!-- Bagian Input Komentar -->
+                <div class="mb-4">
+                    <label for="comment" class="font-semibold">Komentar:</label>
+                    <textarea name="comment" id="comment" rows="4" class="border w-full p-2 rounded"
+                        placeholder="Ceritakan pengalaman Anda (Maksimal 500 kata)" maxlength="500"></textarea>
+                </div>
+
+                <!-- Tombol Submit -->
+                <div class="flex justify-end">
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Post</button>
+                </div>
+
+                <?php if ($error): ?>
+                    <p class="text-red-500 mt-2"><?= htmlspecialchars($error); ?></p>
+                <?php endif; ?>
+            </form>
+        </div>
+    </div>
+
+
+    <script>
+
+        let selectedRating = 0;
+
+        function openReviewModal(rating) {
+
+            // Setel rating ketika bintang diklik
+            setRating(rating);
+            // Tampilkan modal review
+            document.getElementById('reviewModal').classList.remove('hidden');
+        }
+
+        function setRating(rating) {
+            selectedRating = rating;
+            document.getElementById('selectedRating').value = rating;
+
+            // Update warna bintang di modal
+            let stars = document.querySelectorAll('#modalStarRating .star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('selected'); // Menandai bintang yang dipilih
+                } else {
+                    star.classList.remove('selected'); // Menghapus tanda dari bintang yang tidak dipilih
+                }
+            });
+
+            // Update warna bintang di luar modal
+            let outerStars = document.querySelectorAll('#outerStarRating .star');
+            outerStars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('selected');
+                } else {
+                    star.classList.remove('selected');
+                }
+            });
+        }
+
+        function closeReviewModal() {
+            document.getElementById('reviewModal').classList.add('hidden');
+        }
+
+    </script>
+
+
+
+    <div class="product-details">
+        <h1><?= htmlspecialchars($product['name']); ?></h1>
+        <p><?= htmlspecialchars($product['description']); ?></p>
+        <p>Harga: <?= htmlspecialchars($product['price']); ?></p>
+    </div>
+
+    <div class="reviews-section">
+        <h2>Ulasan Produk</h2>
+        <?php if ($reviews->num_rows > 0): ?>
+            <?php while ($review = $reviews->fetch_assoc()): ?>
+                <div class="review">
+                    <div class="review-rating">
+                        <?php
+                        // Menampilkan bintang sesuai dengan rating
+                        for ($i = 1; $i <= 5; $i++): ?>
+                            <span class="star <?= $i <= $review['rating'] ? 'selected' : ''; ?>">&starf;</span>
+                        <?php endfor; ?>
+                    </div>
+                    <p><?= htmlspecialchars($review['comment']); ?></p>
+                    <small>oleh <?= htmlspecialchars($review['username']); ?></small>
+                </div>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <p>Tidak ada ulasan untuk produk ini.</p>
+        <?php endif; ?>
+    </div>
+
+
+
 
     <!-- event buy modal -->
     <div id="buyModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
