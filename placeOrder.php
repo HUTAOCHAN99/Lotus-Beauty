@@ -81,17 +81,51 @@ try {
 }
 ?>
 
-<html>
+<!DOCTYPE html>
+<html lang="id">
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script type="text/javascript"
-        src="https://app.sandbox.midtrans.com/snap/snap.js"
-        data-client-key="SB-Mid-client-zu9OrVu-Hm2fCAJf"></script>
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-zu9OrVu-Hm2fCAJf"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <title>Invoice Pembayaran</title>
 </head>
 
-<body>
-    <button id="pay-button">Pay!</button>
+<body class="bg-gray-100">
+    <div class="max-w-lg mx-auto my-10 p-6 bg-white shadow-lg rounded-lg">
+        <h2 class="text-2xl font-semibold text-center text-gray-800 mb-6">Invoice Pembayaran</h2>
+
+        <!-- Daftar produk yang akan dibeli -->
+        <div class="mb-4">
+            <h3 class="font-semibold text-lg text-gray-700 mb-2">Detail Produk</h3>
+            <ul class="divide-y divide-gray-200">
+                <?php foreach ($orderItems as $item): ?>
+                    <li class="py-4 flex justify-between items-center">
+                        <div>
+                            <p class="font-medium text-gray-800"><?= htmlspecialchars($item['name']); ?></p>
+                            <p class="text-sm text-gray-500">Jumlah: <?= htmlspecialchars($item['quantity']); ?></p>
+                        </div>
+                        <p class="font-semibold text-gray-600">Rp<?= number_format($item['price'] * $item['quantity'], 0, ',', '.'); ?></p>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+
+        <!-- Total harga -->
+        <div class="border-t border-gray-300 pt-4 mt-4">
+            <div class="flex justify-between items-center">
+                <span class="font-semibold text-gray-700">Total Harga:</span>
+                <span class="text-lg font-semibold text-gray-800">Rp<?= number_format($totalAmount, 0, ',', '.'); ?></span>
+            </div>
+        </div>
+
+        <!-- Tombol bayar -->
+        <div class="mt-6 text-center">
+            <button id="pay-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow-md focus:outline-none">
+                Bayar Sekarang
+            </button>
+        </div>
+    </div>
 
     <script type="text/javascript">
         var payButton = document.getElementById('pay-button');
@@ -101,17 +135,15 @@ try {
                 onSuccess: function(result) {
                     alert("Pembayaran berhasil!");
                     console.log(result);
-                    const paymentMethod = result.payment_type; // Ambil metode pembayaran yang digunakan
+                    const paymentMethod = result.payment_type;
 
-                    // Ambil data transaksi yang dibutuhkan
                     const transactionData = {
-                        order_id: result.order_id, // Mengambil order_id dari hasil pembayaran
-                        user_id: '<?php echo $user_id; ?>', // Mengambil user_id dari PHP
-                        items: <?php echo json_encode($orderItems); ?>, // Mengambil detail produk
-                        payment_method: paymentMethod // Ambil metode pembayaran dari hasil
+                        order_id: result.order_id,
+                        user_id: '<?php echo $user_id; ?>',
+                        items: <?php echo json_encode($orderItems); ?>,
+                        payment_method: paymentMethod
                     };
 
-                    // Mengirim data transaksi ke server untuk diproses
                     fetch('checkout.php', {
                             method: 'POST',
                             headers: {
@@ -123,7 +155,6 @@ try {
                         .then(data => {
                             if (data.success) {
                                 alert(data.message);
-                                // Lakukan redirect atau tindakan lain jika diperlukan
                                 window.location.href = 'Home.php';
                             } else {
                                 alert(data.message);
