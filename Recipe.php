@@ -14,8 +14,8 @@
         <?php
         include('db.php'); // Pastikan Anda sudah menghubungkan ke database
 
-        // Ambil data semua resep dari database
-        $result = $konek->query("SELECT nama_resep, image_url FROM prescription");
+        // Ambil data semua resep dari database, termasuk prescription_id
+        $result = $konek->query("SELECT prescription_id, nama_resep, image_url FROM prescription");
 
         // Periksa apakah query berhasil
         if ($result === false) {
@@ -27,20 +27,17 @@
         if ($result->num_rows === 0) {
             echo "<p>Tidak ada resep yang ditemukan.</p>";
         } else {
-            // Tampilkan resep
-            while ($row = $result->fetch_assoc()): 
-                // Pastikan ada gambar
+            while ($row = $result->fetch_assoc()):
                 $image_url = !empty($row['image_url']) ? htmlspecialchars($row['image_url']) : 'path/to/default-image.png';
-                // Encode nama resep untuk URL
-                $encoded_name = urlencode($row['nama_resep']);
+                $prescription_id = $row['prescription_id'];
                 ?>
                 <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
                     <img src="<?php echo $image_url; ?>" alt="<?php echo htmlspecialchars($row['nama_resep']); ?>" class="w-16 h-16 mb-3">
-                    <a href="Detail_Resep.php?nama_resep=<?php echo $encoded_name; ?>" class="text-center text-sm font-semibold text-blue-500 hover:underline">
+                    <a href="List_Recipe.php?prescription_id=<?php echo $prescription_id; ?>" class="text-center text-sm font-semibold text-blue-500 hover:underline">
                         <?php echo htmlspecialchars($row['nama_resep']); ?>
                     </a>
                 </div>
-            <?php endwhile; 
+            <?php endwhile;
         }
         ?>
     </div>
@@ -48,15 +45,3 @@
 <?php include('Footer.php'); ?>
 </body>
 </html>
-
-
-
-
-
-<!-- 
-// Ambil nama resep dari URL
-$nama_resep = isset($_GET['nama_resep']) ? urldecode($_GET['nama_resep']) : '';
-
-// Lakukan query ke database untuk mendapatkan detail resep berdasarkan $nama_resep
-// Lanjutkan dengan logika untuk menampilkan detail resep... -->
-

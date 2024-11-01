@@ -88,7 +88,7 @@
 
         <!-- Footer Bottom -->
         <div class="mt-8 border-t border-gray-700 pt-6 text-center">
-            <p>&copy; 2024 LotusBeauty Site by <a href="#" class="text-yellow-500 hover:underline">Hamba Allah</a></p>
+            <p>&copy; 2024 LotusBeauty Site by <a href="#" class="text-yellow-500 hover:underline">LotusBeauty Group</a></p>
             <ul class="flex justify-center space-x-8 mt-4">
                 <li><a href="#" class="hover:underline">Terms & Conditions</a></li>
                 <li><a href="#" class="hover:underline">Privacy Policy</a></li>
