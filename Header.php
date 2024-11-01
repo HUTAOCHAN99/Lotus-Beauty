@@ -21,7 +21,8 @@
         }
 
         .search-bar-container.open {
-            width: 250px; /* Sesuaikan dengan lebar yang diinginkan */
+            width: 250px;
+            /* Sesuaikan dengan lebar yang diinginkan */
             opacity: 1;
             visibility: visible;
         }
@@ -80,15 +81,20 @@
         <!-- Right Side (Icons + Search Bar) -->
         <div class="flex items-center space-x-4">
             <!-- Search Bar (Initially Hidden) -->
+            <!-- Search Bar (Initially Hidden) -->
             <div id="search-bar" class="search-bar-container bg-white shadow-md rounded-md p-1">
-                <input type="text" class="w-full border-none focus:outline-none rounded-md p-2" placeholder="Search for products...">
-                <button id="search-submit" class="text-green-900 hover:text-black ml-2">
-                    <i class="ri-search-line ri-lg"></i>
-                </button>
-                <button id="search-cancel" class="text-green-900 hover:text-black ml-2">
-                    <i class="ri-close-line ri-lg"></i>
-                </button>
+                <form action="Product_Page.php" method="GET" class="flex items-center">
+                    <input type="text" name="search" class="w-full border-none focus:outline-none rounded-md p-2"
+                        placeholder="Search for products...">
+                    <button type="submit" class="text-green-900 hover:text-black ml-2">
+                        <i class="ri-search-line ri-lg"></i>
+                    </button>
+                    <button id="search-cancel" type="button" class="text-green-900 hover:text-black ml-2">
+                        <i class="ri-close-line ri-lg"></i>
+                    </button>
+                </form>
             </div>
+
 
             <!-- Search Icon Button -->
             <button id="search-toggle" class="text-green-900 hover:text-black">

@@ -11,10 +11,21 @@
 <body class="bg-gray-100">
     <?php
     include('Header.php');
-    include('db.php'); // Pastikan Anda sudah menghubungkan ke database
+    include('db.php'); // Pastikan sudah terhubung ke database
     
-    // Ambil data semua produk dari database, pastikan untuk menyertakan product_id
-    $result = $konek->query("SELECT product_id, name, image FROM product");
+    // Ambil kata kunci pencarian dari query string
+    $search_keyword = isset($_GET['search']) ? $_GET['search'] : '';
+
+    // Query produk, cek apakah ada kata kunci
+    if (!empty($search_keyword)) {
+        $stmt = $konek->prepare("SELECT product_id, name, image FROM product WHERE name LIKE ?");
+        $like_keyword = "%$search_keyword%";
+        $stmt->bind_param("s", $like_keyword);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    } else {
+        $result = $konek->query("SELECT product_id, name, image FROM product");
+    }
 
     // Periksa apakah query berhasil
     if ($result === false) {
@@ -25,6 +36,13 @@
 
     <section class="max-w-4xl mx-auto p-4">
         <h2 class="text-2xl font-bold mb-6">Daftar Produk</h2>
+
+        <!-- Pesan pencarian -->
+        <?php if (!empty($search_keyword)): ?>
+            <p class="text-gray-700">Hasil pencarian untuk:
+                <strong><?php echo htmlspecialchars($search_keyword); ?></strong></p>
+        <?php endif; ?>
+
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             <?php while ($row = $result->fetch_assoc()): ?>
                 <div
@@ -42,9 +60,8 @@
         </div>
     </section>
 
-
-
     <?php include('Footer.php'); ?>
+
 </body>
 
 </html>

@@ -117,7 +117,7 @@ $error = '';
 
 </head>
 
-<body>
+<body class="bg-gray-100 ">
     <?php include('Header.php'); ?>
     <div class="bg-gray-100 flex items-center justify-center p-2">
         <div id="product-card" class="relative bg-white shadow-lg rounded-lg overflow-hidden card">
@@ -361,26 +361,25 @@ $error = '';
         <p>Harga: <?= htmlspecialchars($product['price']); ?></p>
     </div>
 
-    <div class="reviews-section">
-        <h2>Ulasan Produk</h2>
-        <?php if ($reviews->num_rows > 0): ?>
-            <?php while ($review = $reviews->fetch_assoc()): ?>
-                <div class="review">
-                    <div class="review-rating">
-                        <?php
-                        // Menampilkan bintang sesuai dengan rating
-                        for ($i = 1; $i <= 5; $i++): ?>
-                            <span class="star <?= $i <= $review['rating'] ? 'selected' : ''; ?>">&starf;</span>
-                        <?php endfor; ?>
-                    </div>
-                    <p><?= htmlspecialchars($review['comment']); ?></p>
-                    <small>oleh <?= htmlspecialchars($review['username']); ?></small>
+    <div class="reviews-section max-w-2xl mx-auto my-8 p-6 bg-white shadow-md rounded-lg">
+    <h2 class="font-bold text-xl text-center mb-6 text-gray-800">Ulasan Produk</h2>
+    <?php if ($reviews->num_rows > 0): ?>
+        <?php while ($review = $reviews->fetch_assoc()): ?>
+            <div class="review border-b border-gray-200 pb-4 mb-4">
+                <div class="review-rating flex items-center mb-2">
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                        <span class="star <?= $i <= $review['rating'] ? 'text-yellow-400' : 'text-gray-300'; ?>">&starf;</span>
+                    <?php endfor; ?>
                 </div>
-            <?php endwhile; ?>
-        <?php else: ?>
-            <p>Tidak ada ulasan untuk produk ini.</p>
-        <?php endif; ?>
-    </div>
+                <p class="text-gray-700 mb-1"><?= htmlspecialchars($review['comment']); ?></p>
+                <small class="text-gray-500">oleh <?= htmlspecialchars($review['username']); ?></small>
+            </div>
+        <?php endwhile; ?>
+    <?php else: ?>
+        <p class="text-gray-500 text-center">Tidak ada ulasan untuk produk ini.</p>
+    <?php endif; ?>
+</div>
+
 
 
 
