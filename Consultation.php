@@ -49,12 +49,15 @@ if ($userRole === 'dokter') {
     exit;
 }
 
-// Ambil daftar dokter dan apoteker
+// Ambil daftar dokter, apoteker, dan customer service (CS)
 $doctorQuery = "SELECT user_id, username FROM users WHERE role = 'dokter'";
 $doctorResult = $konek->query($doctorQuery);
 
 $apotekerQuery = "SELECT user_id, username FROM users WHERE role = 'apoteker'";
 $apotekerResult = $konek->query($apotekerQuery);
+
+$csQuery = "SELECT user_id, username FROM users WHERE role = 'cs'";
+$csResult = $konek->query($csQuery);
 
 // Tutup koneksi
 $konek->close();
@@ -66,7 +69,7 @@ $konek->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat dengan Dokter / Apoteker</title>
+    <title>Chat dengan Dokter / Apoteker / CS</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -78,6 +81,11 @@ $konek->close();
         .message-doctor {
             text-align: left;
             background-color: #e0f7fa;
+        }
+
+        .message-cs {
+            text-align: left;
+            background-color: #ffe0b2;
         }
     </style>
 </head>
@@ -113,6 +121,17 @@ $konek->close();
                         <span><?php echo htmlspecialchars($apoteker['username']); ?></span>
                     </a>
                 <?php endwhile;
+            } elseif ($type === 'cs') {
+                echo '<h2 class="font-semibold mb-4">Daftar Customer Service</h2>';
+                while ($cs = $csResult->fetch_assoc()): ?>
+                    <a href="?type=cs&cs_id=<?php echo $cs['user_id']; ?>"
+                        class="flex items-center p-2 hover:bg-blue-100 rounded">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3">
+                            <?php echo strtoupper(substr($cs['username'], 0, 1)); ?>
+                        </div>
+                        <span><?php echo htmlspecialchars($cs['username']); ?></span>
+                    </a>
+                <?php endwhile;
             } else {
                 echo "<p>Tipe tidak dikenali.</p>";
             }
@@ -123,9 +142,9 @@ $konek->close();
         <div class="w-2/3 p-4 h-screen overflow-y-auto">
             <h2 class="font-semibold mb-4">
                 <?php
-                // Tampilkan nama dokter atau apoteker yang dipilih
-                $selectedId = isset($_GET['doctor_id']) ? $_GET['doctor_id'] : (isset($_GET['apoteker_id']) ? $_GET['apoteker_id'] : null);
-                $selectedRole = isset($_GET['doctor_id']) ? 'dokter' : (isset($_GET['apoteker_id']) ? 'apoteker' : null);
+                // Tampilkan nama dokter, apoteker, atau CS yang dipilih
+                $selectedId = isset($_GET['doctor_id']) ? $_GET['doctor_id'] : (isset($_GET['apoteker_id']) ? $_GET['apoteker_id'] : (isset($_GET['cs_id']) ? $_GET['cs_id'] : null));
+                $selectedRole = isset($_GET['doctor_id']) ? 'dokter' : (isset($_GET['apoteker_id']) ? 'apoteker' : (isset($_GET['cs_id']) ? 'cs' : null));
 
                 if ($selectedId) {
                     $konek = getConnection();
@@ -138,14 +157,14 @@ $konek->close();
                     $stmt->close();
                     $konek->close();
                 } else {
-                    echo "Pilih dokter atau apoteker untuk memulai chat.";
+                    echo "Pilih dokter, apoteker, atau CS untuk memulai chat.";
                 }
                 ?>
             </h2>
 
             <div class="p-4 h-80 overflow-y-auto bg-gray-50">
                 <?php
-                // Tampilkan pesan hanya jika dokter atau apoteker dipilih
+                // Tampilkan pesan hanya jika dokter, apoteker, atau CS dipilih
                 if ($selectedId) {
                     $konek = getConnection();
                     $messageQuery = "SELECT m.*, u.username FROM messages m JOIN users u ON m.user_id = u.user_id 
@@ -157,9 +176,11 @@ $konek->close();
                     $messageResult = $messageStmt->get_result();
 
                     while ($message = $messageResult->fetch_assoc()) {
-                        $messageClass = ($message['user_id'] == $userId) ? 'message-user' : 'message-doctor';
+                        $messageClass = ($message['user_id'] == $userId) ? 'message-user' : 
+                                        ($selectedRole === 'dokter' ? 'message-doctor' : 
+                                        ($selectedRole === 'apoteker' ? 'message-apoteker' : 'message-cs'));
                         echo "<div class='p-2 my-2 border-b $messageClass'>";
-                        echo "<strong>" . htmlspecialchars($message['username']) . ":</strong> " . htmlspecialchars($message['message_text']);
+                        echo htmlspecialchars($message['message_text']);
                         echo "</div>";
                     }
                     $messageStmt->close();
@@ -192,7 +213,7 @@ $konek->close();
 
         if ($insertStmt->execute()) {
             // Redirect to prevent form resubmission
-            header("Location: consultation.php?" . ($selectedRole == 'dokter' ? "doctor_id=" : "apoteker_id=") . $recipientId);
+            header("Location: consultation.php?" . ($selectedRole === 'dokter' ? "doctor_id=" : ($selectedRole === 'apoteker' ? "apoteker_id=" : "cs_id=")) . $recipientId);
             exit();
         } else {
             echo "Error: " . $insertStmt->error;

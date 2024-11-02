@@ -20,6 +20,10 @@ $userStmt->bind_param("i", $_SESSION['user_id']); // user_id apoteker dari sessi
 $userStmt->execute();
 $userResult = $userStmt->get_result();
 
+// Ambil daftar customer service (CS)
+$csQuery = "SELECT user_id, username FROM users WHERE role = 'cs'";
+$csResult = $konek->query($csQuery);
+
 // Mengambil pesan dari pengguna yang dipilih
 $selectedUserId = isset($_GET['user_id']) ? $_GET['user_id'] : null;
 $messageQuery = "SELECT m.*, u.username FROM messages m JOIN users u ON m.user_id = u.user_id 
@@ -99,6 +103,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
                 <span><?php echo htmlspecialchars($user['username']); ?></span>
             </a>
         <?php endwhile; ?>
+
+        <h2 class="font-semibold mb-4 mt-4">Customer Service</h2>
+        <?php while ($cs = $csResult->fetch_assoc()) : ?>
+            <a href="?user_id=<?php echo $cs['user_id']; ?>" class="flex items-center p-2 hover:bg-blue-100 rounded">
+                <div class="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center mr-3">
+                    <?php echo strtoupper(substr($cs['username'], 0, 1)); ?>
+                </div>
+                <span><?php echo htmlspecialchars($cs['username']); ?></span>
+            </a>
+        <?php endwhile; ?>
     </div>
 
     <!-- Area Pesan -->
@@ -124,8 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
             <?php
                 while ($message = $messageResult->fetch_assoc()) {
                     $messageClass = ($message['user_id'] == $_SESSION['user_id']) ? 'message-apoteker' : 'message-user';
-                    echo "<div class='$messageClass'>"; // Adjusted message container
-                    echo "<strong>" . htmlspecialchars($message['username']) . ":</strong> " . htmlspecialchars($message['message_text']);
+                    echo "<div class='$messageClass'>";
+                    echo htmlspecialchars($message['message_text']);
                     echo "</div>";
                 }
             ?>

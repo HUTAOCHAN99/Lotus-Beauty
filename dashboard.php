@@ -156,7 +156,7 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
                         Akun</a></li>
 
                 <!-- Additional options for admin -->
-                <?php if ($user['role'] == 'admin'): ?>
+                <?php if ($user['role'] != 'customer' ): ?>
                     <li><a href="user_management.php" class="nav-link"><i class="ri-admin-fill nav-icon"></i> Manajemen
                             Pengguna</a></li>
                     <li><a href="reports.php" class="nav-link"><i class="ri-file-list-3-fill nav-icon"></i> Laporan dan

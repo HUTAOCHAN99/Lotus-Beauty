@@ -16,9 +16,9 @@ if ($konek->connect_error) {
 }
 
 // Ambil daftar pengguna (customer) yang mengirim pesan ke dokter
-$userQuery = "SELECT DISTINCT u.user_id, u.username FROM messages m JOIN users u ON m.user_id = u.user_id WHERE m.recipient_id = ?";
+$userQuery = "SELECT DISTINCT u.user_id, u.username FROM messages m JOIN users u ON m.user_id = u.user_id WHERE m.recipient_id = ? OR m.user_id = ?"; // Dokter juga bisa berinteraksi dengan CS
 $userStmt = $konek->prepare($userQuery);
-$userStmt->bind_param("i", $_SESSION['user_id']); // user_id dokter dari session
+$userStmt->bind_param("ii", $_SESSION['user_id'], $_SESSION['user_id']); // user_id dokter dari session
 $userStmt->execute();
 $userResult = $userStmt->get_result();
 
@@ -31,6 +31,10 @@ $messageStmt = $konek->prepare($messageQuery);
 $messageStmt->bind_param("iiii", $_SESSION['user_id'], $selectedUserId, $selectedUserId, $_SESSION['user_id']);
 $messageStmt->execute();
 $messageResult = $messageStmt->get_result();
+
+// Mengambil daftar customer service
+$csQuery = "SELECT user_id, username FROM users WHERE role = 'cs'";
+$csResult = $konek->query($csQuery);
 
 // Pastikan untuk menutup semua statement sebelum menutup koneksi
 $userStmt->close();
@@ -93,6 +97,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
                 <span><?php echo htmlspecialchars($user['username']); ?></span>
             </a>
         <?php endwhile; ?>
+
+        <h2 class="font-semibold mb-4 mt-4">Customer Service</h2>
+        <?php while ($cs = $csResult->fetch_assoc()) : ?>
+            <a href="?user_id=<?php echo $cs['user_id']; ?>" class="flex items-center p-2 hover:bg-blue-100 rounded">
+                <div class="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center mr-3">
+                    <?php echo strtoupper(substr($cs['username'], 0, 1)); ?>
+                </div>
+                <span><?php echo htmlspecialchars($cs['username']); ?></span>
+            </a>
+        <?php endwhile; ?>
     </div>
 
     <!-- Area Pesan -->
@@ -119,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
                 while ($message = $messageResult->fetch_assoc()) {
                     $messageClass = ($message['user_id'] == $_SESSION['user_id']) ? 'message-doctor' : 'message-user';
                     echo "<div class='p-2 my-2 border-b $messageClass'>";
-                    echo "<strong>" . htmlspecialchars($message['username']) . ":</strong> " . htmlspecialchars($message['message_text']);
+                    echo htmlspecialchars($message['message_text']); // Tampilkan pesan
                     echo "</div>";
                 }
             ?>
