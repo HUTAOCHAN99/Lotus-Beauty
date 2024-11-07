@@ -63,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -72,53 +73,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
     <style>
         .message-user {
             text-align: left;
-            background-color: #f0f9ff; /* Light blue for user messages */
+            background-color: #f0f9ff;
+            /* Light blue for user messages */
             border-radius: 15px;
             padding: 10px;
             margin: 5px 0;
-            max-width: 70%; /* Limit width for readability */
+            max-width: 70%;
+            /* Limit width for readability */
         }
+
         .message-apoteker {
             text-align: right;
-            background-color: #e0f7fa; /* Light cyan for apoteker messages */
+            background-color: #e0f7fa;
+            /* Light cyan for apoteker messages */
             border-radius: 15px;
             padding: 10px;
             margin: 5px 0;
-            max-width: 70%; /* Limit width for readability */
+            max-width: 70%;
+            /* Limit width for readability */
         }
     </style>
 </head>
+
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<?php
+    include 'Header.php';
+    ?>
+    <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden flex">
 
-<div class="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden flex">
+        <!-- Daftar Pengguna -->
+        <div class="w-1/3 bg-gray-50 p-4 h-screen overflow-y-auto">
+            <h2 class="font-semibold mb-4">Pengguna</h2>
+            <?php while ($user = $userResult->fetch_assoc()): ?>
+                <a href="?user_id=<?php echo $user['user_id']; ?>" class="flex items-center p-2 hover:bg-blue-100 rounded">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3">
+                        <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
+                    </div>
+                    <span><?php echo htmlspecialchars($user['username']); ?></span>
+                </a>
+            <?php endwhile; ?>
 
-    <!-- Daftar Pengguna -->
-    <div class="w-1/3 bg-gray-50 p-4 h-screen overflow-y-auto">
-        <h2 class="font-semibold mb-4">Pengguna</h2>
-        <?php while ($user = $userResult->fetch_assoc()) : ?>
-            <a href="?user_id=<?php echo $user['user_id']; ?>" class="flex items-center p-2 hover:bg-blue-100 rounded">
-                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3">
-                    <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
-                </div>
-                <span><?php echo htmlspecialchars($user['username']); ?></span>
-            </a>
-        <?php endwhile; ?>
+            <h2 class="font-semibold mb-4 mt-4">Customer Service</h2>
+            <?php while ($cs = $csResult->fetch_assoc()): ?>
+                <a href="?user_id=<?php echo $cs['user_id']; ?>" class="flex items-center p-2 hover:bg-blue-100 rounded">
+                    <div class="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center mr-3">
+                        <?php echo strtoupper(substr($cs['username'], 0, 1)); ?>
+                    </div>
+                    <span><?php echo htmlspecialchars($cs['username']); ?></span>
+                </a>
+            <?php endwhile; ?>
+        </div>
 
-        <h2 class="font-semibold mb-4 mt-4">Customer Service</h2>
-        <?php while ($cs = $csResult->fetch_assoc()) : ?>
-            <a href="?user_id=<?php echo $cs['user_id']; ?>" class="flex items-center p-2 hover:bg-blue-100 rounded">
-                <div class="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center mr-3">
-                    <?php echo strtoupper(substr($cs['username'], 0, 1)); ?>
-                </div>
-                <span><?php echo htmlspecialchars($cs['username']); ?></span>
-            </a>
-        <?php endwhile; ?>
-    </div>
-
-    <!-- Area Pesan -->
-    <div class="w-2/3 p-4 h-screen overflow-y-auto">
-        <h2 class="font-semibold mb-4">
-            <?php 
+        <!-- Area Pesan -->
+        <div class="w-2/3 p-4 h-screen overflow-y-auto">
+            <h2 class="font-semibold mb-4">
+                <?php
                 if ($selectedUserId) {
                     $selectedUserQuery = "SELECT username FROM users WHERE user_id = ?";
                     $stmt = $konek->prepare($selectedUserQuery);
@@ -131,30 +140,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
                 } else {
                     echo "Pilih pengguna untuk memulai chat.";
                 }
-            ?>
-        </h2>
+                ?>
+            </h2>
 
-        <div class="p-4 h-80 overflow-y-auto bg-gray-50">
-            <?php
+            <div class="p-4 h-80 overflow-y-auto bg-gray-50">
+                <?php
                 while ($message = $messageResult->fetch_assoc()) {
                     $messageClass = ($message['user_id'] == $_SESSION['user_id']) ? 'message-apoteker' : 'message-user';
                     echo "<div class='$messageClass'>";
                     echo htmlspecialchars($message['message_text']);
                     echo "</div>";
                 }
-            ?>
-        </div>
+                ?>
+            </div>
 
-        <!-- Area Input Pesan -->
-        <form method="POST" class="flex items-center p-2 border-t" <?php echo $selectedUserId ? '' : 'style="display:none;"'; ?>>
-            <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($selectedUserId); ?>" />
-            <input type="text" name="message_text" placeholder="Ketik di sini dan tekan enter.." class="flex-1 px-4 py-2 border rounded-full text-sm focus:outline-none" required />
-            <button type="submit" class="ml-2 text-orange-500">
-                <i class="ri-send-plane-2-line text-xl"></i>
-            </button>
-        </form>
+            <!-- Area Input Pesan -->
+            <form method="POST" class="flex items-center p-2 border-t" <?php echo $selectedUserId ? '' : 'style="display:none;"'; ?>>
+                <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($selectedUserId); ?>" />
+                <input type="text" name="message_text" placeholder="Ketik di sini dan tekan enter.."
+                    class="flex-1 px-4 py-2 border rounded-full text-sm focus:outline-none" required />
+                <button type="submit" class="ml-2 text-orange-500">
+                    <i class="ri-send-plane-2-line text-xl"></i>
+                </button>
+            </form>
+        </div>
     </div>
-</div>
 
 </body>
+
 </html>

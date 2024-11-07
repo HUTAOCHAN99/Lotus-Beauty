@@ -80,12 +80,12 @@
     <!-- Bagian Atas -->
     <?php include('Header.php'); ?>
     <header class="bg-gray-100 p-4">
-        <!-- Carousel Utama -->
+        <!-- Carousel Event -->
         <div class="swiper-container home-swiper home m-auto max-w-4xl rounded-lg shadow-lg overflow-hidden relative">
             <div class="swiper-wrapper">
                 <?php
-                $directory = "src/images/carousel/";
-                $images = glob($directory . "*.{jpg,jpeg,png,gif}", GLOB_BRACE);
+                $directory = "img/event/";
+                $images = glob($directory . "*.{jpg,jpeg,png,gif,webp}", GLOB_BRACE);
                 foreach ($images as $image) {
                     echo '<div class="swiper-slide">';
                     echo '<img src="' . $image . '" alt="Gambar Promo" class="w-full h-auto object-cover rounded-lg">';
@@ -94,7 +94,7 @@
                 ?>
             </div>
             <div class="absolute bottom-4 right-4 z-20">
-                <button class="mt-2 px-4 py-2 bg-orange-500 rounded-lg text-white">Lihat Semua</button>
+                <a href="event.php" class="mt-2 px-4 py-2 bg-orange-500 rounded-lg text-white">Lihat Semua</a>
             </div>
             <div class="swiper-button-next"></div>
             <div class="swiper-button-prev"></div>
@@ -107,19 +107,34 @@
     <!-- Bagian Ikon Grid -->
     <section class="grid grid-cols-3 gap-4 p-4 border-lg bg-gray-200">
         <div class="flex flex-col items-center">
-            <i class="ri-file-upload-line text-3xl text-blue-500"></i>
-            <p class="text-sm text-gray-700 mt-2">Upload Resep</p>
+            <!-- Ikon produk obat -->
+            <i class="ri-medicine-bottle-line text-3xl text-blue-500"></i>
+            <p class="text-sm text-gray-700 mt-2">Produk</p>
         </div>
         <div class="flex flex-col items-center">
-            <a href="Recipe.php"><i class="ri-file-text-line text-3xl text-blue-500"></i></a>
-            <p class="text-sm text-gray-700 mt-2">Obat Resep</p>
+            <!-- Ikon resep -->
+            <a href="Recipe.php">
+                <i class="ri-file-text-line text-3xl text-blue-500"></i>
+            </a>
+            <p class="text-sm text-gray-700 mt-2">Resep</p>
         </div>
         <div class="flex flex-col items-center">
-            <a href="Product_Page.php"><i class="ri-capsule-line text-3xl text-blue-500"></i></a>
-            <p class="text-sm text-gray-700 mt-2">Obat Herbal</p>
+            <!-- Ikon keranjang belanja -->
+            <a href="Product_Page.php">
+                <i class="ri-shopping-cart-line text-3xl text-blue-500"></i>
+            </a>
+            <p class="text-sm text-gray-700 mt-2">Keranjang</p>
         </div>
     </section>
-    <!-- Carousel Utama -->
+
+    <!-- Carousel Promosi -->
+    <!-- Carousel Promosi -->
+    <div class="flex justify-between items-center px-8 py-4">
+        <h2 class="text-2xl font-bold">Promo Menarik Untukmu</h2>
+        <a href="event.php" class="text-orange-500 hover:text-slate-500 transition">Lihat Semua</a>
+    </div>
+
+
     <div class="swiper-container home-swiper home m-auto max-w-4xl rounded-lg shadow-lg overflow-hidden relative p-4">
         <div class="swiper-wrapper">
             <?php
@@ -131,9 +146,6 @@
                 echo '</div>';
             }
             ?>
-        </div>
-        <div class="absolute bottom-4 right-4 z-20">
-            <button class="mt-2 px-4 py-2 bg-orange-500 rounded-lg text-white">Lihat Semua</button>
         </div>
         <div class="swiper-button-next"></div>
         <div class="swiper-button-prev"></div>
@@ -153,12 +165,13 @@
             <a href="Recipe.php"><i class="ri-file-list-3-line text-xl text-gray-700"></i></a>
             <p class="text-xs text-gray-700">Resep</p>
         </div>
-        <div class="flex flex-col items-center">
-            <a href="Consultation_Page.php"><i class="ri-message-line text-xl text-gray-700"></i></a>
-            <p class="text-xs text-gray-700">Konsultasi</p>
-        </div>
-        <div class="flex flex-col items-center">
-
+        <?php if ($role !== 'admin'): ?>
+            <div class="flex flex-col items-center">
+                <a href="Consultation_Page.php"><i class="ri-message-line text-xl text-gray-700"></i></a>
+                <p class="text-xs text-gray-700">Konsultasi</p>
+            </div>
+            <div class="flex flex-col items-center">
+            <?php endif; ?>
             <a href="dashboard.php" class="flex flex-col items-center">
                 <i class="ri-user-line text-xl text-gray-700"></i>
                 <p class="text-xs text-gray-700">Akun</p>

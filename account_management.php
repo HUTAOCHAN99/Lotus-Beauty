@@ -55,7 +55,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['user_
 }
 
 // Ambil data pengguna yang statusnya aktif
-$stmt = $pdo->prepare("SELECT * FROM users WHERE status = 'active'");
+$stmt = $pdo->prepare("SELECT * FROM users");
+
+
 $stmt->execute();
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>

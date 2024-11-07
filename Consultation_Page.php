@@ -17,7 +17,7 @@
       <a href="Consultation.php?type=dokter"
         class="flex items-center p-4 bg-blue-50 rounded-lg shadow-md hover:bg-blue-100 transition duration-200">
         <div class="w-16 h-16 rounded-full flex items-center justify-center bg-blue-100">
-          <img src="doctor-icon.png" alt="Doctor Icon" class="w-12 h-12">
+          <img src="img\icon\doctor-icon.jpg" alt="Doctor Icon" class="w-12 h-12">
         </div>
         <div class="ml-4">
           <h3 class="text-lg font-semibold text-gray-700">Chat Dokter</h3>
@@ -29,7 +29,7 @@
       <a href="Consultation.php?type=apoteker"
         class="flex items-center p-4 bg-orange-50 rounded-lg shadow-md hover:bg-orange-100 transition duration-200">
         <div class="w-16 h-16 rounded-full flex items-center justify-center bg-orange-100">
-          <img src="pharmacist-icon.png" alt="Pharmacist Icon" class="w-12 h-12">
+          <img src="img\icon\pharmacist.jpg" alt="Pharmacist Icon" class="w-12 h-12">
         </div>
         <div class="ml-4">
           <h3 class="text-lg font-semibold text-gray-700">Chat Apoteker</h3>
@@ -41,7 +41,7 @@
       <a href="Consultation.php?type=cs"
         class="flex items-center p-4 bg-blue-50 rounded-lg shadow-md hover:bg-blue-100 transition duration-200">
         <div class="w-16 h-16 rounded-full flex items-center justify-center bg-blue-100">
-          <img src="cs-icon.png" alt="Customer Service Icon" class="w-12 h-12">
+          <img src="img\icon\CS.jpg" alt="Customer Service Icon" class="w-12 h-12">
         </div>
         <div class="ml-4">
           <h3 class="text-lg font-semibold text-gray-700">Chat CS Farmaku</h3>

@@ -1,3 +1,12 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+include 'db.php'; // Pastikan koneksi ke database sudah benar
+
+// Mengambil role dari session jika ada
+$role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,7 +31,6 @@
 
         .search-bar-container.open {
             width: 250px;
-            /* Sesuaikan dengan lebar yang diinginkan */
             opacity: 1;
             visibility: visible;
         }
@@ -31,7 +39,6 @@
             background-color: #B0E0E6;
         }
 
-        /* Fixed navbar styling */
         .navbar-fixed {
             position: fixed;
             top: 0;
@@ -44,7 +51,6 @@
             padding-top: 4rem;
         }
 
-        /* Mobile menu */
         .mobile-menu {
             display: none;
             transition: max-height 0.3s ease-in-out;
@@ -59,33 +65,30 @@
 </head>
 
 <body class="bg-green">
-    <!-- Navbar -->
-    <nav class="bg-powderBlue shadow-md py-4 px-8 flex justify-between items-center navbar-fixed">
-        <!-- Left Side (Logo + Menu) -->
+    <nav class="bg-powderBlue shadow-md py-4 px-8 flex justify-between items-center navbar-fixed ">
         <div class="flex items-center space-x-8">
-            <!-- Logo -->
             <div class="flex items-center justify-center">
                 <img src="img/icon/icon_shop.png" alt="icon-shop" width="120px">
             </div>
 
-            <!-- Main Menu (Hidden on Mobile) -->
             <div class="hidden md:flex space-x-6">
                 <a href="Home.php" class="text-green-900 hover:font-bold">Home</a>
                 <a href="Product_Page.php" class="text-green-900 hover:font-bold">Produk</a>
-                <a href="Consultation_Page.php" class="text-green-900 hover:font-bold">Konsultasi</a>
+                
+                <!-- Hanya tampilkan link Konsultasi jika role bukan 'admin' -->
+                <?php if ($role !== 'admin'): ?>
+                    <a href="Consultation_Page.php" class="text-green-900 hover:font-bold">Konsultasi</a>
+                <?php endif; ?>
+                
                 <a href="Recipe.php" class="text-green-900 hover:font-bold">Resep</a>
-                <a href="#" class="text-green-900 hover:font-bold">About Us</a>
+                <a href="AboutUs.php" class="text-green-900 hover:font-bold">About Us</a>
             </div>
         </div>
 
-        <!-- Right Side (Icons + Search Bar) -->
         <div class="flex items-center space-x-4">
-            <!-- Search Bar (Initially Hidden) -->
-            <!-- Search Bar (Initially Hidden) -->
             <div id="search-bar" class="search-bar-container bg-white shadow-md rounded-md p-1">
                 <form action="Product_Page.php" method="GET" class="flex items-center">
-                    <input type="text" name="search" class="w-full border-none focus:outline-none rounded-md p-2"
-                        placeholder="Search for products...">
+                    <input type="text" name="search" class="w-full border-none focus:outline-none rounded-md p-2" placeholder="Search for products...">
                     <button type="submit" class="text-green-900 hover:text-black ml-2">
                         <i class="ri-search-line ri-lg"></i>
                     </button>
@@ -95,12 +98,9 @@
                 </form>
             </div>
 
-
-            <!-- Search Icon Button -->
             <button id="search-toggle" class="text-green-900 hover:text-black">
                 <i class="ri-search-line ri-lg"></i>
             </button>
-
             <button class="text-green-900 hover:text-black">
                 <a href="cart.php"><i class="ri-shopping-bag-line ri-lg"></i></a>
             </button>
@@ -108,54 +108,50 @@
                 <a href="dashboard.php"><i class="ri-user-line ri-lg"></i></a>
             </button>
 
-            <!-- Mobile Menu Icon (only visible on mobile) -->
             <button id="mobile-menu-button" class="block md:hidden text-green-900 hover:text-black">
                 <i class="ri-menu-line ri-lg"></i>
             </button>
         </div>
     </nav>
 
-    <!-- Mobile Menu (Initially Hidden) -->
     <div id="mobile-menu" class="mobile-menu md:hidden bg-white shadow-md py-4 px-8">
         <a href="Home.php" class="block py-2 text-green-900 hover:font-bold">Home</a>
         <a href="Product_Page.php" class="block py-2 text-green-900 hover:font-bold">Produk</a>
         <a href="Purchase.php" class="block py-2 text-green-900 hover:font-bold">Shop</a>
-        <a href="Consultation_Page.php" class="block py-2 text-green-900 hover:font-bold">Konsultasi</a>
+        
+        <!-- Hanya tampilkan link Konsultasi jika role bukan 'admin' -->
+        <?php if ($role !== 'admin'): ?>
+            <a href="Consultation_Page.php" class="block py-2 text-green-900 hover:font-bold">Konsultasi</a>
+        <?php endif; ?>
+        
         <a href="Recipe.php" class="block py-2 text-green-900 hover:font-bold">Resep</a>
-        <a href="#" class="block py-2 text-green-900 hover:font-bold">About Us</a>
+        <a href="AboutUs.php" class="block py-2 text-green-900 hover:font-bold">About Us</a>
     </div>
-    <div class="block p-4"></div>
-
+    <div class="block my-4"></div>
     <script>
         const mobileMenuButton = document.getElementById("mobile-menu-button");
         const mobileMenu = document.getElementById("mobile-menu");
-
         const searchToggle = document.getElementById("search-toggle");
         const searchBar = document.getElementById("search-bar");
         const searchCancel = document.getElementById("search-cancel");
 
-        // Toggle mobile menu
         mobileMenuButton.addEventListener("click", () => {
             mobileMenu.classList.toggle("open");
         });
 
-        // Menampilkan search bar saat search icon diklik
         searchToggle.addEventListener("click", () => {
             searchBar.classList.add("open");
-            searchToggle.classList.add("hidden"); // Sembunyikan icon search
+            searchToggle.classList.add("hidden");
         });
 
-        // Menyembunyikan search bar saat tombol cancel diklik
         searchCancel.addEventListener("click", () => {
-            // Tambahkan penundaan sebelum menyembunyikan search bar dan menampilkan ikon kembali
             setTimeout(() => {
                 searchBar.classList.remove("open");
-                searchToggle.classList.remove("hidden"); // Tampilkan kembali icon search
-                document.querySelector('#search-bar input').value = ""; // Kosongkan input
-            }, 300); // Sesuaikan dengan durasi transisi CSS
+                searchToggle.classList.remove("hidden");
+                document.querySelector('#search-bar input').value = "";
+            }, 300);
         });
     </script>
 
 </body>
-
 </html>

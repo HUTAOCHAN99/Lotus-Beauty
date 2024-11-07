@@ -18,7 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $stmt = $konek->prepare("SELECT user_id, email, password FROM users WHERE username = ?");
+    // Pastikan role juga diambil dari database
+    $stmt = $konek->prepare("SELECT user_id, email, password, role FROM users WHERE username = ?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -26,16 +27,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
 
+        // Verifikasi password
         if (password_verify($password, $user['password'])) {
             $_SESSION['reset_email'] = $user['email'];
             $_SESSION['username'] = $username;
             $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['role'] = $user['role']; // Set role ke dalam session
             $_SESSION['action'] = 'login';
-            
 
+            // Generate token
             $token = bin2hex(random_bytes(4));
             $_SESSION['token'] = $token;
 
+            // Kirim email dengan kode verifikasi
             $mail = new PHPMailer\PHPMailer\PHPMailer(true);
             try {
                 $mail->isSMTP();

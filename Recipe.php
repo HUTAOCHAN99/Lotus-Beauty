@@ -12,9 +12,9 @@
     <h2 class="text-2xl font-bold mb-6">Obat Resep</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
         <?php
-        include('db.php'); // Pastikan Anda sudah menghubungkan ke database
+        include('db.php'); // Koneksi database
 
-        // Ambil data semua resep dari database, termasuk prescription_id
+        // Ambil data semua resep dari database
         $result = $konek->query("SELECT prescription_id, nama_resep, image_url FROM prescription");
 
         // Periksa apakah query berhasil

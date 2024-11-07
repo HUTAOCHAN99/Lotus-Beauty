@@ -87,7 +87,9 @@ $konek->close();
 </head>
 
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-
+<?php 
+include 'Header.php';
+?>
     <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden flex">
 
         <div class="w-1/3 bg-gray-50 p-4 h-screen overflow-y-auto">

@@ -65,39 +65,44 @@ $konek->close();
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-
-    <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
-        <div class="p-4">
-            <h2 class="font-semibold mb-4">Riwayat Chat</h2>
-            <table class="w-full mb-4">
-                <thead>
-                    <tr>
-                        <th class="border px-4 py-2">Pengirim</th>
-                        <th class="border px-4 py-2">Penerima</th>
-                        <th class="border px-4 py-2">Pesan</th>
-                        <th class="border px-4 py-2">Tanggal</th>
-                        <th class="border px-4 py-2">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($chat = $chatResult->fetch_assoc()): ?>
+<body>
+    <div class="bg-gray-100 flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
+            <div class="p-4">
+                <h2 class="font-semibold mb-4">Riwayat Chat</h2>
+                <table class="w-full mb-4">
+                    <thead>
                         <tr>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($chat['user_username']); ?></td>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($chat['recipient_username']); ?></td>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($chat['message_text']); ?></td>
-                            <td class="border px-4 py-2"><?php echo htmlspecialchars($chat['created_at']); ?></td>
-                            <td class="border px-4 py-2">
-                                <form method="POST" action="delete_message.php">
-                                    <input type="hidden" name="message_id" value="<?php echo $chat['message_id']; ?>">
-                                    <button type="submit" class="text-red-500 hover:underline">Hapus</button>
-                                </form>
-                            </td>
+                            <th class="border px-4 py-2">Pengirim</th>
+                            <th class="border px-4 py-2">Penerima</th>
+                            <th class="border px-4 py-2">Pesan</th>
+                            <th class="border px-4 py-2">Tanggal</th>
+                            <th class="border px-4 py-2">Aksi</th>
                         </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        <?php while ($chat = $chatResult->fetch_assoc()): ?>
+                            <tr>
+                                <td class="border px-4 py-2"><?php echo htmlspecialchars($chat['user_username']); ?></td>
+                                <td class="border px-4 py-2"><?php echo htmlspecialchars($chat['recipient_username']); ?>
+                                </td>
+                                <td class="border px-4 py-2"><?php echo htmlspecialchars($chat['message_text']); ?></td>
+                                <td class="border px-4 py-2"><?php echo htmlspecialchars($chat['created_at']); ?></td>
+                                <td class="border px-4 py-2">
+                                    <form method="POST" action="delete_message.php">
+                                        <input type="hidden" name="message_id" value="<?php echo $chat['message_id']; ?>">
+                                        <button type="submit" class="text-red-500 hover:underline">Hapus</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
+    </div>
+    <div class="text-center my-8">
+        <a href="user_management.php" class="text-sm text-gray-600 hover:text-gray-800">← Kembali ke user management</a>
     </div>
 
 </body>
