@@ -108,7 +108,7 @@
     <section class="grid grid-cols-3 gap-4 p-4 border-lg bg-gray-200">
         <div class="flex flex-col items-center">
             <!-- Ikon produk obat -->
-            <i class="ri-medicine-bottle-line text-3xl text-blue-500"></i>
+            <a href="Product_Page.php"><i class="ri-medicine-bottle-line text-3xl text-blue-500"></i></a>
             <p class="text-sm text-gray-700 mt-2">Produk</p>
         </div>
         <div class="flex flex-col items-center">
@@ -120,7 +120,7 @@
         </div>
         <div class="flex flex-col items-center">
             <!-- Ikon keranjang belanja -->
-            <a href="Product_Page.php">
+            <a href="cart.php">
                 <i class="ri-shopping-cart-line text-3xl text-blue-500"></i>
             </a>
             <p class="text-sm text-gray-700 mt-2">Keranjang</p>

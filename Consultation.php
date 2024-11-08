@@ -50,7 +50,7 @@ if ($userRole === 'dokter') {
     exit;
 }
 
-// Ambil daftar dokter, apoteker, dan customer service (CS)
+    // Ambil daftar dokter
 $doctorQuery = "SELECT user_id, username FROM users WHERE role = 'dokter'";
 $doctorResult = $konek->query($doctorQuery);
 
@@ -133,7 +133,7 @@ ob_end_flush(); // Hentikan output buffering
         }
 
         .message-cs {
-            background-color: green;
+            background-color: #e0f7fa;
         }
 
         .message-container {
@@ -262,7 +262,7 @@ ob_end_flush(); // Hentikan output buffering
                         $stmt->close();
                         $konek->close();
                     } else {
-                        echo "Pilih dokter, apoteker, atau CS untuk memulai chat.";
+                        echo "Pilih dokter untuk memulai chat";
                     }
                     ?>
                 </h2>
@@ -347,23 +347,33 @@ ob_end_flush(); // Hentikan output buffering
             messageContainer.scrollTop = messageContainer.scrollHeight;
         }
 
-        // Tampilkan tombol scroll jika tidak di bagian bawah chat
-        messageContainer.addEventListener("scroll", () => {
+        // Fungsi untuk mengecek apakah user sudah di dasar chat
+        function checkScrollPosition() {
             const atBottom = messageContainer.scrollHeight - messageContainer.scrollTop === messageContainer.clientHeight;
             scrollButton.style.display = atBottom ? "none" : "block";
-        });
+        }
 
-        // Klik tombol scroll ke bawah
+        // Event listener untuk scroll pada message container
+        messageContainer.addEventListener("scroll", checkScrollPosition);
+
+        // Event listener untuk tombol scroll ke bawah
         scrollButton.addEventListener("click", scrollToBottom);
 
         // Pastikan chat scroll ke bawah ketika halaman dimuat
-        window.onload = scrollToBottom;
+        window.onload = () => {
+            scrollToBottom();
+            checkScrollPosition(); // Cek posisi saat halaman dimuat
+        };
 
         // Scroll otomatis setelah form disubmit
         document.querySelector('form').addEventListener('submit', function () {
-            setTimeout(scrollToBottom, 300);
+            setTimeout(() => {
+                scrollToBottom();
+                checkScrollPosition(); // Cek posisi setelah mengirim pesan
+            }, 300);
         });
     </script>
+
 </body>
 
 </html>

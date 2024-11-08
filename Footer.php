@@ -42,7 +42,7 @@
                     <li><a href="Home.php" class="hover:underline">Home</a></li>
                     <li><a href="Product_Page.php" class="hover:underline">Produk</a></li>
                     <li><a href="Recipe.php" class="hover:underline">Resep</a></li>
-                    <li><a href="Consultation.php" class="hover:underline">Konsultasi</a></li>
+                    <li><a href="Consultation_Page.php" class="hover:underline">Konsultasi</a></li>
                 </ul>
             </div>
 
