@@ -8,7 +8,7 @@
 </head>
 <body class="bg-gray-100">
 <?php include('Header.php'); ?>
-<section class="max-w-4xl mx-auto p-4">
+<section class="max-w-6xl mx-auto p-4 ">
     <h2 class="text-2xl font-bold mb-6">Obat Resep</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
         <?php
