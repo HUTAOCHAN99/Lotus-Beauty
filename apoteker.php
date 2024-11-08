@@ -25,17 +25,39 @@ if (empty($username)) {
     exit;
 }
 
-// Ambil daftar pengguna (customer) yang menghubungi apoteker
+// Ambil role pengguna dari database
 $konek = getConnection();
-$userQuery = "SELECT DISTINCT u.user_id, u.username FROM messages m JOIN users u ON m.user_id = u.user_id WHERE m.recipient_id = ?";
+$roleQuery = "SELECT role FROM users WHERE username = ?";
+$roleStmt = $konek->prepare($roleQuery);
+$roleStmt->bind_param("s", $username);
+$roleStmt->execute();
+$roleResult = $roleStmt->get_result();
+$roleRow = $roleResult->fetch_assoc();
+$userRole = $roleRow['role']; // Menyimpan role pengguna
+$roleStmt->close();
+
+// Ambil daftar pengguna (customer, dokter, dan cs) berdasarkan role
+if ($userRole == 'apoteker') {
+    $userQuery = "SELECT DISTINCT u.user_id, u.username 
+                  FROM messages m 
+                  JOIN users u ON m.user_id = u.user_id 
+                  WHERE (m.recipient_id = ? OR m.user_id = ?) 
+                  AND u.role IN ('customer', 'cs') 
+                  AND u.user_id != ?";
+} else {
+    // Jika pengguna adalah dokter atau role lain, ambil sesuai role mereka
+    $userQuery = "SELECT DISTINCT u.user_id, u.username 
+                  FROM messages m 
+                  JOIN users u ON m.user_id = u.user_id 
+                  WHERE (m.recipient_id = ? OR m.user_id = ?) 
+                  AND u.role != ? 
+                  AND u.user_id != ?";
+}
+
 $userStmt = $konek->prepare($userQuery);
-$userStmt->bind_param("i", $_SESSION['user_id']); // user_id apoteker dari session
+$userStmt->bind_param("iiii", $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id']);
 $userStmt->execute();
 $userResult = $userStmt->get_result();
-
-// Ambil daftar customer service (CS)
-$csQuery = "SELECT user_id, username FROM users WHERE role = 'cs'";
-$csResult = $konek->query($csQuery);
 
 // Mengambil pesan dari pengguna yang dipilih
 $selectedUserId = isset($_GET['user_id']) ? $_GET['user_id'] : null;
@@ -52,11 +74,10 @@ $userStmt->close();
 $messageStmt->close();
 
 // Handle the message sending
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text']) && isset($_POST['recipient_id'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
     $messageText = $_POST['message_text'];
-    $recipientId = $_POST['recipient_id'];  // recipient_id yang dipilih pengguna
+    $recipientId = $_POST['user_id']; // recipient_id yang dipilih pengguna
     $userId = $_SESSION['user_id']; // ID pengguna yang sedang login
-    $messageType = 'apoteker';  // Misalnya, set ini sesuai dengan peran pengguna saat ini (bisa 'dokter', 'apoteker', atau 'cs')
 
     // Memastikan recipient_id valid
     if ($recipientId && !empty($messageText)) {
@@ -64,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text']) && is
         $insertQuery = "INSERT INTO messages (user_id, recipient_id, message_text, message_type, status, created_at) 
                         VALUES (?, ?, ?, ?, 'sent', NOW())";
         $insertStmt = $konek->prepare($insertQuery);
-        $insertStmt->bind_param("iiss", $userId, $recipientId, $messageText, $messageType);
+        $insertStmt->bind_param("iiss", $userId, $recipientId, $messageText, 'apoteker');
 
         if ($insertStmt->execute()) {
             // Setelah pesan terkirim, arahkan ulang ke halaman chat dengan penerima yang sama
@@ -91,11 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text']) && is
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .bg-powderBlue {
-            background-color: #B0E0E6;
-        }
-
-        /* Atur posisi pesan menggunakan Flexbox */
         .message-row {
             display: flex;
             margin-bottom: 10px;
@@ -118,7 +134,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text']) && is
             flex-shrink: 0;
         }
 
-        /* Gaya Scrollbar */
         .message-container::-webkit-scrollbar {
             width: 8px;
         }
@@ -136,7 +151,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text']) && is
             background: #888;
         }
 
-        /* Tombol Scroll */
         #scroll-button {
             display: none;
             position: fixed;
@@ -179,16 +193,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text']) && is
                     <span><?php echo htmlspecialchars($user['username']); ?></span>
                 </a>
             <?php endwhile; ?>
-
-            <h2 class="font-semibold mb-4 mt-4">Customer Service</h2>
-            <?php while ($cs = $csResult->fetch_assoc()): ?>
-                <a href="?user_id=<?php echo $cs['user_id']; ?>" class="flex items-center p-2 hover:bg-blue-100 rounded">
-                    <div class="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center mr-3">
-                        <?php echo strtoupper(substr($cs['username'], 0, 1)); ?>
-                    </div>
-                    <span><?php echo htmlspecialchars($cs['username']); ?></span>
-                </a>
-            <?php endwhile; ?>
         </div>
 
         <!-- Area Pesan -->
@@ -202,82 +206,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text']) && is
                     $stmt->execute();
                     $selectedUserResult = $stmt->get_result();
                     $selectedUser = $selectedUserResult->fetch_assoc();
-                    echo "Chat dengan " . htmlspecialchars($selectedUser['username']);
-                    $stmt->close();
-                } else {
-                    echo "Pilih pengguna untuk memulai chat.";
+                    echo htmlspecialchars($selectedUser['username']);
                 }
                 ?>
             </h2>
 
-            <div class="flex-1 overflow-y-auto message-container" id="message-container">
-                <?php
-                if ($selectedId) {
-                    while ($message = $messageResult->fetch_assoc()) {
-                        $isUserMessage = ($message['user_id'] == $_SESSION['user_id']);
-                        $messageClass = $isUserMessage ? 'message-user' : 'message-apoteker';
-                        $rowClass = $isUserMessage ? 'flex-row-reverse' : 'flex-row';
-
-                        echo "<div class='message-row $rowClass'>";
-                        echo "<div class='$messageClass'>";
-                        if (!$isUserMessage) {
-                            echo "<p class='font-bold text-xs mb-1'>" . htmlspecialchars($message['username']) . "</p>";
-                        }
-                        echo "<p>" . htmlspecialchars($message['message_text']) . "</p>";
-                        echo "<p class='text-xs text-gray-500'>" . date("H:i", strtotime($message['created_at'])) . "</p>";
-                        echo "</div>";
-                        echo "</div>";
-                    }
-                }
-                ?>
+            <!-- Tampilan Pesan -->
+            <div class="message-container flex-1 p-4 overflow-y-auto" id="message-container">
+                <?php while ($message = $messageResult->fetch_assoc()): ?>
+                    <div class="message-row <?php echo $message['user_id'] == $_SESSION['user_id'] ? 'justify-end' : ''; ?>">
+                        <div class="<?php echo $message['user_id'] == $_SESSION['user_id'] ? 'message-apoteker' : 'message-user'; ?>">
+                            <?php echo htmlspecialchars($message['message_text']); ?>
+                        </div>
+                    </div>
+                <?php endwhile; ?>
             </div>
 
-            <div id="scroll-button">
-                <i class="ri-arrow-down-line text-xl"></i>
-            </div>
-
-            <!-- Area Input Pesan -->
-            <div class="fixed w-1/2 bottom-0 p-2 bg-white border-t">
-                <form method="POST" class="flex items-center" <?php echo $selectedId ? '' : 'style="display:none;"'; ?>>
-                    <input type="hidden" name="recipient_id" value="<?php echo htmlspecialchars($selectedId); ?>" />
-                    <input type="text" name="message_text" placeholder="Ketik di sini dan tekan enter.."
-                        class="flex-1 px-4 py-2 border rounded-full text-sm focus:outline-none" required />
-                    <button type="submit" class="ml-2 text-orange-500">
-                        <i class="ri-send-plane-2-line text-xl"></i>
-                    </button>
-                </form>
-            </div>
+            <!-- Input Pesan -->
+            <form method="POST" class="p-4 bg-gray-50 border-t-2">
+                <input type="hidden" name="user_id" value="<?php echo $selectedUserId; ?>">
+                <textarea name="message_text" class="w-full p-2 border rounded" rows="3" placeholder="Ketik pesan..."></textarea>
+                <button type="submit" class="mt-2 w-full bg-blue-500 text-white p-2 rounded">Kirim Pesan</button>
+            </form>
         </div>
     </div>
 
+    <!-- Scroll ke bawah -->
+    <button id="scroll-button" onclick="scrollToBottom()">↓</button>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const messageContainer = document.getElementById("message-container");
-            const scrollButton = document.getElementById("scroll-button");
+        // Fungsi scroll ke bawah
+        function scrollToBottom() {
+            const messageContainer = document.getElementById('message-container');
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
 
-            function scrollToBottom() {
-                messageContainer.scrollTop = messageContainer.scrollHeight;
-            }
-
-            function checkScrollPosition() {
-                const atBottom = messageContainer.scrollHeight - messageContainer.scrollTop <= messageContainer.clientHeight + 10;
-                scrollButton.style.display = atBottom ? "none" : "block";
-            }
-
-            messageContainer.addEventListener("scroll", checkScrollPosition);
-            scrollButton.addEventListener("click", scrollToBottom);
-
-            window.onload = () => {
-                scrollToBottom();
-                checkScrollPosition();
-            };
-
-            document.querySelector('form').addEventListener('submit', function () {
-                setTimeout(() => {
-                    scrollToBottom();
-                    checkScrollPosition();
-                }, 300);
-            });
+        // Mengaktifkan tombol scroll jika tidak di bagian bawah
+        document.getElementById('message-container').addEventListener('scroll', function() {
+            const button = document.getElementById('scroll-button');
+            const messageContainer = document.getElementById('message-container');
+            button.style.display = messageContainer.scrollTop < messageContainer.scrollHeight - messageContainer.offsetHeight ? 'block' : 'none';
         });
     </script>
 

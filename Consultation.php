@@ -35,22 +35,32 @@ $stmt->bind_result($userRole, $userId);
 $stmt->fetch();
 $stmt->close();
 
-// Mengarahkan pengguna berdasarkan role
+
+if (isset($_GET['type'])) {
+    $type = $_GET['type'];
+} else {
+    echo "Tipe tidak ditemukan.";
+    exit();
+}
+// Mengarahkan pengguna berdasarkan role dengan mengirimkan nilai $type
 if ($userRole === 'dokter') {
-    header("Location: dokter.php");
+    header("Location: dokter.php?type=" . urlencode($type));
     exit();
 } elseif ($userRole === 'apoteker') {
-    header("Location: apoteker.php");
+    $type = 'apoteker'; // Misalnya $type sudah ada nilainya
+    header("Location: apoteker.php?type=" . urlencode($type));
     exit();
 } elseif ($userRole === 'cs') {
-    header("Location: cs.php");
+    $type = 'cs'; // Misalnya $type sudah ada nilainya
+    header("Location: cs.php?type=" . urlencode($type));
     exit();
 } elseif ($userRole !== 'customer') {
     echo "Role tidak dikenali.";
     exit;
 }
 
-    // Ambil daftar dokter
+
+// Ambil daftar dokter
 $doctorQuery = "SELECT user_id, username FROM users WHERE role = 'dokter'";
 $doctorResult = $konek->query($doctorQuery);
 
@@ -236,7 +246,7 @@ ob_end_flush(); // Hentikan output buffering
                             </div>
                             <span><?php echo htmlspecialchars($cs['username']); ?></span>
                         </a>
-                    <?php endwhile;
+                <?php endwhile;
                 } else {
                     echo "<p>Tipe tidak dikenali.</p>";
                 }
@@ -273,8 +283,8 @@ ob_end_flush(); // Hentikan output buffering
                     if ($selectedId) {
                         $konek = getConnection();
                         $messageQuery = "SELECT m.*, u.username FROM messages m JOIN users u ON m.user_id = u.user_id 
-            WHERE (m.user_id = ? AND m.recipient_id = ?) OR (m.user_id = ? AND m.recipient_id = ?)
-            ORDER BY m.created_at ASC";
+                WHERE (m.user_id = ? AND m.recipient_id = ?) OR (m.user_id = ? AND m.recipient_id = ?)
+                 ORDER BY m.created_at ASC";
                         $messageStmt = $konek->prepare($messageQuery);
                         $messageStmt->bind_param("iiii", $userId, $selectedId, $selectedId, $userId);
                         $messageStmt->execute();
@@ -282,9 +292,7 @@ ob_end_flush(); // Hentikan output buffering
 
                         while ($message = $messageResult->fetch_assoc()) {
                             $isUserMessage = ($message['user_id'] == $userId);
-                            $messageClass = $isUserMessage ? 'message-user' :
-                                ($selectedRole === 'dokter' ? 'message-doctor' :
-                                    ($selectedRole === 'apoteker' ? 'message-apoteker' : 'message-cs'));
+                            $messageClass = $isUserMessage ? 'message-user' : ($selectedRole === 'dokter' ? 'message-doctor' : ($selectedRole === 'apoteker' ? 'message-apoteker' : 'message-cs'));
 
                             echo "<div class='p-2 my-2 border-b $messageClass'>";
                             if (!$isUserMessage) {
@@ -366,7 +374,7 @@ ob_end_flush(); // Hentikan output buffering
         };
 
         // Scroll otomatis setelah form disubmit
-        document.querySelector('form').addEventListener('submit', function () {
+        document.querySelector('form').addEventListener('submit', function() {
             setTimeout(() => {
                 scrollToBottom();
                 checkScrollPosition(); // Cek posisi setelah mengirim pesan
