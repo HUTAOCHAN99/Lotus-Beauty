@@ -56,26 +56,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
     } elseif ($category === 'resep') {
-        // Prescription data
+        // Data yang diperlukan untuk tabel `prescription`
         $nama_resep = htmlspecialchars($_POST['nama_resep']);
         $doctor_name = htmlspecialchars($_POST['doctor_name']);
         $patient_name = htmlspecialchars($_POST['patient_name']);
         $usage_instructions = htmlspecialchars($_POST['usage_instructions']);
-        $product_id = htmlspecialchars($_POST['product_id']);
+        $desc_recipe = htmlspecialchars($_POST['desc_recipe']);
+        $product_id = intval($_POST['product_id']); // pastikan product_id berupa angka
+        $created_at = date("Y-m-d H:i:s");
+        $updated_at = date("Y-m-d H:i:s");
 
+        // Penanganan upload gambar
         $image = $_FILES['image'];
-        $imagePath = 'img/resep/' . basename($image['name']);
+        $imagePath = '';
 
-        if (move_uploaded_file($image['tmp_name'], $imagePath)) {
-            $stmt = $konek->prepare("INSERT INTO prescription (nama_resep, doctor_name, patient_name, usage_instructions, product_id, created_at, updated_at, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssiiss", $nama_resep, $doctor_name, $patient_name, $usage_instructions, $product_id, $created_at, $updated_at, $imagePath);
-            $stmt->execute();
-            $uploadSuccess = true; // Mark as successful
+        if ($image['error'] == UPLOAD_ERR_OK) {
+            $imagePath = 'img/resep/' . basename($image['name']);
+            if (!move_uploaded_file($image['tmp_name'], $imagePath)) {
+                echo "<p class='text-red-500'>Gagal mengunggah gambar.</p>";
+                exit();
+            }
+        }
+
+        // Simpan data ke tabel `prescription`
+        $stmt = $konek->prepare("INSERT INTO prescription (nama_resep, product_id, doctor_name, patient_name, usage_instructions, desc_recipe, created_at, updated_at, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("sisssssss", $nama_resep, $product_id, $doctor_name, $patient_name, $usage_instructions, $desc_recipe, $created_at, $updated_at, $imagePath);
+
+        if ($stmt->execute()) {
+            echo "<script>
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Resep berhasil diunggah!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        window.location.href = 'dashboard.php?success=1';
+                    });
+                  </script>";
         } else {
-            echo "<p class='text-red-500'>Error uploading image.</p>";
-            exit();
+            echo "<p class='text-red-500'>Gagal menyimpan data resep.</p>";
         }
     }
+
 
     // Check if upload was successful and output SweetAlert script
     if ($uploadSuccess) {
@@ -125,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Check if the upload was successful
             <?php if (isset($successMessage) && $successMessage): ?>
                 Swal.fire({
@@ -134,7 +156,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     title: 'Produk berhasil diunggah',
                     showConfirmButton: false,
                     timer: 1500
-                }).then(function() {
+                }).then(function () {
                     window.location.href = 'dashboard.php?success=1'; // Redirect after alert
                 });
             <?php endif; ?>
@@ -166,31 +188,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if ($category === 'resep'): ?>
                 <div class="mb-4">
                     <label class="block text-gray-700">Nama Resep</label>
-                    <input type="text" name="nama_resep" class="w-full px-4 py-2 border rounded-lg">
+                    <input type="text" name="nama_resep" class="w-full px-4 py-2 border rounded-lg" required>
                     <span class="error-message">Nama resep wajib diisi.</span>
                 </div>
 
                 <div class="mb-4">
                     <label class="block text-gray-700">Nama Dokter</label>
-                    <input type="text" name="doctor_name" class="w-full px-4 py-2 border rounded-lg">
+                    <input type="text" name="doctor_name" class="w-full px-4 py-2 border rounded-lg" required>
                     <span class="error-message">Nama dokter wajib diisi.</span>
                 </div>
 
                 <div class="mb-4">
                     <label class="block text-gray-700">Nama Pasien</label>
-                    <input type="text" name="patient_name" class="w-full px-4 py-2 border rounded-lg">
+                    <input type="text" name="patient_name" class="w-full px-4 py-2 border rounded-lg" required>
                     <span class="error-message">Nama pasien wajib diisi.</span>
                 </div>
 
                 <div class="mb-4">
                     <label class="block text-gray-700">Petunjuk Penggunaan</label>
-                    <textarea name="usage_instructions" class="w-full px-4 py-2 border rounded-lg"></textarea>
+                    <textarea name="usage_instructions" class="w-full px-4 py-2 border rounded-lg" required></textarea>
                     <span class="error-message">Petunjuk penggunaan wajib diisi.</span>
                 </div>
 
                 <div class="mb-4">
+                    <label class="block text-gray-700">Deskripsi</label>
+                    <textarea name="desc_recipe" class="w-full px-4 py-2 border rounded-lg" required></textarea>
+                    <span class="error-message">Deskripsi wajib diisi.</span>
+                </div>
+
+                <div class="mb-4">
                     <label class="block text-gray-700">Pilih Produk Herbal</label>
-                    <select name="product_id" class="w-full px-4 py-2 border rounded-lg">
+                    <select name="product_id" class="w-full px-4 py-2 border rounded-lg" required>
                         <option value="">-- Pilih Produk --</option>
                         <?php foreach ($products as $product): ?>
                             <option value="<?php echo $product['product_id']; ?>"><?php echo $product['name']; ?></option>
@@ -201,7 +229,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="mb-4">
                     <label class="block text-gray-700">Gambar Resep</label>
-                    <input type="file" name="image" accept="image/*" class="w-full px-4 py-2 border rounded-lg">
+                    <input type="file" name="image" accept="image/*" class="w-full px-4 py-2 border rounded-lg" required>
                     <span class="error-message">Gambar resep wajib diunggah.</span>
                 </div>
 
