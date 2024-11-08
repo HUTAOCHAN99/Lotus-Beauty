@@ -47,11 +47,9 @@ if ($userRole === 'dokter') {
     header("Location: dokter.php?type=" . urlencode($type));
     exit();
 } elseif ($userRole === 'apoteker') {
-    $type = 'apoteker'; // Misalnya $type sudah ada nilainya
     header("Location: apoteker.php?type=" . urlencode($type));
     exit();
 } elseif ($userRole === 'cs') {
-    $type = 'cs'; // Misalnya $type sudah ada nilainya
     header("Location: cs.php?type=" . urlencode($type));
     exit();
 } elseif ($userRole !== 'customer') {

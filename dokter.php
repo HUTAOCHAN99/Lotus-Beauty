@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
         <div class="w-1/3 bg-gray-50 p-4 h-screen overflow-y-auto">
             <?php
             // Cek tipe dari parameter URL
-            $type = isset($_GET['type']) ? $_GET['type'] : 'dokter';
+            $type = isset($_GET['type']) ? $_GET['type'] : 'customer';
 
             if ($type === 'customer') {
                 echo '<h2 class="font-semibold mb-4">Pengguna</h2>';

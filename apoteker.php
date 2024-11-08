@@ -1,61 +1,28 @@
 <?php
-ob_start(); // Mulai output buffering
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Koneksi ke database
-function getConnection()
-{
-    $hostname = "localhost";
-    $username_db = "root";
-    $password_db = "";
-    $database = "lotusbeauty";
-    $konek = new mysqli($hostname, $username_db, $password_db, $database);
+$hostname = "localhost";
+$username_db = "root";
+$password_db = "";
+$database = "lotusbeauty";
+$konek = new mysqli($hostname, $username_db, $password_db, $database);
 
-    // Periksa koneksi ke database
-    if ($konek->connect_error) {
-        die("Koneksi gagal: " . $konek->connect_error);
-    }
-    return $konek;
-}
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
-
-// Memeriksa apakah pengguna sudah login
-if (empty($username)) {
-    echo "Anda harus login untuk mengakses halaman ini.";
-    exit;
+// Periksa koneksi ke database
+if ($konek->connect_error) {
+    die("Koneksi gagal: " . $konek->connect_error);
 }
 
-// Ambil role pengguna dari database
-$konek = getConnection();
-$roleQuery = "SELECT role FROM users WHERE username = ?";
-$roleStmt = $konek->prepare($roleQuery);
-$roleStmt->bind_param("s", $username);
-$roleStmt->execute();
-$roleResult = $roleStmt->get_result();
-$roleRow = $roleResult->fetch_assoc();
-$userRole = $roleRow['role']; // Menyimpan role pengguna
-$roleStmt->close();
-
-// Ambil daftar pengguna (customer, dokter, dan cs) berdasarkan role
-if ($userRole == 'apoteker') {
-    $userQuery = "SELECT DISTINCT u.user_id, u.username 
-                  FROM messages m 
-                  JOIN users u ON m.user_id = u.user_id 
-                  WHERE (m.recipient_id = ? OR m.user_id = ?) 
-                  AND u.role IN ('customer', 'cs') 
-                  AND u.user_id != ?";
-} else {
-    // Jika pengguna adalah dokter atau role lain, ambil sesuai role mereka
-    $userQuery = "SELECT DISTINCT u.user_id, u.username 
-                  FROM messages m 
-                  JOIN users u ON m.user_id = u.user_id 
-                  WHERE (m.recipient_id = ? OR m.user_id = ?) 
-                  AND u.role != ? 
-                  AND u.user_id != ?";
-}
-
+// Ambil daftar pengguna (customer) yang mengirim pesan ke apoteker
+$userQuery = "SELECT DISTINCT u.user_id, u.username 
+              FROM messages m 
+              JOIN users u ON m.user_id = u.user_id 
+              WHERE m.recipient_id = ? OR m.user_id = ? 
+              AND u.user_id != ?";
 $userStmt = $konek->prepare($userQuery);
-$userStmt->bind_param("iiii", $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id']);
+$userStmt->bind_param("iii", $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id']);
 $userStmt->execute();
 $userResult = $userStmt->get_result();
 
@@ -69,42 +36,37 @@ $messageStmt->bind_param("iiii", $_SESSION['user_id'], $selectedUserId, $selecte
 $messageStmt->execute();
 $messageResult = $messageStmt->get_result();
 
-// Pastikan untuk menutup semua statement sebelum menutup koneksi
-$userStmt->close();
-$messageStmt->close();
+// Mengambil daftar dokter dan customer service
+$csQuery = "SELECT user_id, username FROM users WHERE role = 'cs'";
+$csResult = $konek->query($csQuery);
+
+$dokterQuery = "SELECT user_id, username FROM users WHERE role = 'dokter'";
+$dokterResult = $konek->query($dokterQuery);
 
 // Handle the message sending
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
     $messageText = $_POST['message_text'];
-    $recipientId = $_POST['user_id']; // recipient_id yang dipilih pengguna
-    $userId = $_SESSION['user_id']; // ID pengguna yang sedang login
+    $recipientId = $_POST['user_id'];
+    $doctorId = $_SESSION['user_id'];
 
-    // Memastikan recipient_id valid
-    if ($recipientId && !empty($messageText)) {
-        // Menyisipkan pesan ke database
-        $insertQuery = "INSERT INTO messages (user_id, recipient_id, message_text, message_type, status, created_at) 
-                        VALUES (?, ?, ?, ?, 'sent', NOW())";
-        $insertStmt = $konek->prepare($insertQuery);
-        $insertStmt->bind_param("iiss", $userId, $recipientId, $messageText, 'apoteker');
+    $insertQuery = "INSERT INTO messages (user_id, recipient_id, message_text, created_at) VALUES (?, ?, ?, NOW())";
+    $insertStmt = $konek->prepare($insertQuery);
+    $insertStmt->bind_param("iis", $doctorId, $recipientId, $messageText);
 
-        if ($insertStmt->execute()) {
-            // Setelah pesan terkirim, arahkan ulang ke halaman chat dengan penerima yang sama
-            header("Location: apoteker.php?user_id=" . $recipientId);
-            exit();
-        } else {
-            echo "Terjadi kesalahan: " . $insertStmt->error;
-        }
-
-        $insertStmt->close();
+    if ($insertStmt->execute()) {
+        header("Location: dokter.php?user_id=" . $recipientId);
+        exit();
     } else {
-        echo "Pesan atau penerima tidak valid.";
+        echo "Error: " . $insertStmt->error;
     }
-}
 
+    $insertStmt->close();
+}
 ?>
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -169,6 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
         }
     </style>
 </head>
+
 <body class="bg-gray-100">
 
     <!-- Navbar -->
@@ -180,53 +143,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
         <div class="w-10"></div>
     </nav>
 
-    <div class="flex min-h-screen bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden flex">
 
-        <!-- Sidebar Pengguna -->
         <div class="w-1/3 bg-gray-50 p-4 h-screen overflow-y-auto">
-            <h2 class="font-semibold mb-4">Pengguna</h2>
-            <?php while ($user = $userResult->fetch_assoc()): ?>
-                <a href="?user_id=<?php echo $user['user_id']; ?>" class="flex items-center p-2 hover:bg-blue-100 rounded">
-                    <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3">
-                        <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
-                    </div>
-                    <span><?php echo htmlspecialchars($user['username']); ?></span>
-                </a>
-            <?php endwhile; ?>
+            <?php
+            // Cek tipe dari parameter URL
+            $type = isset($_GET['type']) ? $_GET['type'] : 'dokter';
+
+            if ($type === 'customer') {
+                echo '<h2 class="font-semibold mb-4">Pengguna</h2>';
+                while ($user = $userResult->fetch_assoc()): ?>
+                    <a href="?user_id=<?php echo $user['user_id']; ?>&type=customer"
+                        class="flex items-center p-2 hover:bg-blue-100 rounded">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3">
+                            <?php echo strtoupper(substr($user['username'], 0, 1)); ?>
+                        </div>
+                        <span><?php echo htmlspecialchars($user['username']); ?></span>
+                    </a>
+                <?php endwhile;
+            } elseif ($type === 'dokter') {
+                echo '<h2 class="font-semibold mb-4">Daftar Dokter</h2>';
+                while ($dokter = $dokterResult->fetch_assoc()): ?>
+                    <a href="?user_id=<?php echo $dokter['user_id']; ?>&type=dokter"
+                        class="flex items-center p-2 hover:bg-blue-100 rounded">
+                        <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center mr-3">
+                            <?php echo strtoupper(substr($dokter['username'], 0, 1)); ?>
+                        </div>
+                        <span><?php echo htmlspecialchars($dokter['username']); ?></span>
+                    </a>
+                <?php endwhile;
+            } elseif ($type === 'cs') {
+                echo '<h2 class="font-semibold mb-4 mt-4">Customer Service</h2>';
+                while ($cs = $csResult->fetch_assoc()): ?>
+                    <a href="?user_id=<?php echo $cs['user_id']; ?>&type=cs"
+                        class="flex items-center p-2 hover:bg-blue-100 rounded">
+                        <div class="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center mr-3">
+                            <?php echo strtoupper(substr($cs['username'], 0, 1)); ?>
+                        </div>
+                        <span><?php echo htmlspecialchars($cs['username']); ?></span>
+                    </a>
+                <?php endwhile;
+            } else {
+                echo "<p>Tipe tidak dikenali.</p>";
+            }
+            ?>
         </div>
 
         <!-- Area Pesan -->
-        <div class="w-2/3 h-screen flex flex-col">
-            <h2 class="font-semibold mb-4 text-xl">
+        <div class="w-2/3 p-4 h-screen overflow-y-auto">
+            <h2 class="font-semibold mb-4">
                 <?php
-                $selectedId = $selectedUserId ?? null;
-                if ($selectedId) {
-                    $stmt = $konek->prepare("SELECT username FROM users WHERE user_id = ?");
-                    $stmt->bind_param("i", $selectedId);
+                if ($selectedUserId) {
+                    $selectedUserQuery = "SELECT username FROM users WHERE user_id = ?";
+                    $stmt = $konek->prepare($selectedUserQuery);
+                    $stmt->bind_param("i", $selectedUserId);
                     $stmt->execute();
                     $selectedUserResult = $stmt->get_result();
                     $selectedUser = $selectedUserResult->fetch_assoc();
-                    echo htmlspecialchars($selectedUser['username']);
+                    echo "Chat dengan " . htmlspecialchars($selectedUser['username']);
+                    $stmt->close();
+                } else {
+                    echo "Pilih pengguna untuk memulai chat.";
                 }
                 ?>
             </h2>
 
-            <!-- Tampilan Pesan -->
-            <div class="message-container flex-1 p-4 overflow-y-auto" id="message-container">
-                <?php while ($message = $messageResult->fetch_assoc()): ?>
-                    <div class="message-row <?php echo $message['user_id'] == $_SESSION['user_id'] ? 'justify-end' : ''; ?>">
-                        <div class="<?php echo $message['user_id'] == $_SESSION['user_id'] ? 'message-apoteker' : 'message-user'; ?>">
-                            <?php echo htmlspecialchars($message['message_text']); ?>
-                        </div>
-                    </div>
-                <?php endwhile; ?>
+            <div class="p-4 h-80 overflow-y-auto bg-gray-50">
+                <?php
+                while ($message = $messageResult->fetch_assoc()) {
+                    $messageClass = ($message['user_id'] == $_SESSION['user_id']) ? 'message-doctor' : 'message-user';
+                    echo "<div class='p-2 my-2 border-b $messageClass'>";
+                    echo htmlspecialchars($message['message_text']);
+                    echo "</div>";
+                }
+                ?>
             </div>
 
-            <!-- Input Pesan -->
-            <form method="POST" class="p-4 bg-gray-50 border-t-2">
-                <input type="hidden" name="user_id" value="<?php echo $selectedUserId; ?>">
-                <textarea name="message_text" class="w-full p-2 border rounded" rows="3" placeholder="Ketik pesan..."></textarea>
-                <button type="submit" class="mt-2 w-full bg-blue-500 text-white p-2 rounded">Kirim Pesan</button>
+            <!-- Area Input Pesan -->
+            <form method="POST" class="flex items-center p-2 border-t" <?php echo $selectedUserId ? '' : 'style="display:none;"'; ?>>
+                <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($selectedUserId); ?>" />
+                <input type="text" name="message_text" placeholder="Ketik di sini dan tekan enter.."
+                    class="flex-1 px-4 py-2 border rounded-full text-sm focus:outline-none" required />
+                <button type="submit" class="ml-2 text-orange-500">
+                    <i class="ri-send-plane-2-line text-xl"></i>
+                </button>
             </form>
         </div>
     </div>
@@ -242,7 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
         }
 
         // Mengaktifkan tombol scroll jika tidak di bagian bawah
-        document.getElementById('message-container').addEventListener('scroll', function() {
+        document.getElementById('message-container').addEventListener('scroll', function () {
             const button = document.getElementById('scroll-button');
             const messageContainer = document.getElementById('message-container');
             button.style.display = messageContainer.scrollTop < messageContainer.scrollHeight - messageContainer.offsetHeight ? 'block' : 'none';
@@ -250,4 +250,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
     </script>
 
 </body>
+
 </html>
