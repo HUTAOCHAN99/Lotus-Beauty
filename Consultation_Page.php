@@ -4,7 +4,7 @@ session_start();
 // Pastikan pengguna sudah login dan memiliki role
 if (!isset($_SESSION['role'])) {
     // Redirect ke halaman login jika pengguna belum login
-    header('Location: login.php');
+    header('Location: Landing_Page.php');
     exit();
 }
 
