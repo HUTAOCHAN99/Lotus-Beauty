@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
             <?php elseif ($type === 'dokter'): ?>
                 <h2 class="font-semibold mb-4">Daftar Dokter</h2>
                 <?php while ($dokter = $dokterResult->fetch_assoc()): ?>
-                    <a href="?user_id=<?php echo $dokter['user_id']; ?>&type=dokter" class="block p-2 hover:bg-blue-100">
+                    <a href="?user_id=<?php echo $dokter['user_id']; ?>&type=dokter$dokter" class="block p-2 hover:bg-blue-100">
                         <span><?php echo htmlspecialchars($dokter['username']); ?></span>
                     </a>
                 <?php endwhile; ?>

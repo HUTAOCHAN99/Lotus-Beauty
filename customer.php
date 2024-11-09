@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
         }
 
         #chatContent {
-            max-height: calc(100vh - 80px);
+            max-height: calc(100vh - 160px);
             /* Mengurangi tinggi area pesan dengan form input */
             overflow-y: scroll;
             /* Menampilkan scrollbar, jika diperlukan */
@@ -186,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
 
     <div class="w-full max-w-8xl bg-white shadow-lg rounded-lg overflow-hidden flex">
         <!-- Daftar Chat (Sidebar) -->
-        <div class="w-1/3 bg-gray-50 p-8 h-screen overflow-y-auto">
+        <div class="w-1/3 bg-gray-50 p-4 h-screen overflow-y-auto">
             <?php $type = isset($_GET['type']) ? $_GET['type'] : 'dokter'; ?>
             <h2 class="font-semibold mb-4">Daftar Chat</h2>
             <?php
@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
         <!-- Daftar Chat End -->
 
         <!-- Area Pesan -->
-        <div class="w-2/3 p-8 overflow-y-auto h-screen flex flex-col">
+        <div class="w-2/3 p-4 overflow-y-auto h-screen flex flex-col">
             <h2 class="font-semibold mb-0">
                 <?php
                 if ($selectedUserId) {

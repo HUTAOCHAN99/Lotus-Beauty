@@ -1,4 +1,5 @@
 <?php
+ob_start();
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -19,22 +20,26 @@ if ($konek->connect_error) {
 $userQuery = "SELECT DISTINCT u.user_id, u.username 
               FROM messages m 
               JOIN users u ON m.user_id = u.user_id 
-              WHERE (m.recipient_id = ? OR m.user_id = ?) AND u.user_id != ?";
+              WHERE (m.recipient_id = ? OR m.user_id = ?) 
+                AND u.user_id != ?
+                AND u.role = 'customer'"; // Pastikan hanya mengambil pengguna dengan role customer
 $userStmt = $konek->prepare($userQuery);
 $userStmt->bind_param("iii", $_SESSION['user_id'], $_SESSION['user_id'], $_SESSION['user_id']);
 $userStmt->execute();
 $userResult = $userStmt->get_result();
 
-// Mengambil daftar customer service dan dokter
+// Mengambil daftar customer service
 $csQuery = "SELECT user_id, username FROM users WHERE role = 'cs'";
 $csResult = $konek->query($csQuery);
 
+// Mengambil daftar dokter
 $dokterQuery = "SELECT user_id, username FROM users WHERE role = 'dokter'";
 $dokterResult = $konek->query($dokterQuery);
 
 // Mengambil pesan dari pengguna yang dipilih
 $selectedUserId = isset($_GET['user_id']) ? $_GET['user_id'] : null;
 $type = isset($_GET['type']) ? $_GET['type'] : 'customer';
+
 
 $messageQuery = "SELECT m.*, u.username FROM messages m 
                  JOIN users u ON m.user_id = u.user_id 
@@ -66,7 +71,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
 
     $insertStmt->close();
 }
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">
@@ -136,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
         }
 
         #chatContent {
-            max-height: calc(100vh - 80px);
+            max-height: calc(100vh - 160px);
             overflow-y: scroll;
         }
 
@@ -171,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
 
     <div class="w-full max-w-8xl bg-white shadow-lg rounded-lg overflow-hidden flex">
         <!-- Daftar Chat (Sidebar) -->
-        <div class="w-1/3 bg-gray-50 p-8 h-screen overflow-y-auto">
+        <div class="w-1/3 bg-gray-50 p-4 h-screen overflow-y-auto">
             <?php $type = isset($_GET['type']) ? $_GET['type'] : 'dokter'; ?>
             <h2 class="font-semibold mb-4">Daftar Chat</h2>
             <?php if ($type === 'customer') { ?>
@@ -185,10 +192,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
                         <span><?php echo htmlspecialchars($user['username']); ?></span>
                     </a>
                 <?php endwhile;
-            } elseif ($type === 'apoteker') { ?>
-                <h3 class="font-semibold mt-2">Apoteker</h3>
+            } elseif ($type === 'dokter') { ?>
+                <h3 class="font-semibold mt-2">dokter</h3>
                 <?php while ($dokter = $dokterResult->fetch_assoc()): ?>
-                    <a href="?user_id=<?php echo $dokter['user_id']; ?>&type=dokter$dokter"
+                    <a href="?user_id=<?php echo $dokter['user_id']; ?>&type=dokter"
                         class="flex items-center p-2 hover:bg-green-100 rounded">
                         <div class="w-10 h-10 rounded-full bg-green-600 text-white flex items-center justify-center mr-3">
                             <?php echo strtoupper(substr($dokter['username'], 0, 1)); ?>
@@ -211,7 +218,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
         </div>
 
         <!-- Area Pesan -->
-        <div class="w-2/3 p-8 overflow-y-auto h-screen flex flex-col">
+        <div class="w-2/3 p-4 overflow-y-auto h-screen flex flex-col">
             <h2 class="font-semibold mb-0">
                 <?php
                 if ($selectedUserId) {
@@ -253,9 +260,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
 
         <!-- Form Input Pesan -->
         <form method="POST" class="flex items-center w-3/5 absolute bottom-0 right-10 items-center p-[10px]"
-            <?php echo $selectedUserId ? '' : 'style="display:none;"'; ?> onsubmit="scrollToBottom()">
+            <?php echo $selectedUserId ? '' : 'style="display:none;"'; ?> onsubmit="scrollToBottom(); return true;">
             <input type="hidden" name="user_id" value="<?php echo htmlspecialchars($selectedUserId); ?>" />
-            <input type="hidden" name="type" value="<?php echo htmlspecialchars($selectedType); ?>" />
+            <input type="hidden" name="type" value="<?php echo htmlspecialchars($type); ?>" />
             <input type="text" name="message_text" placeholder="Tulis pesan..." class="flex-1 p-2 rounded border mr-2"
                 required>
             <button type="submit" class="ml-2 text-orange-500">
