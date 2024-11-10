@@ -51,44 +51,44 @@ $user = $result->fetch_assoc();
         </div>
 
         <!-- Pengaturan Privasi -->
-        <div class="flex items-center mb-6 border-b border-gray-200 pb-4">
+        <!-- <div class="flex items-center mb-6 border-b border-gray-200 pb-4">
             <i class="ri-user-settings-line text-xl text-purple-500 mr-4"></i>
             <div>
                 <h3 class="text-xl font-medium">Pengaturan Privasi</h3>
                 <p class="text-gray-500 text-sm">Kelola siapa yang dapat melihat informasi profil Anda.</p>
                 <a href="privacy_settings.php" class="text-blue-600 hover:underline text-sm">Pengaturan Privasi</a>
             </div>
-        </div>
+        </div> -->
 
         <!-- Kelola Email Pemberitahuan -->
-        <div class="flex items-center mb-6 border-b border-gray-200 pb-4">
+        <!-- <div class="flex items-center mb-6 border-b border-gray-200 pb-4">
             <i class="ri-mail-settings-line text-xl text-yellow-500 mr-4"></i>
             <div>
                 <h3 class="text-xl font-medium">Kelola Email Pemberitahuan</h3>
                 <p class="text-gray-500 text-sm">Pilih notifikasi yang ingin Anda terima melalui email.</p>
                 <a href="email_notifications.php" class="text-blue-600 hover:underline text-sm">Kelola Pemberitahuan Email</a>
             </div>
-        </div>
+        </div> -->
 
         <!-- Riwayat Login -->
-        <div class="flex items-center mb-6 border-b border-gray-200 pb-4">
+        <!-- <div class="flex items-center mb-6 border-b border-gray-200 pb-4">
             <i class="ri-time-line text-xl text-indigo-500 mr-4"></i>
             <div>
                 <h3 class="text-xl font-medium">Riwayat Login</h3>
                 <p class="text-gray-500 text-sm">Lihat riwayat login terakhir Anda.</p>
                 <a href="login_history.php" class="text-blue-600 hover:underline text-sm">Lihat Riwayat Login</a>
             </div>
-        </div>
+        </div> -->
 
         <!-- Aktivasi/Deaktivasi Akun -->
-        <div class="flex items-center mb-6 border-b border-gray-200 pb-4">
+        <!-- <div class="flex items-center mb-6 border-b border-gray-200 pb-4">
             <i class="ri-toggle-line text-xl text-red-500 mr-4"></i>
             <div>
                 <h3 class="text-xl font-medium">Aktivasi/Deaktivasi Akun</h3>
                 <p class="text-gray-500 text-sm">Aktifkan atau nonaktifkan akun Anda sesuai kebutuhan.</p>
                 <a href="toggle_account.php" class="text-red-600 hover:underline text-sm">Aktifkan/Nonaktifkan Akun</a>
             </div>
-        </div>
+        </div> -->
 
         <!-- Tombol Kembali -->
         <div class="text-center mt-8">

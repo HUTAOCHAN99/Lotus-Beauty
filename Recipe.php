@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -31,9 +31,9 @@
                 $image_url = !empty($row['image_url']) ? htmlspecialchars($row['image_url']) : 'path/to/default-image.png';
                 $prescription_id = $row['prescription_id'];
                 ?>
-                <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center">
-                    <img src="<?php echo $image_url; ?>" alt="<?php echo htmlspecialchars($row['nama_resep']); ?>" class="w-16 h-16 mb-3">
-                    <a href="List_Recipe.php?prescription_id=<?php echo $prescription_id; ?>" class="text-center text-sm font-semibold text-blue-500 hover:underline">
+                <div class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center transition-transform duration-300 transform hover:scale-105">
+                    <a href="List_Recipe.php?prescription_id=<?php echo $prescription_id; ?>" class="block text-center text-sm font-semibold text-black">
+                        <img src="<?php echo $image_url; ?>" alt="<?php echo htmlspecialchars($row['nama_resep']); ?>" class="w-16 h-16 mb-3 mx-auto">
                         <?php echo htmlspecialchars($row['nama_resep']); ?>
                     </a>
                 </div>

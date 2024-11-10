@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
@@ -10,7 +10,7 @@
 
 <body class="bg-gray-100">
     <?php include('Header.php'); ?>
-    <section class="max-w-6xl mx-auto p-4">
+    <section class="max-w-8xl mx-auto p-4">
         <?php
         include('db.php'); // Database connection
         
@@ -31,10 +31,11 @@
             $image_url = !empty($resep['image_url']) ? htmlspecialchars($resep['image_url']) : 'path/to/default-image.png';
             ?>
             <div class="w-full mx-auto flex flex-col items-center">
-                <h2 class="text-2xl font-bold mb-4"><?php echo htmlspecialchars($resep['nama_resep']); ?></h2>
-                <img src="<?php echo $image_url; ?>" alt="<?php echo htmlspecialchars($resep['nama_resep']); ?>"
-                    class="w-32 h-32 mb-4">
-                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                <div class="bg-white w-1/2 p-4 rounded-lg shadow-md mb-6 mt-4">
+                    <h2 class="text-2xl font-bold mb-4 text-center"><?php echo htmlspecialchars($resep['nama_resep']); ?></h2>
+                    <img src="<?php echo $image_url; ?>" alt="<?php echo htmlspecialchars($resep['nama_resep']); ?>"
+                        class="w-32 h-32 m-auto">
+
                     <div class="mb-4 flex items-center">
                         <i class="ri-stethoscope-line text-gray-600 mr-2"></i>
                         <p class="text-gray-800"><strong>Dokter:</strong>

@@ -156,11 +156,19 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
                         Akun</a></li>
 
                 <!-- Additional options for admin -->
-                <?php if ($user['role'] != 'customer' ): ?>
+                <?php if ($user['role'] == 'admin'): ?>
+                    <!-- Hanya admin yang dapat melihat Manajemen Pengguna -->
                     <li><a href="user_management.php" class="nav-link"><i class="ri-admin-fill nav-icon"></i> Manajemen
                             Pengguna</a></li>
-                    <li><a href="reports.php" class="nav-link"><i class="ri-file-list-3-fill nav-icon"></i> Laporan dan
+                <?php endif; ?>
+
+                <?php if ($user['role'] == 'admin' || $user['role'] == 'customer'): ?>
+                    <!-- Admin dan customer dapat melihat Laporan dan Statistik -->
+                    <li><a href="Reports.php" class="nav-link"><i class="ri-file-list-3-fill nav-icon"></i> Laporan dan
                             Statistik</a></li>
+                <?php endif; ?>
+
+                <?php if ($user['role'] != 'customer'): ?>
                     <div class="dashboard-card flex space-x-4 mt-6 p-4 border border-gray-300 rounded-lg shadow-md">
                         <a href="upload.php?category=resep"
                             class="flex items-center bg-blue-500 text-white rounded-lg px-4 py-2 transition duration-300 ease-in-out hover:bg-blue-600 transform hover:scale-105">
@@ -173,8 +181,8 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
                             Upload Obat Herbal
                         </a>
                     </div>
-
                 <?php endif; ?>
+
             </ul>
         </div>
 

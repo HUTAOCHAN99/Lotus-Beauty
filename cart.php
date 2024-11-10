@@ -87,7 +87,7 @@ $totalPrice = 0;
             <div class="mt-4">
                 <strong>Total Pembayaran:</strong> Rp <span id="total-payment">0</span>
             </div>
-            <button type="submit" class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">Checkout</button>
+            <button type="submit" class="my-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">Checkout</button>
         </form>
 
         <a href="Product_Page.php" class="flex items-center bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
