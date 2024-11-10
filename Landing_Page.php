@@ -9,6 +9,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- SweetAlert2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.5/dist/sweetalert2.min.css">
+    <!-- GreatVibes fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
@@ -36,14 +38,35 @@
             align-items: center;
             text-align: center;
         }
+
+        .GreatVibes {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .Terracota {
+            color: #7C4B3A;
+        }
+
+        .emboss-text {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #7C4B3A;
+            /* Terracota color */
+            position: relative;
+            text-shadow:
+                1px 1px 2px rgba(255, 255, 255, 0.7),
+                /* Light highlight for the top left */
+                -1px -1px 2px rgba(0, 0, 0, 0.4);
+            /* Dark shadow for bottom right */
+        }
     </style>
 </head>
 
 <body class="bg-gradient-to-b from-blue-900 to-indigo-800">
     <div class="parallax relative flex flex-col justify-center items-center">
-        <div class="relative z-10 flex flex-col items-center justify-center space-y-4">
-            <h1 class="text-white font-bold text-4xl sm:text-6xl md:text-7xl">Lotus Beauty</h1>
-            <blockquote class="text-white text-lg sm:text-xl font-semibold italic">
+        <div class="relative z-10 flex flex-col items-center justify-center space-y-4 ">
+            <h1 class="GreatVibes Terracota font-bold text-6xl sm:text-8xl md:text-9xl emboss-text">Lotus Beauty</h1>
+            <blockquote class="text-white  text-lg sm:text-xl font-semibold italic">
                 “Karena Keindahan Adalah Milik Kita Semua”
             </blockquote>
 
