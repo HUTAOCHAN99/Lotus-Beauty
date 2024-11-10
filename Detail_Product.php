@@ -119,6 +119,7 @@ $error = '';
 
 <body class="bg-gray-100 ">
     <?php include('Header.php'); ?>
+    <div class="block p-4"></div>
     <div class="bg-gray-100 flex items-center justify-center p-2">
         <div id="product-card" class="relative bg-white shadow-lg rounded-lg overflow-hidden card">
             <div class="bg-blue-500 h-70 flex items-center justify-center flex-1 cursor-pointer"
@@ -352,15 +353,6 @@ $error = '';
         }
 
     </script>
-
-
-
-    <div class="product-details">
-        <h1><?= htmlspecialchars($product['name']); ?></h1>
-        <p><?= htmlspecialchars($product['description']); ?></p>
-        <p>Harga: <?= htmlspecialchars($product['price']); ?></p>
-    </div>
-
     <div class="reviews-section max-w-2xl mx-auto my-8 p-6 bg-white shadow-md rounded-lg">
     <h2 class="font-bold text-xl text-center mb-6 text-gray-800">Ulasan Produk</h2>
     <?php if ($reviews->num_rows > 0): ?>

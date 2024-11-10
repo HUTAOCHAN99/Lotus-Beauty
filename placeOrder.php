@@ -30,12 +30,29 @@ if (!$user) {
 
 $user_id = $user['user_id'];
 
-// Ambil data produk di keranjang untuk user ini
-$cartQuery = $konek->prepare("SELECT c.product_id, p.price, c.quantity, p.name FROM cart c JOIN product p ON c.product_id = p.product_id WHERE c.user_id = ?");
-$cartQuery->bind_param("i", $user_id);
+
+// Ambil data produk yang dipilih dari form di cart.php
+$selectedCartIds = $_POST['selected_products'] ?? [];
+if (empty($selectedCartIds)) {
+    echo "Tidak ada produk yang dipilih.";
+    exit();
+}
+
+// Konversi ID produk yang dipilih menjadi string untuk digunakan dalam query
+$inQuery = implode(',', array_fill(0, count($selectedCartIds), '?'));
+
+
+// Ubah query SQL untuk mengambil hanya produk yang dipilih dari keranjang
+$cartQuery = $konek->prepare("SELECT c.product_id, p.price, c.quantity, p.name 
+                              FROM cart c 
+                              JOIN product p ON c.product_id = p.product_id 
+                              WHERE c.user_id = ? AND c.cart_id IN ($inQuery)");
+
+// Bind user_id dan cart_id yang dipilih
+$params = array_merge([$user_id], $selectedCartIds);
+$cartQuery->bind_param(str_repeat('i', count($params)), ...$params);
 $cartQuery->execute();
 $cartResult = $cartQuery->get_result();
-
 // Inisialisasi total harga dan item detail
 $totalAmount = 0;
 $orderItems = [];

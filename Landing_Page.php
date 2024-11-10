@@ -43,7 +43,11 @@
     <div class="parallax relative flex flex-col justify-center items-center">
         <div class="relative z-10 flex flex-col items-center justify-center space-y-4">
             <h1 class="text-white font-bold text-4xl sm:text-6xl md:text-7xl">Lotus Beauty</h1>
-            <p class="text-gray-300 text-lg sm:text-xl">.....Jargon entahlah.....</p>
+            <blockquote class="text-white text-lg sm:text-xl font-semibold italic">
+                “Karena Keindahan Adalah Milik Kita Semua”
+            </blockquote>
+
+
             <div class="flex space-x-4 mt-4">
                 <a href="#"
                     class="px-6 py-2 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700 transition">Baca
