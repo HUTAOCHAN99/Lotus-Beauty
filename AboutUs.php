@@ -8,18 +8,19 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
-        /* Custom CSS for the open/close transition */
+        /* Update pada animasi transisi untuk tim */
         .open {
             opacity: 1;
             transform: translateY(0);
-            transition: opacity 2s ease, transform 2s ease-in-out;
+            transition: opacity 5s ease, transform 5s ease-in-out;
             display: block;
+            transition-delay: 1s;
         }
 
         .close {
             opacity: 0;
             transform: translateY(-20px);
-            transition: opacity 1s ease, transform 2s ease-in-out;
+            transition: opacity 2s ease-in-out, transform 2s ease-in-out;
             display: block;
         }
 
@@ -27,16 +28,67 @@
         #team-section {
             display: none;
         }
+
+        /* Hover animation for the chevron */
+        #open-team-button i,
+        #close-team-button i {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        #open-team-button:hover i,
+        #close-team-button:hover i {
+            transform: translateY(-5px);
+            /* Makes the chevron move upwards */
+        }
+
+        /* Update pada animasi bounce untuk teks */
+        @keyframes bounceText {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Menambahkan animasi bounce pada teks di button */
+        #open-team-button span,
+        #close-team-button span {
+            animation: bounceText 1s ease-in-out infinite;
+        }
+
+        /* Menambahkan animasi bounce pada icon chevron */
+        @keyframes bounceChevron {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Menambahkan animasi bounce pada icon chevron */
+        #open-team-button i,
+        #close-team-button i {
+            animation: bounceChevron 1s ease-in-out infinite;
+        }
     </style>
 </head>
 
 <body class="bg-gray-100">
     <?php include 'Header.php'; ?>
-    <div class="min-h-screen flex flex-col items-center justify-center mt-4 relative sm:mt-8 sm:p-4" id="about-us-section">
+    <div class="min-h-screen flex flex-col items-center justify-center relative" id="about-us-section">
         <!-- About Us Section -->
-        <div class="flex flex-col md:flex-row items-center justify-between w-full max-w-5xl">
-            <div class="w-full md:w-[40%] text-center mb-8 md:mb-0">
-                <h2 class="text-4xl font-bold text-gray-800 mb-4">About Us</h2>
+        <div
+            class="flex flex-col md:flex-row items-center justify-between w-full max-w-6xl my-2 p-8 bg-white shadow-lg">
+            <div class="w-full md:w-[40%] text-center">
+                <h2 class="text-4xl font-bold text-gray-800">About Us</h2>
                 <div class="flex items-center justify-center">
                     <img src="img\icon\LotusBeauty.png" alt="Team Logo" class="w-xl rounded-xl shadow-lg"
                         style="box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.3), inset -5px -5px 10px rgba(255, 255, 255, 0.3);">
@@ -52,16 +104,13 @@
 
         <!-- Button to Show Team Section -->
         <button id="open-team-button"
-            class="absolute bottom-16 left-1/2 transform -translate-x-1/2 text-gray-800 text-3xl hover:text-gray-600 transition duration-300 flex items-center">
+            class="absolute bottom-12 left-1/2 transform -translate-x-1/2 text-gray-800 text-3xl hover:text-gray-600 transition duration-300 flex items-center">
             <i id="open-icon" class="fas fa-chevron-down mr-2"></i>
-            <span>Buka Tim</span>
+            <span class="biock sm:hidden md:block">Buka Tim</span> <!-- Teks disembunyikan pada layar kecil -->
         </button>
 
-        <!-- Button to Hide Team Section -->
-
-
         <!-- Team Section -->
-        <div id="team-section" class="w-full max-w-8xl mt-8 transition-opacity duration-500 ease-in-out close">
+        <div id="team-section" class="w-full max-w-6xl my-4 transition-opacity duration-500 ease-in-out close">
             <h3 class="text-3xl font-semibold text-gray-800 mb-6 text-center">Meet Our Team</h3>
             <div id="team-member1" class="flex flex-col space-y-4">
                 <!-- Member 1 -->
@@ -70,9 +119,9 @@
                         <img src="img\team\zhofir.jpg" alt="Member 1" class="w-full h-3/4 object-cover rounded-md">
                     </div>
                     <div class="w-full md:w-1/2 flex flex-col items-center justify-center text-center">
-                        <h4 class="text-xl font-bold text-gray-800">Ahmad Zhofir Amanullah Nayif</h4>
+                        <h4 class="text-xl font-semibold text-gray-800">Ahmad Zhofir Amanullah Nayif</h4>
                         <p class="text-gray-600">Universitas Pembangunan Nasional "Veteran" Yogyakarta</p>
-                        <p class="text-gray-600">Ketua Tim</p>
+                        <h5 class="text-lg font-bold text-gray-800">123230056</h5>
                         <p class="text-gray-600">Front End Developer</p>
                         <h4 class="font-bold mt-3">Contact me</h4>
                         <div class="mt-2 flex justify-center space-x-4 bg-slate-600 rounded-lg p-4">
@@ -106,8 +155,8 @@
                         <p class="text-gray-600">
                             Universitas Pembangunan Nasional "Veteran" Yogyakarta
                         </p>
-                        <p class="text-gray-600">Anggota Tim</p>
-                        <p class="text-gray-600">Front end Developer</p>
+                        <h5 class="text-lg font-bold text-gray-800">123230051</h5>
+                        <p class="text-gray-600">Back end Developer</p>
                         <h4 class="text-center justify-center font-bold mt-3">
                             Contact me
                         </h4>
@@ -133,10 +182,11 @@
                 </div>
             </div>
 
+            <!-- Button to Hide Team Section -->
             <button id="close-team-button"
                 class="absolute bottom-16 left-1/2 transform -translate-x-1/2 text-gray-800 text-3xl hover:text-gray-600 transition duration-300 flex items-center hidden">
                 <i id="close-icon" class="fas fa-chevron-up mr-2"></i>
-                <span>Tutup Tim</span>
+                <span class="block sm:hidden md:block">Tutup Tim</span> <!-- Teks disembunyikan pada layar kecil -->
             </button>
         </div>
     </div>
