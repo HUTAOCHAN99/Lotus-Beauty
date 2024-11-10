@@ -65,30 +65,46 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
 </head>
 
 <body class="bg-green">
-    <nav class="bg-powderBlue shadow-md py-4 px-8 flex justify-between items-center navbar-fixed ">
+    <nav class="bg-powderBlue shadow-md py-4 px-8 flex justify-between items-center navbar-fixed">
         <div class="flex items-center space-x-8">
             <div class="flex items-center justify-center">
                 <img src="img/icon/icon_shop.png" alt="icon-shop" width="120px">
             </div>
-
+            <?php
+            // Mendapatkan nama file saat ini menggunakan basename
+            $currentPage = basename($_SERVER['PHP_SELF']);
+            ?>
             <div class="hidden md:flex space-x-6">
-                <a href="Home.php" class="text-green-900 hover:font-bold">Home</a>
-                <a href="Product_Page.php" class="text-green-900 hover:font-bold">Produk</a>
-                
+                <?php if ($currentPage == 'Home.php'): ?>
+                    <a href="#" class="hover:underline">Home</a> <!-- Mengarah ke bagian atas -->
+                <?php else: ?>
+                    <a href="Home.php" class="hover:underline">Home</a> <!-- Mengarah ke Home.php -->
+                <?php endif; ?>
+                <a href="Product_Page.php" class="text-black hover:font-bold">Produk</a>
+
                 <!-- Hanya tampilkan link Konsultasi jika role bukan 'admin' -->
                 <?php if ($role !== 'admin'): ?>
                     <a href="Consultation_Page.php" class="text-green-900 hover:font-bold">Konsultasi</a>
                 <?php endif; ?>
-                
-                <a href="Recipe.php" class="text-green-900 hover:font-bold">Resep</a>
-                <a href="AboutUs.php" class="text-green-900 hover:font-bold">About Us</a>
+
+                <?php if ($currentPage == 'Recipe.php'): ?>
+                    <a href="#" class="hover:underline">Resep</a> <!-- Mengarah ke bagian resep -->
+                <?php else: ?>
+                    <a href="Recipe.php" class="hover:underline">Resep</a> <!-- Mengarah ke Recipe.php -->
+                <?php endif; ?>
+                <?php if ($currentPage == 'AboutUs.php'): ?>
+                            <a href="#" class="hover:underline">About us</a> <!-- Mengarah ke bagian About us -->
+                        <?php else: ?>
+                            <a href="AboutUs.php" class="hover:underline">About us</a> <!-- Mengarah ke Recipe.php -->
+                        <?php endif; ?>
             </div>
         </div>
 
         <div class="flex items-center space-x-4">
             <div id="search-bar" class="search-bar-container bg-white shadow-md rounded-md p-1">
                 <form action="Product_Page.php" method="GET" class="flex items-center">
-                    <input type="text" name="search" class="w-full border-none focus:outline-none rounded-md p-2" placeholder="Search for products...">
+                    <input type="text" name="search" class="w-full border-none focus:outline-none rounded-md p-2"
+                        placeholder="Search for products...">
                     <button type="submit" class="text-green-900 hover:text-black ml-2">
                         <i class="ri-search-line ri-lg"></i>
                     </button>
@@ -118,12 +134,12 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
         <a href="Home.php" class="block py-2 text-green-900 hover:font-bold">Home</a>
         <a href="Product_Page.php" class="block py-2 text-green-900 hover:font-bold">Produk</a>
         <a href="Purchase.php" class="block py-2 text-green-900 hover:font-bold">Shop</a>
-        
+
         <!-- Hanya tampilkan link Konsultasi jika role bukan 'admin' -->
         <?php if ($role !== 'admin'): ?>
             <a href="Consultation_Page.php" class="block py-2 text-green-900 hover:font-bold">Konsultasi</a>
         <?php endif; ?>
-        
+
         <a href="Recipe.php" class="block py-2 text-green-900 hover:font-bold">Resep</a>
         <a href="AboutUs.php" class="block py-2 text-green-900 hover:font-bold">About Us</a>
     </div>
@@ -154,4 +170,5 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
     </script>
 
 </body>
+
 </html>

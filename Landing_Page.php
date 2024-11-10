@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 
 <head>
     <meta charset="UTF-8">
@@ -52,7 +52,7 @@
                 <a href="#"
                     class="px-6 py-2 bg-blue-600 text-white font-bold rounded-md hover:bg-blue-700 transition">Baca
                     Journal Kecantikan</a>
-                <a href="#"
+                <a href="AboutUs.php"
                     class="px-6 py-2 bg-purple-600 text-white font-bold rounded-md hover:bg-purple-700 transition">About
                     Us</a>
             </div>

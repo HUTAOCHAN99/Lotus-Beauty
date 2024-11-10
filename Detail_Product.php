@@ -11,7 +11,7 @@ $query->bind_param("i", $product_id);
 $query->execute();
 $result = $query->get_result();
 
-$reviewQuery = $konek->prepare("SELECT users.username, reviews.rating, reviews.comment 
+$reviewQuery = $konek->prepare("SELECT users.username, reviews.rating, reviews.comment,reviews.created_at 
                                 FROM reviews 
                                 JOIN users ON reviews.user_id = users.user_id 
                                 WHERE product_id = ?");
@@ -48,7 +48,12 @@ $error = '';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom animation styles */
+        /* warna custom */
+        .bg-powderBlue {
+            background-color: #B0E0E6;
+        }
+
+        /* Pengaturan animasi */
         .product-details {
             flex-basis: 0;
             overflow: hidden;
@@ -122,17 +127,19 @@ $error = '';
     <div class="block p-4"></div>
     <div class="bg-gray-100 flex items-center justify-center p-2">
         <div id="product-card" class="relative bg-white shadow-lg rounded-lg overflow-hidden card">
-            <div class="bg-blue-500 h-70 flex items-center justify-center flex-1 cursor-pointer"
+            <div class="bg-powderBlue h-70 flex items-center justify-center flex-1 cursor-pointer"
                 onclick="toggleDetails()">
                 <img id="product-image" src="<?= htmlspecialchars($product['image']); ?>"
-                    alt="<?= htmlspecialchars($product['name']); ?>" class="h-32">
+                    alt="<?= htmlspecialchars($product['name']); ?>"
+                    class="h-40 shadow-lg shadow-gray-500/50 rounded-lg">
             </div>
             <div id="product-details" class="product-details bg-white shadow-lg">
                 <div class="p-2">
                     <h3 class="text-xl font-semibold"><?= htmlspecialchars($product['name']); ?></h3>
                     <p class="text-gray-500"><?= htmlspecialchars($product['category']); ?></p>
                     <p class="text-lg font-bold">$<?= number_format($product['price'], 2); ?></p>
-                    <p class="text-sm text-gray-700 mt-2"><?= htmlspecialchars($product['description']); ?></p>
+                    <p class="text-sm text-gray-700 mt-2 text-justify"><?= htmlspecialchars($product['description']); ?>
+                    </p>
                     <div class="mt-2">
                         <div>
                             <span class="text-sm font-semibold">Stock Tersedia:</span>
@@ -223,8 +230,19 @@ $error = '';
                 var quantity = document.getElementById('order-quantity').value;
                 var productId = <?= $product_id ?>; // Mendapatkan product_id dari PHP
 
-                // Mempersiapkan URL untuk dikirim ke checkout.php
+                // Pastikan quantity tidak kosong atau kurang dari 1
+                if (!quantity || quantity <= 0) {
+                    alert("Jumlah pesanan harus minimal 1");
+                    return;
+                }
+
+                // Persiapkan URL untuk dikirim ke checkout.php
                 var checkoutUrl = 'checkout.php?checkout_product=' + productId + '&quantity=' + quantity;
+                console.log("Checkout URL:", checkoutUrl);
+
+
+                // Debug: Pastikan URL sudah benar
+                console.log("Checkout URL:", checkoutUrl);
 
                 // Menggunakan fetch dengan metode GET
                 fetch(checkoutUrl, {
@@ -237,13 +255,14 @@ $error = '';
                             closeModal();
                             window.location.reload(); // Reload halaman untuk memperbarui stok
                         } else {
-                            alert("Gagal melakukan pembelian: " + data.message); // Menampilkan pesan kegagalan
+                            alert("Gagal melakukan pembelian: " + data.message); // Menampilkan pesan gagal
                         }
                     })
                     .catch(error => {
                         alert("Error: " + error); // Tangani error
                     });
             }
+
         </script>
     </div>
 
@@ -251,18 +270,19 @@ $error = '';
 
 
     <!-- Input Rating Bintang (di luar modal) -->
-    <div class="w-1/2 mx-auto">
-        <div class="w-1/2 flex justify-center mx-auto">
-            <label class="font-semibold">Rate this Product</label>
+    <div class="w-full md:w-1/2 mx-auto p-4">
+        <div class="w-full flex justify-center p-4">
+            <label class="font-semibold text-center">Beri nilai untuk produk ini</label>
         </div>
-        <div id="outerStarRating" class="w-1/2 mx-auto text-center">
-            <span class="star" onclick="openReviewModal(1)">&#9733;</span>
-            <span class="star" onclick="openReviewModal(2)">&#9733;</span>
-            <span class="star" onclick="openReviewModal(3)">&#9733;</span>
-            <span class="star" onclick="openReviewModal(4)">&#9733;</span>
-            <span class="star" onclick="openReviewModal(5)">&#9733;</span>
+        <div id="outerStarRating" class="w-full md:w-1/2 mx-auto text-center">
+            <span class="star cursor-pointer" onclick="openReviewModal(1)">&#9733;</span>
+            <span class="star cursor-pointer" onclick="openReviewModal(2)">&#9733;</span>
+            <span class="star cursor-pointer" onclick="openReviewModal(3)">&#9733;</span>
+            <span class="star cursor-pointer" onclick="openReviewModal(4)">&#9733;</span>
+            <span class="star cursor-pointer" onclick="openReviewModal(5)">&#9733;</span>
         </div>
     </div>
+
 
     <!-- Review Modal (pop-up) - Hidden initially -->
     <div id="reviewModal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
@@ -354,23 +374,29 @@ $error = '';
 
     </script>
     <div class="reviews-section max-w-2xl mx-auto my-8 p-6 bg-white shadow-md rounded-lg">
-    <h2 class="font-bold text-xl text-center mb-6 text-gray-800">Ulasan Produk</h2>
-    <?php if ($reviews->num_rows > 0): ?>
-        <?php while ($review = $reviews->fetch_assoc()): ?>
-            <div class="review border-b border-gray-200 pb-4 mb-4">
-                <div class="review-rating flex items-center mb-2">
-                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                        <span class="star <?= $i <= $review['rating'] ? 'text-yellow-400' : 'text-gray-300'; ?>">&starf;</span>
-                    <?php endfor; ?>
+        <h2 class="font-bold text-xl text-center mb-6 text-gray-800">Ulasan Produk</h2>
+        <?php if ($reviews->num_rows > 0): ?>
+            <?php while ($review = $reviews->fetch_assoc()): ?>
+                <div class="review border-b border-gray-200 pb-4 mb-4">
+                    <div class="review-rating flex items-center mb-2">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <span class="star <?= $i <= $review['rating'] ? 'text-yellow-400' : 'text-gray-300'; ?>">&starf;</span>
+                        <?php endfor; ?>
+                        <div class="p-4">
+                            <p class="text-sm font-light"><?php
+                            // Pastikan untuk mengubah format tanggal sesuai dengan keinginan
+                            echo date("m/d/Y", strtotime($review['created_at']));
+                            ?></p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mb-1"><?= htmlspecialchars($review['comment']); ?></p>
+                    <small class="text-gray-500">oleh <?= htmlspecialchars($review['username']); ?></small>
                 </div>
-                <p class="text-gray-700 mb-1"><?= htmlspecialchars($review['comment']); ?></p>
-                <small class="text-gray-500">oleh <?= htmlspecialchars($review['username']); ?></small>
-            </div>
-        <?php endwhile; ?>
-    <?php else: ?>
-        <p class="text-gray-500 text-center">Tidak ada ulasan untuk produk ini.</p>
-    <?php endif; ?>
-</div>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <p class="text-gray-500 text-center">Tidak ada ulasan untuk produk ini.</p>
+        <?php endif; ?>
+    </div>
 
 
 
