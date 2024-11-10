@@ -10,7 +10,7 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .bg-PewterBlue{
+        .bg-PewterBlue {
             background-color: #8aa6b3;
         }
     </style>
@@ -22,7 +22,7 @@
             <!-- Address and Join as Reseller -->
             <div class="flex flex-col justify-between">
                 <div>
-                    <h2 class="text-xl font-bold">Feng Hoe Tang</h2>
+                    <h2 class="text-xl font-bold">LotusBeauty</h2>
                     <p class="mt-4">
                         Jalan Kebahagiaan No. 42<br>
                         (Dekat dengan Taman Canda dan Tawa)<br>
@@ -62,24 +62,18 @@
                 <div class="mt-8">
                     <h4 class="font-semibold">Other Social Media</h4>
                     <ul class="grid grid-cols-3 gap-x-4 gap-y-2 mt-4">
-                        <li><a href="mailto:info@herbilogy.com" class="text-white hover:text-yellow-500">
-                                <i class="fas fa-envelope"></i> Email</a></li>
                         <li><a href="#" class="text-white hover:text-yellow-500">
-                                <i class="fab fa-tiktok"></i> @herbilogy</a></li>
+                                <i class="fas fa-envelope"></i> LotusBeauty</a></li>
                         <li><a href="#" class="text-white hover:text-yellow-500">
-                                <i class="fab fa-instagram"></i> @carefor.her</a></li>
+                                <i class="fab fa-instagram"></i> @LotusBeauty</a></li>
                         <li><a href="#" class="text-white hover:text-yellow-500">
-                                <i class="fab fa-tiktok"></i> @momilogy</a></li>
+                                <i class="fab fa-tiktok"></i> @LotusBeauty</a></li>
                         <li><a href="#" class="text-white hover:text-yellow-500">
-                                <i class="fab fa-facebook-f"></i> Facebook</a></li>
+                                <i class="fab fa-facebook-f"></i> LotusBeauty</a></li>
                         <li><a href="#" class="text-white hover:text-yellow-500">
-                                <i class="fab fa-instagram"></i> @partof.her</a></li>
+                                <i class="fab fa-twitter"></i> LotusBeauty</a></li>
                         <li><a href="#" class="text-white hover:text-yellow-500">
-                                <i class="fab fa-instagram"></i> @momlike.her</a></li>
-                        <li><a href="#" class="text-white hover:text-yellow-500">
-                                <i class="fab fa-twitter"></i> Twitter</a></li>
-                        <li><a href="#" class="text-white hover:text-yellow-500">
-                                <i class="fab fa-youtube"></i> YouTube</a></li>
+                                <i class="fab fa-youtube"></i> LotusBeauty</a></li>
                     </ul>
                 </div>
 
@@ -88,12 +82,8 @@
 
         <!-- Footer Bottom -->
         <div class="mt-8 border-t border-gray-700 pt-6 text-center">
-            <p>&copy; 2024 LotusBeauty Site by <a href="#" class="text-yellow-500 hover:underline">LotusBeauty Group</a></p>
-            <ul class="flex justify-center space-x-8 mt-4">
-                <li><a href="#" class="hover:underline">Terms & Conditions</a></li>
-                <li><a href="#" class="hover:underline">Privacy Policy</a></li>
-                <li><a href="#" class="hover:underline">Shipping and Returns</a></li>
-            </ul>
+            <p>&copy; 2024 LotusBeauty Site by <a href="#" class="text-yellow-500 hover:underline">LotusBeauty Group</a>
+            </p>
         </div>
     </footer>
 </body>
