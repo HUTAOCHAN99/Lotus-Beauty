@@ -69,6 +69,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Manajemen Pengguna Aktif</title>
     <script>
@@ -102,7 +103,17 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </script>
 </head>
 
-<body class="bg-gray-50 min-h-screen p-8">
+<body class="bg-gray-100 min-h-screen">
+    <nav class="bg-powderBlue shadow-md p-4 flex justify-between items-center mb-4">
+        <!-- Tombol Kembali ke Home -->
+        <a href="user_management.php" class="text-black flex items-center space-x-2">
+            <i class="ri-arrow-left-line text-xl"></i>
+        </a>
+        <!-- Nama Halaman -->
+        <h1 class="text-gray-800 font-bold text-lg">Manajemen Akun</h1>
+        <!-- Placeholder untuk spasi antara tombol kembali dan nama halaman -->
+        <div class="w-10"></div>
+    </nav>
     <div class="max-w-4xl mx-auto">
         <h1 class="text-2xl font-semibold text-center mb-4">Daftar Pengguna Aktif</h1>
 
@@ -158,7 +169,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </script>
         <?php endif; ?>
     </div>
-   
+
     <div class="text-center mt-8">
         <a href="user_management.php" class="text-sm text-gray-600 hover:text-gray-800">← Kembali ke user management</a>
     </div>

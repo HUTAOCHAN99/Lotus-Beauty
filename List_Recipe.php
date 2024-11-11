@@ -51,7 +51,7 @@
                             <i class="ri-file-list-3-line text-gray-600 mr-2"></i>
                             <p class="text-gray-800"><strong>Instruksi Penggunaan:</strong></p>
                         </div>
-                        <p class="text-gray-700 mt-2 whitespace-pre-line">
+                        <p class="text-gray-700 mt-2">
                             <?php echo nl2br(htmlspecialchars($resep['usage_instructions'])); ?>
                         </p>
                     </div>
@@ -60,7 +60,7 @@
                             <i class="ri-file-text-line text-gray-600 mr-2"></i>
                             <p class="text-gray-800"><strong>Deskripsi:</strong></p>
                         </div>
-                        <p class="text-gray-700 mt-2 whitespace-pre-line">
+                        <p class="text-gray-700">
                             <?php echo nl2br(htmlspecialchars($resep['desc_recipe'])); ?>
                         </p>
                     </div>

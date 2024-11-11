@@ -1,20 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan Penjualan</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@^2.0/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon/fonts/remixicon.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100 flex flex-col items-center min-h-screen p-4">
 
-    <header class="text-center mt-8">
-        <h1 class="text-3xl font-bold text-blue-600">Laporan Penjualan Mingguan & Harian</h1>
-        <p class="text-gray-600 mt-2">Analisis penjualan mingguan dan harian untuk memantau performa toko.</p>
-    </header>
-
-    <main class="container mx-auto max-w-4xl bg-white rounded-lg shadow-lg p-6 mt-8">
+<body class="bg-gray-100 flex flex-col items-center min-h-screen">
+    <nav class="bg-powderBlue w-full shadow-md p-4 flex justify-between items-center mb-4">
+        <!-- Tombol Kembali ke Home -->
+        <a href="dashboard.php" class="text-black flex items-center space-x-2">
+            <i class="ri-arrow-left-line text-xl"></i>
+        </a>
+        <!-- Nama Halaman -->
+        <h1 class="text-gray-800 font-bold text-lg">Laporan Statistik Penjualan</h1>
+        <!-- Placeholder untuk spasi antara tombol kembali dan nama halaman -->
+        <div class="w-10"></div>
+    </nav>
+    <main class="container mx-auto max-w-4xl rounded-lg shadow-lg p-6 mt-8">
         <?php
         include 'db.php';
         $dataPenjualanMingguan = [];
@@ -56,20 +63,20 @@
         ?>
 
         <!-- Grafik Penjualan Mingguan -->
-        <section class="mb-10">
+        <section class="mb-4 border p-4">
             <h2 class="text-xl font-semibold text-blue-600 mb-4">Penjualan per Minggu</h2>
             <canvas id="chartPenjualanMingguan" class="w-full h-64"></canvas>
         </section>
-<div class="block py-4"></div>
+        <div class="block py-4"></div>
         <!-- Grafik Penjualan Harian -->
-        <section>
+        <section class="my-4 border p-4">
             <h2 class="text-xl font-semibold text-blue-600 mb-4">Penjualan per Hari</h2>
             <canvas id="chartPenjualanHarian" class="w-full h-64"></canvas>
         </section>
     </main>
 
-    <footer class="text-gray-500 text-sm mt-8">
-        &copy; <?php echo date("Y"); ?> LotusBeauty - Semua Hak Dilindungi
+    <footer class="text-gray-500 text-sm my-8">
+        &copy; <?php echo date("Y"); ?> LotusBeauty
     </footer>
 
     <script>
@@ -136,4 +143,5 @@
     </script>
 
 </body>
+
 </html>

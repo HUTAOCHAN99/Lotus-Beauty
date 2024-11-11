@@ -36,9 +36,12 @@ $totalPrice = 0;
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <!-- Head content here -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
+
 <body>
     <?php include('Header.php'); ?>
     <div class="max-w-4xl w-full mx-auto p-6 bg-white shadow-md rounded-lg mt-6">
@@ -67,17 +70,15 @@ $totalPrice = 0;
                                     onchange="updateTotal()">
                                 <input type="hidden" name="product_ids[<?= $row['cart_id'] ?>]"
                                     value="<?= $row['product_id'] ?>">
-                                <input type="hidden" name="quantities[<?= $row['cart_id'] ?>]" value="<?= $row['quantity'] ?>">
+                                <input type="hidden" name="quantities[<?= $row['cart_id'] ?>]"
+                                    value="<?= $row['quantity'] ?>">
                             </td>
                             <td class="py-2 px-4 border-b"><?= htmlspecialchars($row['name']) ?></td>
                             <td class="py-2 px-4 border-b"><?= htmlspecialchars($row['quantity']) ?></td>
                             <td class="py-2 px-4 border-b">Rp <?= number_format($row['price'], 2, ',', '.') ?></td>
                             <td class="py-2 px-4 border-b">Rp <?= number_format($itemTotal, 2, ',', '.') ?></td>
                             <td class="py-2 px-4 border-b">
-                                <form action="remove_from_cart.php" method="POST" style="display: inline;">
-                                    <input type="hidden" name="cart_id" value="<?= $row['cart_id'] ?>">
-                                    <button type="submit" class="text-red-500 hover:underline">Hapus</button>
-                                </form>
+                                <button type="button" class="text-red-500 hover:underline" onclick="confirmDelete(<?= $row['cart_id'] ?>)">Hapus</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -87,16 +88,49 @@ $totalPrice = 0;
             <div class="mt-4">
                 <strong>Total Pembayaran:</strong> Rp <span id="total-payment">0</span>
             </div>
-            <button type="submit" class="my-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">Checkout</button>
+            <button type="submit"
+                class="my-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">Checkout</button>
         </form>
 
-        <a href="Product_Page.php" class="flex items-center bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
+        <a href="Product_Page.php"
+            class="flex items-center bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
             <i class="ri-shopping-cart-fill mr-2"></i>
             Belanja Sekarang
         </a>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+        function confirmDelete(cartId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Perform AJAX request to delete item
+                    fetch(`remove_from_cart.php?cart_id=${cartId}`, { method: 'GET' })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire("Deleted!", "Your item has been deleted.", "success").then(() => {
+                                    location.reload(); // Reload page to reflect changes
+                                });
+                            } else {
+                                Swal.fire("Error!", data.error || "Failed to delete item.", "error");
+                            }
+                        })
+                        .catch(() => {
+                            Swal.fire("Error!", "An error occurred. Please try again.", "error");
+                        });
+                }
+            });
+        }
+
         function updateTotal() {
             const checkboxes = document.querySelectorAll('input[name="selected_products[]"]');
             let total = 0;
@@ -104,14 +138,16 @@ $totalPrice = 0;
             checkboxes.forEach(checkbox => {
                 if (checkbox.checked) {
                     const row = checkbox.closest('tr');
-                    const price = parseFloat(row.cells[4].innerText.replace('Rp ', '').replace('.', '').replace(',', '.'));
+                    const price = parseFloat(row.cells[4].innerText.replace('Rp ', '').replace(/\./g, '').replace(',', '.'));
                     total += price;
                 }
             });
 
-            document.getElementById('total-payment').innerText = total.toLocaleString('id-ID', {
+            document.getElementById('total-payment').innerText = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
                 minimumFractionDigits: 2
-            });
+            }).format(total);
         }
     </script>
     <?php include('Footer.php'); ?>

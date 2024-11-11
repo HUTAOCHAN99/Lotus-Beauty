@@ -2,28 +2,26 @@
 session_start();
 include 'db.php';
 
-// Check if the user is logged in
+header('Content-Type: application/json');
+
 if (!isset($_SESSION['username'])) {
-    header("Location: Landing_Page.php");
+    echo json_encode(['success' => false, 'error' => 'User not logged in']);
     exit();
 }
 
-// Check if cart_id is provided in the POST request
-if (isset($_POST['cart_id'])) {
-    $cart_id = $_POST['cart_id'];
-
-    // Prepare and execute the delete query
-    $deleteQuery = $konek->prepare("DELETE FROM cart WHERE cart_id = ?");
-    $deleteQuery->bind_param("i", $cart_id);
-
-    if ($deleteQuery->execute()) {
-        // Redirect back to the cart page with a success message
-        header("Location: cart.php?success=deleted");
-        exit();
-    } else {
-        echo "Failed to remove item from the cart. Please try again.";
-    }
-} else {
-    echo "Invalid request. No cart item selected.";
+if (!isset($_GET['cart_id'])) {
+    echo json_encode(['success' => false, 'error' => 'Invalid request. No cart item selected.']);
+    exit();
 }
+
+$cart_id = $_GET['cart_id'];
+$deleteQuery = $konek->prepare("DELETE FROM cart WHERE cart_id = ?");
+$deleteQuery->bind_param("i", $cart_id);
+
+if ($deleteQuery->execute()) {
+    echo json_encode(['success' => true]);
+} else {
+    echo json_encode(['success' => false, 'error' => 'Failed to remove item from the cart.']);
+}
+$deleteQuery->close();
 ?>

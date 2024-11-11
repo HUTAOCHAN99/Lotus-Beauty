@@ -62,13 +62,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $patient_name = htmlspecialchars($_POST['patient_name']);
         $usage_instructions = htmlspecialchars($_POST['usage_instructions']);
         $product_id = htmlspecialchars($_POST['product_id']);
-
+        $desc_recipe = htmlspecialchars($_POST['desc_recipe']);
         $image = $_FILES['image'];
         $imagePath = 'img/resep/' . basename($image['name']);
 
+        $stmt = $konek->prepare("INSERT INTO prescription (nama_resep, doctor_name, patient_name, usage_instructions, product_id, created_at, updated_at, desc_recipe, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssiisss", $nama_resep, $doctor_name, $patient_name, $usage_instructions, $product_id, $created_at, $updated_at, $desc_recipe, $imagePath);
+
         if (move_uploaded_file($image['tmp_name'], $imagePath)) {
-            $stmt = $konek->prepare("INSERT INTO prescription (nama_resep, doctor_name, patient_name, usage_instructions, product_id, created_at, updated_at, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssssiiss", $nama_resep, $doctor_name, $patient_name, $usage_instructions, $product_id, $created_at, $updated_at, $imagePath);
+            $stmt = $konek->prepare("INSERT INTO prescription (nama_resep, doctor_name, patient_name, usage_instructions, product_id, created_at, updated_at,desc_recipe,image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)");
+            $stmt->bind_param("ssssiisss", $nama_resep, $doctor_name, $patient_name, $usage_instructions, $product_id, $created_at, $updated_at, $desc_recipe, $imagePath);
+
             $stmt->execute();
             $uploadSuccess = true; // Mark as successful
         } else {
@@ -125,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Check if the upload was successful
             <?php if (isset($successMessage) && $successMessage): ?>
                 Swal.fire({
@@ -134,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     title: 'Produk berhasil diunggah',
                     showConfirmButton: false,
                     timer: 1500
-                }).then(function() {
+                }).then(function () {
                     window.location.href = 'dashboard.php?success=1'; // Redirect after alert
                 });
             <?php endif; ?>
@@ -187,7 +191,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <textarea name="usage_instructions" class="w-full px-4 py-2 border rounded-lg"></textarea>
                     <span class="error-message">Petunjuk penggunaan wajib diisi.</span>
                 </div>
-
+                <div class="mb-4">
+                    <label class="block text-gray-700">Deskripsi</label>
+                    <textarea name="desc_recipe" class="w-full px-4 py-2 border rounded-lg"></textarea>
+                    <span class="error-message">Deskripsi wajib diisi.</span>
+                </div>
                 <div class="mb-4">
                     <label class="block text-gray-700">Pilih Produk Herbal</label>
                     <select name="product_id" class="w-full px-4 py-2 border rounded-lg">

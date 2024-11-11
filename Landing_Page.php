@@ -80,7 +80,6 @@
                     Us</a>
             </div>
             <div class="flex space-x-4 mt-6 text-gray-300">
-                <a href="#" class="hover:underline">Subscribe</a>
                 <a href="Home.php" class="hover:underline">Official Site</a>
             </div>
         </div>
