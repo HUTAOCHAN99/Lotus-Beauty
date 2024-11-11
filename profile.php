@@ -74,11 +74,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="flex items-center justify-center min-h-screen p-4">
     <div class="relative z-10 max-w-md w-full mx-auto p-8 bg-white bg-opacity-30 backdrop-blur-md shadow-lg rounded-lg border border-white/20">
         <h2 class="text-center text-2xl font-semibold mb-6 text-black">Pengaturan Profil</h2>
-
-        <?php if (!empty($message)): ?>
-            <div class="mb-4 text-green-600"><?php echo $message; ?></div>
-        <?php endif; ?>
-
         <div class="profile-card p-6 rounded-lg shadow-lg">
             <form method="POST" action="">
                 <div class="mb-4">

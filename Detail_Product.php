@@ -47,6 +47,7 @@ $error = '';
     <title><?= htmlspecialchars($product['name']); ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.5.0/remixicon.css">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         /* warna custom */
         .bg-powderBlue {
@@ -194,7 +195,7 @@ $error = '';
             // Function to add product to cart
             function addToCart() {
                 var quantity = document.getElementById('order-quantity').value;
-                var productId = <?= $product_id ?>; // Getting product_id from PHP to JavaScript
+                var productId = <?= $product_id ?>; // Mendapatkan product_id dari PHP
 
                 var formData = new FormData();
                 formData.append('product_id', productId);
@@ -204,25 +205,38 @@ $error = '';
                     method: 'POST',
                     body: formData
                 })
-                    .then(response => response.json()) // Parse JSON response
+                    .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            alert("Pesanan berhasil ditambahkan!"); // Alert for success
-                            closeModal();
-                            window.location.reload(); // Reload page to update stock
-                            // Optionally redirect to cart.php
-                            window.location.href = 'cart.php'; // Redirect to cart.php after successful addition
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'success',
+                                title: 'Produk berhasil ditambahkan ke keranjang!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+
+                            // Tunggu 1500ms (sesuai timer SweetAlert) sebelum pindah ke halaman cart
+                            setTimeout(() => {
+                                window.location.href = 'cart.php';
+                            }, 1500);
+                            // Redirect ke cart.php setelah sukses
                         } else {
-                            alert(data.message); // Alert for failure with specific message
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: data.message
+                            });
                         }
                     })
                     .catch(error => {
-                        alert("Error: " + error); // Handle any errors
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Terjadi kesalahan: ' + error
+                        });
                     });
             }
-
-
-
 
 
             // Fungsi untuk melakukan checkout langsung

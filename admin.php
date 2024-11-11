@@ -65,7 +65,17 @@ $konek->close();
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body>
+<body class="bg-gray-100">
+    <nav class="bg-powderBlue shadow-md p-4 flex justify-between items-center mb-4">
+        <!-- Tombol Kembali ke Home -->
+        <a href="user_management.php" class="text-black flex items-center space-x-2">
+            <i class="ri-arrow-left-line text-xl"></i>
+        </a>
+        <!-- Nama Halaman -->
+        <h1 class="text-gray-800 font-bold text-lg">Manajemen Chat</h1>
+        <!-- Placeholder untuk spasi antara tombol kembali dan nama halaman -->
+        <div class="w-10"></div>
+    </nav>
     <div class="bg-gray-100 flex items-center justify-center min-h-screen">
         <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
             <div class="p-4">
