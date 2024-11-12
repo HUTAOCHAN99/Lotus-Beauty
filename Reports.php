@@ -12,20 +12,19 @@
 
 <body class="bg-gray-100 flex flex-col items-center min-h-screen">
     <nav class="bg-powderBlue w-full shadow-md p-4 flex justify-between items-center mb-4">
-        <!-- Tombol Kembali ke Home -->
         <a href="dashboard.php" class="text-black flex items-center space-x-2">
             <i class="ri-arrow-left-line text-xl"></i>
         </a>
-        <!-- Nama Halaman -->
         <h1 class="text-gray-800 font-bold text-lg">Laporan Statistik Penjualan</h1>
-        <!-- Placeholder untuk spasi antara tombol kembali dan nama halaman -->
         <div class="w-10"></div>
     </nav>
-    <main class="container mx-auto max-w-4xl rounded-lg shadow-lg p-6 mt-8">
+
+    <main class="container mx-auto max-w-4xl rounded-lg shadow-lg p-2 mt-8">
         <?php
         include 'db.php';
         $dataPenjualanMingguan = [];
         $dataPenjualanHarian = [];
+        $riwayatTransaksi = [];
 
         // Query untuk mendapatkan total penjualan per minggu
         $queryMingguan = "
@@ -60,6 +59,18 @@
                 'total_penjualan' => $row['total_penjualan']
             ];
         }
+
+        // Query untuk mendapatkan riwayat transaksi termasuk user_id
+        $queryRiwayat = "
+            SELECT transaksi_id, user_id, tanggal, total_harga, status, metode_pembayaran, alamat_pengiriman, catatan
+            FROM riwayat_transaksi
+            ORDER BY tanggal DESC;
+        ";
+        $resultRiwayat = $konek->query($queryRiwayat);
+
+        while ($row = $resultRiwayat->fetch_assoc()) {
+            $riwayatTransaksi[] = $row;
+        }
         ?>
 
         <!-- Grafik Penjualan Mingguan -->
@@ -67,11 +78,46 @@
             <h2 class="text-xl font-semibold text-blue-600 mb-4">Penjualan per Minggu</h2>
             <canvas id="chartPenjualanMingguan" class="w-full h-64"></canvas>
         </section>
+
         <div class="block py-4"></div>
+
         <!-- Grafik Penjualan Harian -->
         <section class="my-4 border p-4">
             <h2 class="text-xl font-semibold text-blue-600 mb-4">Penjualan per Hari</h2>
             <canvas id="chartPenjualanHarian" class="w-full h-64"></canvas>
+        </section>
+
+        <!-- Tabel Riwayat Penjualan -->
+        <section class="my-4 border p-4 overflow-x-auto">
+            <h2 class="text-xl font-semibold text-blue-600 mb-4">Riwayat Penjualan</h2>
+            <table class="min-w-full bg-white rounded-lg shadow overflow-hidden">
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="py-2 px-4 text-left">ID Transaksi</th>
+                        <th class="py-2 px-4 text-left">User ID</th>
+                        <th class="py-2 px-4 text-left">Tanggal</th>
+                        <th class="py-2 px-4 text-left">Total Harga</th>
+                        <th class="py-2 px-4 text-left">Status</th>
+                        <th class="py-2 px-4 text-left">Metode Pembayaran</th>
+                        <th class="py-2 px-4 text-left">Alamat Pengiriman</th>
+                        <th class="py-2 px-4 text-left">Catatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($riwayatTransaksi as $transaksi) : ?>
+                        <tr class="border-t">
+                            <td class="py-2 px-4"><?php echo $transaksi['transaksi_id']; ?></td>
+                            <td class="py-2 px-4"><?php echo $transaksi['user_id']; ?></td>
+                            <td class="py-2 px-4"><?php echo $transaksi['tanggal']; ?></td>
+                            <td class="py-2 px-4"><?php echo number_format($transaksi['total_harga'], 2); ?></td>
+                            <td class="py-2 px-4"><?php echo ucfirst($transaksi['status']); ?></td>
+                            <td class="py-2 px-4"><?php echo $transaksi['metode_pembayaran']; ?></td>
+                            <td class="py-2 px-4"><?php echo $transaksi['alamat_pengiriman']; ?></td>
+                            <td class="py-2 px-4"><?php echo $transaksi['catatan']; ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </section>
     </main>
 
@@ -141,7 +187,6 @@
             }
         });
     </script>
-
 </body>
 
 </html>
