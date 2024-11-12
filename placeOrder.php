@@ -31,71 +31,125 @@ if (!$user) {
 $user_id = $user['user_id'];
 
 
-// Ambil data produk yang dipilih dari form di cart.php
-$selectedCartIds = $_POST['selected_products'] ?? [];
-if (empty($selectedCartIds)) {
-    echo "Tidak ada produk yang dipilih.";
-    exit();
-}
 
-// Konversi ID produk yang dipilih menjadi string untuk digunakan dalam query
-$inQuery = implode(',', array_fill(0, count($selectedCartIds), '?'));
-
-
-// Ubah query SQL untuk mengambil hanya produk yang dipilih dari keranjang
-$cartQuery = $konek->prepare("SELECT c.product_id, p.price, c.quantity, p.name 
-                              FROM cart c 
-                              JOIN product p ON c.product_id = p.product_id 
-                              WHERE c.user_id = ? AND c.cart_id IN ($inQuery)");
-
-// Bind user_id dan cart_id yang dipilih
-$params = array_merge([$user_id], $selectedCartIds);
-$cartQuery->bind_param(str_repeat('i', count($params)), ...$params);
-$cartQuery->execute();
-$cartResult = $cartQuery->get_result();
-// Inisialisasi total harga dan item detail
-$totalAmount = 0;
 $orderItems = [];
+$totalAmount = 0;
 
-while ($cartRow = $cartResult->fetch_assoc()) {
-    $product_id = $cartRow['product_id'];
-    $price = $cartRow['price'];
-    $quantity = $cartRow['quantity'];
-    $productname = $cartRow['name'];
-    $totalItemPrice = $price * $quantity;
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // // Tampilkan data user_id, source, dan items
+    // var_dump('User ID:', $_POST['user_id'] ?? 'Tidak ada user_id');
+    // var_dump('Source:', $_POST['source'] ?? 'Tidak ada source');
+    // var_dump('Items:', $_POST['items'] ?? 'Tidak ada items');
+    if (isset($_POST['source'])) {
+        $source = $_POST['source']; // Assign the string to a variable
+        if ($source == "cart_page") {
+            // Handle cart transaction logic from placeOrder.php
+            $selectedCartIds = $_POST['selected_products'] ?? [];
+            if (empty($selectedCartIds)) {
+                echo "No products selected.";
+                exit();
+            }
 
-    // Tambahkan ke total
-    $totalAmount += $totalItemPrice;
+            // Convert selected product IDs to a string for query
+            $inQuery = implode(',', array_fill(0, count($selectedCartIds), '?'));
 
-    // Tambahkan setiap item ke dalam array detail order
-    $orderItems[] = [
-        'id' => $product_id,
-        'price' => $price,
-        'quantity' => $quantity,
-        'name' => $productname
+            // Prepare SQL to get the selected cart items
+            $cartQuery = $konek->prepare("SELECT c.product_id, p.price, c.quantity, p.name 
+                                          FROM cart c 
+                                          JOIN product p ON c.product_id = p.product_id 
+                                          WHERE c.user_id = ? AND c.cart_id IN ($inQuery)");
+
+            // Bind the user_id and selected cart_ids
+            $params = array_merge([$user_id], $selectedCartIds);
+            $cartQuery->bind_param(str_repeat('i', count($params)), ...$params);
+            $cartQuery->execute();
+            $cartResult = $cartQuery->get_result();
+
+            // Process cart items
+            while ($cartRow = $cartResult->fetch_assoc()) {
+                $product_id = $cartRow['product_id'];
+                $price = $cartRow['price'];
+                $quantity = $cartRow['quantity'];
+                $productname = $cartRow['name'];
+                $totalItemPrice = $price * $quantity;
+
+                // Add to total
+                $totalAmount += $totalItemPrice;
+
+                // Add each item to the order details
+                $orderItems[] = [
+                    'id' => $product_id,
+                    'price' => $price,
+                    'quantity' => $quantity,
+                    'name' => $productname
+                ];
+            }
+
+        } else if ($source == "detail_product") {
+
+            // Memastikan 'items' diterima sebagai array
+            $items = isset($_POST['items']) ? json_decode($_POST['items'], true) : [];
+
+            if (empty($items)) {
+                echo "Tidak ada produk yang dipilih.";
+                exit();
+            }
+
+            $item = $items[0]; // Hanya 1 item
+            $product_id = $item['id'];
+            $quantity = $item['quantity'];
+            $price = $item['price'];
+            $productname = $item['name'];
+
+            $totalItemPrice = $price * $quantity;
+
+            // Add to total
+            $totalAmount += $totalItemPrice;
+            $orderItems = [
+                [
+                    'id' => $product_id,
+                    'price' => $price,
+                    'quantity' => $quantity,
+                    'name' => $productname
+                ]
+            ];
+        } else {
+            echo "Invalid source.";
+            exit();
+        }
+    } else {
+        echo "Tidak ada data yang dikirimkan.";
+    }
+
+
+
+    // Prepare transaction details for Midtrans
+    $params = [
+        'transaction_details' => [
+            'order_id' => "ORDER-" . time(),
+            'gross_amount' => $totalAmount,
+        ],
+        'item_details' => $orderItems,
+        'customer_details' => [
+            'first_name' => $user['full_name'],
+            'email' => $user['email'],
+            'phone' => $user['phone_number'],
+        ],
     ];
+
+    try {
+        // Generate the Snap token for payment
+        $snapToken = \Midtrans\Snap::getSnapToken($params);
+    } catch (Exception $e) {
+        echo "Error: " . $e->getMessage();
+        exit();
+    }
+
+
+} else {
+    echo "Tidak ada data yang dikirimkan.";
 }
 
-// Detail transaksi untuk Midtrans
-$params = [
-    'transaction_details' => [
-        'order_id' => "ORDER-" . time(),
-        'gross_amount' => $totalAmount,
-    ],
-    'item_details' => $orderItems,
-    'customer_details' => [
-        'first_name' => $user['full_name'],
-        'email' => $user['email'],
-        'phone' => $user['phone_number'],
-    ],
-];
-
-try {
-    $snapToken = \Midtrans\Snap::getSnapToken($params);
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-    exit();
-}
 ?>
 
 <!DOCTYPE html>
@@ -103,7 +157,8 @@ try {
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="SB-Mid-client-zu9OrVu-Hm2fCAJf"></script>
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="SB-Mid-client-zu9OrVu-Hm2fCAJf"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <title>Invoice Pembayaran</title>
 </head>
@@ -122,7 +177,8 @@ try {
                             <p class="font-medium text-gray-800"><?= htmlspecialchars($item['name']); ?></p>
                             <p class="text-sm text-gray-500">Jumlah: <?= htmlspecialchars($item['quantity']); ?></p>
                         </div>
-                        <p class="font-semibold text-gray-600">Rp<?= number_format($item['price'] * $item['quantity'], 0, ',', '.'); ?></p>
+                        <p class="font-semibold text-gray-600">
+                            Rp<?= number_format($item['price'] * $item['quantity'], 0, ',', '.'); ?></p>
                     </li>
                 <?php endforeach; ?>
             </ul>
@@ -132,13 +188,15 @@ try {
         <div class="border-t border-gray-300 pt-4 mt-4">
             <div class="flex justify-between items-center">
                 <span class="font-semibold text-gray-700">Total Harga:</span>
-                <span class="text-lg font-semibold text-gray-800">Rp<?= number_format($totalAmount, 0, ',', '.'); ?></span>
+                <span
+                    class="text-lg font-semibold text-gray-800">Rp<?= number_format($totalAmount, 0, ',', '.'); ?></span>
             </div>
         </div>
 
         <!-- Tombol bayar -->
         <div class="mt-6 text-center">
-            <button id="pay-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow-md focus:outline-none">
+            <button id="pay-button"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow-md focus:outline-none">
                 Bayar Sekarang
             </button>
         </div>
@@ -146,10 +204,10 @@ try {
 
     <script type="text/javascript">
         var payButton = document.getElementById('pay-button');
-        payButton.addEventListener('click', function() {
+        payButton.addEventListener('click', function () {
             // Memanggil Snap untuk menampilkan popup pembayaran
             window.snap.pay('<?php echo $snapToken; ?>', {
-                onSuccess: function(result) {
+                onSuccess: function (result) {
                     alert("Pembayaran berhasil!");
                     console.log(result);
                     const paymentMethod = result.payment_type;
@@ -162,12 +220,12 @@ try {
                     };
 
                     fetch('checkout.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(transactionData)
-                        })
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(transactionData)
+                    })
                         .then(response => response.json())
                         .then(data => {
                             if (data.success) {
@@ -179,15 +237,15 @@ try {
                         })
                         .catch(error => console.error('Error:', error));
                 },
-                onPending: function(result) {
+                onPending: function (result) {
                     alert("Pembayaran Anda sedang diproses!");
                     console.log(result);
                 },
-                onError: function(result) {
+                onError: function (result) {
                     alert("Pembayaran gagal!");
                     console.log(result);
                 },
-                onClose: function() {
+                onClose: function () {
                     alert('Anda menutup popup tanpa menyelesaikan pembayaran');
                 }
             });

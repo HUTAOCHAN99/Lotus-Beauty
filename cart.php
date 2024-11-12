@@ -47,7 +47,24 @@ $totalPrice = 0;
     <div class="max-w-4xl w-full mx-auto p-6 bg-white shadow-md rounded-lg mt-6">
         <h2 class="text-3xl font-bold text-gray-800">Keranjang Belanja</h2>
 
-        <form action="placeOrder.php" method="POST" class="py-4">
+        <form action="placeOrder.php" method="POST" class="py-4" id="cartForm">
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const form = document.getElementById('cartForm'); // Pastikan ID form benar
+                    if (form) {
+                        form.addEventListener('submit', function () {
+                            // Cek jika `source` tidak ada, tambahkan sebagai input tersembunyi dengan nilai default
+                            if (!document.getElementsByName('source')[0]) {
+                                const sourceInput = document.createElement('input');
+                                sourceInput.type = 'hidden';
+                                sourceInput.name = 'source';
+                                sourceInput.value = 'cart_page';
+                                form.appendChild(sourceInput);
+                            }
+                        });
+                    }
+                });
+            </script>
             <table class="min-w-full mt-6 ">
                 <thead class="bg-gray-200">
                     <tr>
@@ -63,7 +80,7 @@ $totalPrice = 0;
                     <?php foreach ($cartItems as $row):
                         $itemTotal = $row['quantity'] * $row['price'];
                         $totalPrice += $itemTotal; // Accumulate total price
-                    ?>
+                        ?>
                         <tr class="hover:bg-gray-100">
                             <td class="py-2 px-4 border-b">
                                 <input type="checkbox" name="selected_products[]" value="<?= $row['cart_id'] ?>"
@@ -78,7 +95,8 @@ $totalPrice = 0;
                             <td class="py-2 px-4 border-b">Rp <?= number_format($row['price'], 2, ',', '.') ?></td>
                             <td class="py-2 px-4 border-b">Rp <?= number_format($itemTotal, 2, ',', '.') ?></td>
                             <td class="py-2 px-4 border-b">
-                                <button type="button" class="text-red-500 hover:underline" onclick="confirmDelete(<?= $row['cart_id'] ?>)">Hapus</button>
+                                <button type="button" class="text-red-500 hover:underline"
+                                    onclick="confirmDelete(<?= $row['cart_id'] ?>)">Hapus</button>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -91,6 +109,7 @@ $totalPrice = 0;
             <button type="submit"
                 class="my-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">Checkout</button>
         </form>
+
 
         <a href="Product_Page.php"
             class="flex items-center bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
@@ -152,4 +171,5 @@ $totalPrice = 0;
     </script>
     <?php include('Footer.php'); ?>
 </body>
+
 </html>

@@ -239,10 +239,11 @@ $error = '';
             }
 
 
-            // Fungsi untuk melakukan checkout langsung
             function checkout() {
                 var quantity = document.getElementById('order-quantity').value;
-                var productId = <?= $product_id ?>; // Mendapatkan product_id dari PHP
+                var productId = <?= $product_id ?>;
+                var price = <?= $product['price']; ?>;
+                var productName = "<?= htmlspecialchars($product['name']); ?>";
 
                 // Pastikan quantity tidak kosong atau kurang dari 1
                 if (!quantity || quantity <= 0) {
@@ -250,32 +251,49 @@ $error = '';
                     return;
                 }
 
-                // Persiapkan URL untuk dikirim ke checkout.php
-                var checkoutUrl = 'checkout.php?checkout_product=' + productId + '&quantity=' + quantity;
-                console.log("Checkout URL:", checkoutUrl);
+                // Membuat form dinamis untuk mengirim data ke placeOrder.php
+                var form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'placeOrder.php'; // Arahkan ke placeOrder.php
 
+                // Tambahkan data produk ke form
+            
+                var user_id = <?= json_encode($_SESSION['user_id'] ?? null); ?>;
+                var source = "detail_product";
+                // Format data sesuai yang diterima di placeOrder.php
+                var items = [{
+                    id: productId,
+                    quantity: quantity,
+                    price: price,
+                    name: productName
+                }];
 
-                // Debug: Pastikan URL sudah benar
-                console.log("Checkout URL:", checkoutUrl);
+                var inputSource = document.createElement('input');
+                inputSource.type = 'hidden';
+                inputSource.name = 'source';
+                inputSource.value = source;
+                form.appendChild(inputSource);
 
-                // Menggunakan fetch dengan metode GET
-                fetch(checkoutUrl, {
-                    method: 'GET',
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert("Pembelian berhasil!");
-                            closeModal();
-                            window.location.reload(); // Reload halaman untuk memperbarui stok
-                        } else {
-                            alert("Gagal melakukan pembelian: " + data.message); // Menampilkan pesan gagal
-                        }
-                    })
-                    .catch(error => {
-                        alert("Error: " + error); // Tangani error
-                    });
+                var inputUserId = document.createElement('input');
+                inputUserId.type = 'hidden';
+                inputUserId.name = 'user_id';
+                inputUserId.value = user_id;
+                form.appendChild(inputUserId);
+
+                // Kirimkan data items dalam format yang sesuai
+                var inputItems = document.createElement('input');
+                inputItems.type = 'hidden';
+                inputItems.name = 'items';  // Pastikan key-nya adalah 'items'
+                inputItems.value = JSON.stringify(items);  // Mengirimkan data dalam format JSON
+                form.appendChild(inputItems);
+
+                // Submit form untuk mengirimkan data ke placeOrder.php
+                document.body.appendChild(form);
+                form.submit();
             }
+
+
+
 
         </script>
     </div>
