@@ -61,6 +61,35 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
             display: block;
             max-height: 300px;
         }
+
+        /* Link styling */
+        .link-H {
+            position: relative;
+            text-decoration: none;
+            color: #000;
+            /* Warna link */
+            transition: color 0.3s ease;
+        }
+
+        /* Styling untuk garis */
+        .link-H::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 1px;
+            /* Ketebalan garis */
+            background-color: #000;
+            /* Warna garis */
+            transition: width 0.3s ease;
+        }
+
+
+        .link-H:hover::after {
+            width: 100%;
+            /* Garis akan memanjang dari kiri ke kanan */
+        }
     </style>
 </head>
 
@@ -76,27 +105,27 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
             ?>
             <div class="hidden md:flex space-x-6">
                 <?php if ($currentPage == 'Home.php'): ?>
-                    <a href="#" class="hover:underline">Home</a> <!-- Mengarah ke bagian atas -->
+                    <a class="link-H" href="#" >Home</a> <!-- Mengarah ke bagian atas -->
                 <?php else: ?>
-                    <a href="Home.php" class="hover:underline">Home</a> <!-- Mengarah ke Home.php -->
+                    <a class="link-H" href="Home.php" >Home</a> <!-- Mengarah ke Home.php -->
                 <?php endif; ?>
-                <a href="Product_Page.php" class="text-black hover:font-bold">Produk</a>
+                <a class="link-H" href="Product_Page.php" class="text-black hover:font-bold">Produk</a>
 
                 <!-- Hanya tampilkan link Konsultasi jika role bukan 'admin' -->
                 <?php if ($role !== 'admin'): ?>
-                    <a href="Consultation_Page.php" class="text-black hover:font-bold">Konsultasi</a>
+                    <a class="link-H" href="Consultation_Page.php" class="text-black hover:font-bold">Konsultasi</a>
                 <?php endif; ?>
 
                 <?php if ($currentPage == 'Recipe.php'): ?>
-                    <a href="#" class="hover:underline">Resep</a> <!-- Mengarah ke bagian resep -->
+                    <a class="link-H" href="#" >Resep</a> <!-- Mengarah ke bagian resep -->
                 <?php else: ?>
-                    <a href="Recipe.php" class="hover:underline">Resep</a> <!-- Mengarah ke Recipe.php -->
+                    <a class="link-H" href="Recipe.php" >Resep</a> <!-- Mengarah ke Recipe.php -->
                 <?php endif; ?>
                 <?php if ($currentPage == 'AboutUs.php'): ?>
-                            <a href="#" class="hover:underline">About us</a> <!-- Mengarah ke bagian About us -->
-                        <?php else: ?>
-                            <a href="AboutUs.php" class="hover:underline">About us</a> <!-- Mengarah ke Recipe.php -->
-                        <?php endif; ?>
+                    <a class="link-H" href="#" >About us</a> <!-- Mengarah ke bagian About us -->
+                <?php else: ?>
+                    <a class="link-H" href="AboutUs.php" >About us</a> <!-- Mengarah ke Recipe.php -->
+                <?php endif; ?>
             </div>
         </div>
 
