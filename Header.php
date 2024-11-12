@@ -84,7 +84,7 @@ $role = isset($_SESSION['role']) ? $_SESSION['role'] : null;
 
                 <!-- Hanya tampilkan link Konsultasi jika role bukan 'admin' -->
                 <?php if ($role !== 'admin'): ?>
-                    <a href="Consultation_Page.php" class="text-green-900 hover:font-bold">Konsultasi</a>
+                    <a href="Consultation_Page.php" class="text-black hover:font-bold">Konsultasi</a>
                 <?php endif; ?>
 
                 <?php if ($currentPage == 'Recipe.php'): ?>

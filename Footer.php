@@ -125,7 +125,7 @@
         </div>
         <!-- Footer Bottom -->
         <div class="mt-8 border-t border-gray-700 pt-6 text-center">
-            <p>&copy; 2024 LotusBeauty Site by <a href="#" class="text-yellow-500 hover:underline">LotusBeauty Group</a>
+            <p>&copy; 2024 LotusBeauty Site by <a href="AboutUs.php" class="text-yellow-500 hover:underline">LotusBeauty Group</a>
             </p>
         </div>
     </footer>

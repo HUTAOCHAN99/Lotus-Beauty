@@ -18,7 +18,7 @@
         $prescription_id = isset($_GET['prescription_id']) ? intval($_GET['prescription_id']) : 0;
 
         // Fetch prescription details including the product_id
-        $query = "SELECT p.nama_resep, p.doctor_name, p.patient_name, p.usage_instructions,p.desc_recipe, p.image_url, p.product_id
+        $query = "SELECT p.nama_resep, p.doctor_name, p.usage_instructions,p.desc_recipe, p.image_url, p.product_id
               FROM prescription AS p
               WHERE p.prescription_id = $prescription_id";
         $result = $konek->query($query);
@@ -40,11 +40,6 @@
                         <i class="ri-stethoscope-line text-gray-600 mr-2"></i>
                         <p class="text-gray-800"><strong>Dokter:</strong>
                             <?php echo htmlspecialchars($resep['doctor_name']); ?></p>
-                    </div>
-                    <div class="mb-4 flex items-center">
-                        <i class="ri-user-line text-gray-600 mr-2"></i>
-                        <p class="text-gray-800"><strong>Pasien:</strong>
-                            <?php echo htmlspecialchars($resep['patient_name']); ?></p>
                     </div>
                     <div class="mb-4">
                         <div class="flex items-center">
