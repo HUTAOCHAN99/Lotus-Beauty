@@ -29,8 +29,8 @@ if (isset($data['order_id']) && isset($data['user_id']) && isset($data['items'])
             $quantity = $item['quantity'];
             $harga_satuan = $item['price'];
 
-            $updateStockQuery = $konek->prepare("UPDATE product SET stock = stock - ? WHERE product_id = ?");
-            $updateStockQuery->bind_param("ii", $quantity, $product_id);
+            $updateStockQuery = $konek->prepare("UPDATE product SET stock = stock - ?, terjual = terjual + ? WHERE product_id = ?");
+            $updateStockQuery->bind_param("iii", $quantity, $quantity, $product_id);
             $updateStockQuery->execute();
 
             $detailQuery = $konek->prepare("INSERT INTO detail_transaksi (transaksi_id, product_id, jumlah, harga_satuan) VALUES (?, ?, ?, ?)");

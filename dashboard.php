@@ -162,6 +162,12 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
                             Pengguna</a></li>
                 <?php endif; ?>
 
+                <?php if ($user['role'] == 'admin' || $user['role'] == 'dokter'): ?>
+                    <!-- Hanya admin yang dapat melihat Manajemen Pengguna -->
+                    <li><a href="product_management.php" class="nav-link"><i class="ri-file-edit-line nav-icon"></i> Manajemen
+                            Produk</a></li>
+                <?php endif; ?>
+
                 <?php if ($user['role'] == 'admin' || $user['role'] == 'customer'): ?>
                     <!-- Admin dan customer dapat melihat Laporan dan Statistik -->
                     <li><a href="Reports.php" class="nav-link"><i class="ri-file-list-3-fill nav-icon"></i> Laporan dan
