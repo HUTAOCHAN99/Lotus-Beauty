@@ -54,10 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $inQuery = implode(',', array_fill(0, count($selectedCartIds), '?'));
 
             // Prepare SQL to get the selected cart items
-            $cartQuery = $konek->prepare("SELECT c.product_id, p.price, c.quantity, p.name 
-                                          FROM cart c 
-                                          JOIN product p ON c.product_id = p.product_id 
-                                          WHERE c.user_id = ? AND c.cart_id IN ($inQuery)");
+            $cartQuery = $konek->prepare("SELECT c.cart_id, c.product_id, p.price, c.quantity, p.name 
+                                        FROM cart c 
+                                        JOIN product p ON c.product_id = p.product_id 
+                                        WHERE c.user_id = ? AND c.cart_id IN ($inQuery)");
 
             // Bind the user_id and selected cart_ids
             $params = array_merge([$user_id], $selectedCartIds);
@@ -71,6 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $price = $cartRow['price'];
                 $quantity = $cartRow['quantity'];
                 $productname = $cartRow['name'];
+                $cartid = $cartRow['cart_id'];
                 $totalItemPrice = $price * $quantity;
 
                 // Add to total
@@ -81,7 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'id' => $product_id,
                     'price' => $price,
                     'quantity' => $quantity,
-                    'name' => $productname
+                    'name' => $productname,
+                    'cart_id' => $cartid
                 ];
             }
 

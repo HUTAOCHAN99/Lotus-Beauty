@@ -38,10 +38,13 @@ if (isset($data['order_id']) && isset($data['user_id']) && isset($data['items'])
             $detailQuery->execute();
         }
 
-        $deleteCartQuery = $konek->prepare("DELETE FROM cart WHERE user_id = ?");
-        $deleteCartQuery->bind_param("i", $user_id);
-        $deleteCartQuery->execute();
+        foreach ($items as $item) {
+            $cart_id = $item['cart_id']; // Pastikan setiap item memiliki cart_id
 
+            $deleteCartQuery = $konek->prepare("DELETE FROM cart WHERE cart_id = ?");
+            $deleteCartQuery->bind_param("i", $cart_id);
+            $deleteCartQuery->execute();
+        }
         $konek->commit();
         echo json_encode(['success' => true, 'message' => 'Transaksi berhasil diproses!']);
     } catch (Exception $e) {
