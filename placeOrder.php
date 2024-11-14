@@ -102,9 +102,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $quantity = $item['quantity'];
             $price = $item['price'];
             $productname = $item['name'];
+            $cartid = '0';
 
             $totalItemPrice = $price * $quantity;
-
+           
             // Add to total
             $totalAmount += $totalItemPrice;
             $orderItems = [
@@ -112,7 +113,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'id' => $product_id,
                     'price' => $price,
                     'quantity' => $quantity,
-                    'name' => $productname
+                    'name' => $productname,
+                    'cart_id' => $cartid
                 ]
             ];
         } else {
