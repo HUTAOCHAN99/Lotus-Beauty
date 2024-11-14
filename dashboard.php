@@ -168,7 +168,7 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
                             Produk</a></li>
                 <?php endif; ?>
 
-                <?php if ($user['role'] == 'admin' || $user['role'] == 'customer'): ?>
+                <?php if ($user['role'] == 'admin' || $user['role'] == 'cs'): ?>
                     <!-- Admin dan customer dapat melihat Laporan dan Statistik -->
                     <li><a href="Reports.php" class="nav-link"><i class="ri-file-list-3-fill nav-icon"></i> Laporan dan
                             Statistik</a></li>
