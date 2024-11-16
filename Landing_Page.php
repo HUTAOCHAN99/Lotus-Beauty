@@ -20,7 +20,7 @@
 
         /* Parallax effect */
         .parallax {
-            background-image: url('src/images/background/bg-landing-page.jpg');
+            background-image: url('src/images/background/bg-landing-page.png');
             height: 100vh;
             background-attachment: fixed;
             background-position: center;

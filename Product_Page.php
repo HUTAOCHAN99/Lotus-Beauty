@@ -19,15 +19,16 @@
 
     // Tentukan query dasar
     $query = "SELECT p.product_id, p.name, p.image, p.price, p.category,
-                     COALESCE(AVG(r.rating), 0) as average_rating, 
-                     COALESCE(SUM(dt.jumlah), 0) as total_sold
-              FROM product p
-              LEFT JOIN reviews r ON p.product_id = r.product_id
-              LEFT JOIN detail_transaksi dt ON p.product_id = dt.product_id";
-
-    // Jika ada kata kunci pencarian, tambahkan kondisi WHERE
+COALESCE(AVG(r.rating), 0) as average_rating, 
+COALESCE(SUM(dt.jumlah), 0) as total_sold
+FROM product p
+LEFT JOIN reviews r ON p.product_id = r.product_id
+LEFT JOIN detail_transaksi dt ON p.product_id = dt.product_id
+WHERE p.status = 'active'"; // Tambahkan kondisi status active
+    
+    // Jika ada kata kunci pencarian, tambahkan ke kondisi WHERE
     if (!empty($search_keyword)) {
-        $query .= " WHERE p.name LIKE ?";
+        $query .= " AND p.name LIKE ?";
         $like_keyword = "%$search_keyword%";
     }
 
@@ -68,6 +69,7 @@
         echo "<p>Error fetching data: " . $konek->error . "</p>";
         exit();
     }
+
     ?>
 
     <section class="max-w-6xl mx-auto p-4">
