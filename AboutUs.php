@@ -102,7 +102,7 @@
             </div>
         </div>
 
-        <!-- Button to Show Team Section -->
+        <!-- Button untuk melihat team-->
         <button id="open-team-button"
             class="absolute bottom-12 left-1/2 transform -translate-x-1/2 text-gray-800 text-3xl hover:text-gray-600 transition duration-300 flex items-center">
             <i id="open-icon" class="fas fa-chevron-down mr-2"></i>

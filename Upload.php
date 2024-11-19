@@ -92,8 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($product_ids)) {
             $image = $_FILES['image'];
             $imagePath = 'img/resep/' . basename($image['name']);
-
-            // Loop through each selected product and insert it as a new row in the prescription table
+            
             $stmt = $konek->prepare("INSERT INTO prescription (nama_resep, doctor_name, usage_instructions, product_id, created_at, updated_at, desc_recipe, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
             foreach ($product_ids as $product_id) {
@@ -305,7 +304,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 updateSelectedProductsDisplay();
             }
 
-            // Reset dropdown to placeholder option
+            // 
             this.selectedIndex = 0;
         });
 
