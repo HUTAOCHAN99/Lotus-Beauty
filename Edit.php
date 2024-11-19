@@ -37,71 +37,109 @@ if (!$data) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($type === 'product') {
-        // Update data produk
+        // Ambil data form
         $name = htmlspecialchars(trim($_POST['name']));
         $category = htmlspecialchars(trim($_POST['category']));
         $price = floatval($_POST['price']);
         $stock = intval($_POST['stock']);
         $status = htmlspecialchars(trim($_POST['status']));
-        $image_path = $data['image']; // Default ke gambar lama
+        $image_data = $data['image']; // Default ke gambar lama jika tidak diupload ulang
 
         // Proses upload gambar (jika ada)
-        if (!empty($_FILES['image']['name'])) {
-            $image_name = $_FILES['image']['name'];
-            $image_tmp = $_FILES['image']['tmp_name'];
-            $target_directory = "img/product/";
-            $target_file = $target_directory . basename($image_name);
-            move_uploaded_file($image_tmp, $target_file);
-            $image_path = $target_file;
+        if (!empty($_FILES['image']['tmp_name'])) {
+            // Pastikan file yang diunggah adalah gambar
+            $allowed_extensions = ['jpg', 'jpeg', 'png'];
+            $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+
+            if (in_array(strtolower($file_extension), $allowed_extensions)) {
+                // Baca file gambar sebagai biner
+                $image_data = file_get_contents($_FILES['image']['tmp_name']);
+            } else {
+                // Jika file bukan gambar
+                echo "<script>alert('Hanya file gambar (jpg, jpeg, png) yang diperbolehkan.');</script>";
+                exit;
+            }
         }
 
         // Update query
         $update_query = "UPDATE product SET name = ?, category = ?, price = ?, stock = ?, status = ?, image = ? WHERE product_id = ?";
-        $stmt = $konek->prepare($update_query);
-        $stmt->bind_param("ssdisii", $name, $category, $price, $stock, $status, $image_url, $id);
-        if ($stmt->execute()) {
+        $editproses = $konek->prepare($update_query);
+
+        // Bind parameter (gunakan send_long_data untuk data biner)
+        $editproses->bind_param("ssdisbi", $name, $category, $price, $stock, $status, $null, $id);
+
+        // Kirim data gambar secara manual
+        $editproses->send_long_data(5, $image_data); // Parameter ke-6 (indeks 5 dalam array bind_param)
+
+        // Mengeksekusi query dan menampilkan hasil
+        if ($editproses->execute()) {
             echo "<script>
                     alert('Produk berhasil diperbarui!');
                     window.location.href = 'all_product.php';
                   </script>";
         } else {
-            echo "<script>alert('Gagal memperbarui produk.');</script>";
+            echo "<script>alert('Gagal memperbarui produk. Error: " . $editproses->error . "');</script>";
         }
-    } elseif ($type === 'recipe') {
-        // Update data resep
+    }
+    // Bagian untuk menangani `recipe`
+    else if ($type === 'recipe') {
+        // Ambil data form
         $nama_resep = htmlspecialchars(trim($_POST['nama_resep']));
+        $doctor_name = htmlspecialchars(trim($_POST['doctor_name']));
         $usage_instructions = htmlspecialchars(trim($_POST['usage_instructions']));
-        $image_path = $data['image_url'];
+        $desc_recipe = htmlspecialchars(trim($_POST['desc_recipe']));
+        $status = htmlspecialchars(trim($_POST['status']));
+        $image_data = $data['image_url']; // Default ke gambar lama jika tidak diupload ulang
 
         // Proses upload gambar (jika ada)
-        if (!empty($_FILES['image']['name'])) {
-            $image_name = $_FILES['image']['name'];
-            $image_tmp = $_FILES['image']['tmp_name'];
-            $target_directory = "img/recipe/";
-            $target_file = $target_directory . basename($image_name);
-            move_uploaded_file($image_tmp, $target_file);
-            $image_path = $target_file;
+        if (!empty($_FILES['image']['tmp_name'])) {
+            // Pastikan file yang diunggah adalah gambar
+            $allowed_extensions = ['jpg', 'jpeg', 'png'];
+            $file_extension = pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
+
+            if (in_array(strtolower($file_extension), $allowed_extensions)) {
+                // Baca file gambar sebagai biner
+                $image_data = file_get_contents($_FILES['image']['tmp_name']);
+            } else {
+                // Jika file bukan gambar
+                echo "<script>alert('Hanya file gambar (jpg, jpeg, png) yang diperbolehkan.');</script>";
+                exit;
+            }
         }
 
         // Update query
-        $update_query = "UPDATE prescription SET nama_resep = ?, usage_instructions = ?, image_url = ? WHERE prescription_id = ?";
-        $stmt = $konek->prepare($update_query);
-        $stmt->bind_param("sssi", $nama_resep, $usage_instructions, $image_path, $id);
-        if ($stmt->execute()) {
+        $update_query = "UPDATE prescription 
+                 SET nama_resep = ?, doctor_name = ?, usage_instructions = ?, desc_recipe = ?, status = ?, image_url = ? 
+                 WHERE prescription_id = ?";
+        $editproses = $konek->prepare($update_query);
+
+        $null = null;
+        $editproses->bind_param("ssssbsi", $nama_resep, $doctor_name, $usage_instructions, $desc_recipe, $status, $null, $id);
+
+        // Kirim data gambar
+        if ($image_data !== null) {
+            $editproses->send_long_data(5, $image_data);
+        }
+
+        // Mengeksekusi query dan menampilkan hasil
+        if ($editproses->execute()) {
             echo "<script>
                     alert('Resep berhasil diperbarui!');
                     window.location.href = 'all_recipe.php';
                   </script>";
         } else {
-            echo "<script>alert('Gagal memperbarui resep.');</script>";
+            echo "<script>alert('Gagal memperbarui resep. Error: " . $editproses->error . "');</script>";
         }
     }
+
 }
+
 
 $stmt->close();
 $konek->close();
 ?>
 
+<!-- HTML Form untuk Edit Produk -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -116,7 +154,7 @@ $konek->close();
     <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md mt-10">
         <h1 class="text-2xl font-bold mb-6">Edit <?= ucfirst($type); ?></h1>
         <form action="Edit.php?type=<?= $type; ?>&id=<?= $id; ?>" method="POST" enctype="multipart/form-data">
-            <?php if ($type === 'product') : ?>
+            <?php if ($type === 'product'): ?>
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700">Name</label>
                     <input type="text" name="name" id="name" value="<?= htmlspecialchars($data['name']); ?>"
@@ -146,16 +184,25 @@ $konek->close();
                 </div>
                 <div class="mb-4">
                     <label for="image" class="block text-gray-700">Image</label>
-                    <?php if (!empty($data['image'])) : ?>
-                        <img src="<?= $data['image']; ?>" alt="Product Image" class="w-32 h-32 object-cover mb-4">
+                    <?php if (!empty($data['image'])): ?>
+                        <?php
+                        $image_data = base64_encode($data['image']); // Konversi data biner ke base64
+                        $image_src = "data:image/jpeg;base64," . $image_data; // Tambahkan prefix data URI
+                        ?>
+                        <img src="<?= $image_src ?>" alt="Product Image" class="h-40 shadow-lg shadow-gray-500/50 rounded-lg">
                     <?php endif; ?>
                     <input type="file" name="image" id="image" class="w-full px-4 py-2 border rounded-lg">
                 </div>
-            <?php elseif ($type === 'recipe') : ?>
+            <?php elseif ($type === 'recipe'): ?>
                 <div class="mb-4">
                     <label for="nama_resep" class="block text-gray-700">Recipe Name</label>
-                    <input type="text" name="nama_resep" id="nama_resep" value="<?= htmlspecialchars($data['nama_resep']); ?>"
-                        class="w-full px-4 py-2 border rounded-lg">
+                    <input type="text" name="nama_resep" id="nama_resep"
+                        value="<?= htmlspecialchars($data['nama_resep']); ?>" class="w-full px-4 py-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label for="doctor_name" class="block text-gray-700">Doctor Name</label>
+                    <input type="text" name="doctor_name" id="doctor_name"
+                        value="<?= htmlspecialchars($data['doctor_name']); ?>" class="w-full px-4 py-2 border rounded-lg">
                 </div>
                 <div class="mb-4">
                     <label for="usage_instructions" class="block text-gray-700">Usage Instructions</label>
@@ -163,13 +210,29 @@ $konek->close();
                         class="w-full px-4 py-2 border rounded-lg"><?= htmlspecialchars($data['usage_instructions']); ?></textarea>
                 </div>
                 <div class="mb-4">
+                    <label for="desc_recipe" class="block text-gray-700">Description</label>
+                    <textarea name="desc_recipe" id="desc_recipe" rows="4"
+                        class="w-full px-4 py-2 border rounded-lg"><?= htmlspecialchars($data['desc_recipe']); ?></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="status" class="block text-gray-700">Status</label>
+                    <select name="status" id="status" class="w-full px-4 py-2 border rounded-lg">
+                        <option value="active" <?= $data['status'] === 'active' ? 'selected' : ''; ?>>Active</option>
+                        <option value="inactive" <?= $data['status'] === 'inactive' ? 'selected' : ''; ?>>Inactive</option>
+                    </select>
+                </div>
+                <div class="mb-4">
                     <label for="image" class="block text-gray-700">Image</label>
-                    <?php if (!empty($data['image_url'])) : ?>
-                        <img src="<?= $data['image_url']; ?>" alt="Recipe Image" class="w-32 h-32 object-cover mb-4">
+                    <?php if (!empty($data['image'])): ?>
+                        <?php
+                        $image_src = "data:image/jpeg;base64," . $image_data; // Tambahkan prefix data URI
+                        ?>
+                        <img src="<?= $image_src ?>" alt="Product Image" class="h-40 shadow-lg shadow-gray-500/50 rounded-lg">
                     <?php endif; ?>
                     <input type="file" name="image" id="image" class="w-full px-4 py-2 border rounded-lg">
                 </div>
             <?php endif; ?>
+
             <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded-lg">Save Changes</button>
         </form>
     </div>

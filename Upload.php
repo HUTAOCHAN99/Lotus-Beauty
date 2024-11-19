@@ -42,6 +42,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Inisialisasi variabel untuk mengecek keberhasilan upload
     $uploadSuccess = false;
 
+    // Validasi dan upload gambar
+    if (!empty($_FILES['image']['tmp_name'])) {
+        $image = $_FILES['image'];
+        $allowed_extensions = ['jpg', 'jpeg', 'png'];
+        $file_extension = strtolower(pathinfo($image['name'], PATHINFO_EXTENSION));
+
+        if (!in_array($file_extension, $allowed_extensions)) {
+            echo "<p class='text-red-500'>Hanya file gambar dengan ekstensi JPG, JPEG, atau PNG yang diperbolehkan.</p>";
+            exit();
+        }
+
+        // Baca gambar sebagai data biner
+        $image_data = file_get_contents($image['tmp_name']);
+    } else {
+        echo "<p class='text-red-500'>Gambar wajib diunggah.</p>";
+        exit();
+    }
     // Penanganan untuk kategori 'obat-herbal'
     if ($category === 'obat-herbal') {
         $name = htmlspecialchars($_POST['name']);
@@ -53,16 +70,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $image = $_FILES['image'];
         $imagePath = 'img/product/' . basename($image['name']);
 
-        if (move_uploaded_file($image['tmp_name'], $imagePath)) {
-            $stmt = $konek->prepare("INSERT INTO product (name, category, price, description, stock, image, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("ssdsisss", $name, $selected_category, $price, $description, $stock, $imagePath, $created_at, $updated_at);
-            $stmt->execute();
-            $uploadSuccess = $stmt->affected_rows > 0;
-            $stmt->close();
-        } else {
-            echo "<p class='text-red-500'>Error uploading image.</p>";
-            exit();
-        }
+
+        $stmt = $konek->prepare("INSERT INTO product (name, category, price, description, stock, image, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssdissss", $name, $selected_category, $price, $description, $stock, $image_data, $created_at, $updated_at);
+        $stmt->execute();
+        $uploadSuccess = $stmt->affected_rows > 0;
+        $stmt->close();
+
     }
     // Penanganan untuk kategori 'resep'
     elseif ($category === 'resep') {
@@ -75,21 +89,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($product_ids)) {
             $image = $_FILES['image'];
             $imagePath = 'img/resep/' . basename($image['name']);
-            if (move_uploaded_file($image['tmp_name'], $imagePath)) {
-                // Loop through each selected product and insert it as a new row in the prescription table
-                $stmt = $konek->prepare("INSERT INTO prescription (nama_resep, doctor_name, usage_instructions, product_id, created_at, updated_at, desc_recipe, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
-                foreach ($product_ids as $product_id) {
-                    $stmt->bind_param("sssiisss", $nama_resep, $doctor_name, $usage_instructions, $product_id, $created_at, $updated_at, $desc_recipe, $imagePath);
-                    $stmt->execute();
-                }
+            // Loop through each selected product and insert it as a new row in the prescription table
+            $stmt = $konek->prepare("INSERT INTO prescription (nama_resep, doctor_name, usage_instructions, product_id, created_at, updated_at, desc_recipe, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
-                $uploadSuccess = $stmt->affected_rows > 0;
-                $stmt->close();
-            } else {
-                echo "<p class='text-red-500'>Error uploading image.</p>";
-                exit();
+            foreach ($product_ids as $product_id) {
+                $stmt->bind_param("sssiisss", $nama_resep, $doctor_name, $usage_instructions, $product_id, $created_at, $updated_at, $desc_recipe, $image_data);
+                $stmt->execute();
             }
+
+            $uploadSuccess = $stmt->affected_rows > 0;
+            $stmt->close();
+
         } else {
             echo "<p class='text-red-500'>Minimal satu produk herbal wajib dipilih.</p>";
             exit();

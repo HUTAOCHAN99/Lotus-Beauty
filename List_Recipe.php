@@ -14,7 +14,7 @@
     <section class="max-w-8xl mx-auto p-4">
         <?php
         include('db.php'); // Koneksi database
-
+        
         // Memeriksa koneksi database
         if ($konek->connect_error) {
             die("Koneksi database gagal: " . $konek->connect_error);
@@ -38,19 +38,29 @@
 
             <div class="w-full mx-auto flex flex-col items-center">
                 <div class="bg-white w-1/2 p-4 rounded-lg shadow-md mb-6 mt-4">
-                    <h2 class="text-2xl font-bold mb-4 text-center"><?php echo htmlspecialchars($resep['nama_resep']); ?></h2>
-                    <img src="<?php echo $image_url; ?>" alt="<?php echo htmlspecialchars($resep['nama_resep']); ?>" class="w-32 h-32 m-auto">
+                    <h2 class="text-2xl font-bold mb-4 text-center"><?php echo htmlspecialchars($resep['nama_resep']); ?>
+                    </h2>
+
+                    <?php
+                    $image_data = base64_encode($resep['image_url']); // Konversi data binary ke base64
+                    $image_src = "data:image/jpeg;base64," . $image_data; // Tambahkan prefix data URI
+                    ?>
+
+                    <img src="<?= $image_src ?>" alt="<?php echo htmlspecialchars($resep['nama_resep']); ?>"
+                        class="w-32 h-32 m-auto">
 
                     <div class="mb-4 flex items-center">
                         <i class="ri-stethoscope-line text-gray-600 mr-2"></i>
-                        <p class="text-gray-800"><strong>Dokter:</strong> <?php echo htmlspecialchars($resep['doctor_name']); ?></p>
+                        <p class="text-gray-800"><strong>Dokter:</strong>
+                            <?php echo htmlspecialchars($resep['doctor_name']); ?></p>
                     </div>
                     <div class="mb-4">
                         <div class="flex items-center">
                             <i class="ri-file-list-3-line text-gray-600 mr-2"></i>
                             <p class="text-gray-800"><strong>Instruksi Penggunaan:</strong></p>
                         </div>
-                        <p class="text-gray-700 mt-2"><?php echo nl2br(htmlspecialchars($resep['usage_instructions'])); ?></p>
+                        <p class="text-gray-700 mt-2"><?php echo nl2br(htmlspecialchars($resep['usage_instructions'])); ?>
+                        </p>
                     </div>
                     <div class="mb-4">
                         <div class="flex items-center">
@@ -85,24 +95,37 @@
                             $product_image = !empty($product['image']) ? htmlspecialchars($product['image']) : 'path/to/default-image.png';
                             ?>
                             <!-- Card Produk -->
-                            <div class="bg-white p-4 rounded-lg shadow-md transition-transform duration-200 transform hover:scale-105 flex flex-col items-center">
+                            <div
+                                class="bg-white p-4 rounded-lg shadow-md transition-transform duration-200 transform hover:scale-105 flex flex-col items-center">
                                 <a href="Detail_Product.php?product_id=<?php echo $product['product_id']; ?>" class="w-full">
                                     <!-- Gambar produk -->
                                     <div class="flex justify-center">
-                                        <img src="<?php echo htmlspecialchars($product_image); ?>" alt="<?php echo htmlspecialchars($product['name']); ?>" class="w-full h-40 object-cover mb-4 rounded">
+
+                                        <?php
+                                        $image_data = base64_encode($product['image']); // Konversi data binary ke base64
+                                        $image_src = "data:image/jpeg;base64," . $image_data; // Tambahkan prefix data URI
+                                        ?>
+                                        <img src="<?= $image_src ?>" alt="<?php echo htmlspecialchars($product['name']); ?>"
+                                            class="w-full h-40 object-cover mb-4 rounded">
                                     </div>
 
                                     <!-- Nama, Kategori, dan Harga -->
                                     <div class="text-left">
-                                        <h3 class="text-lg font-semibold text-gray-800"><?php echo htmlspecialchars($product['name']); ?></h3>
+                                        <h3 class="text-lg font-semibold text-gray-800">
+                                            <?php echo htmlspecialchars($product['name']); ?>
+                                        </h3>
                                         <p class="text-gray-600 text-sm"><?php echo htmlspecialchars($product['category']); ?></p>
-                                        <p class="text-lg font-bold text-gray-900 mb-2">Rp <?php echo number_format($product['price'], 0, ',', '.'); ?></p>
+                                        <p class="text-lg font-bold text-gray-900 mb-2">Rp
+                                            <?php echo number_format($product['price'], 0, ',', '.'); ?>
+                                        </p>
                                     </div>
 
                                     <!-- Rating dan Terjual -->
                                     <div class="flex justify-between w-full">
                                         <p class="text-sm text-yellow-500 font-semibold">
-                                            Rating: <?php echo isset($product['average_rating']) ? number_format($product['average_rating'], 1) : 'N/A'; ?> ★
+                                            Rating:
+                                            <?php echo isset($product['average_rating']) ? number_format($product['average_rating'], 1) : 'N/A'; ?>
+                                            ★
                                         </p>
                                         <p class="text-sm text-gray-500 font-medium">
                                             Terjual: <?php echo isset($product['total_sold']) ? $product['total_sold'] : 0; ?>
@@ -119,7 +142,7 @@
                 </div>
             </div>
 
-        <?php
+            <?php
         }
         ?>
     </section>

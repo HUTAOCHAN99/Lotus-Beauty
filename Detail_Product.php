@@ -22,6 +22,7 @@ $reviews = $reviewQuery->get_result();
 // Periksa apakah produk ditemukan
 if ($result->num_rows > 0) {
     $product = $result->fetch_assoc();
+    $image_data = base64_encode($product['image']); // Asumsikan kolom `image` menyimpan data gambar
 } else {
     echo "<p>Produk tidak ditemukan.</p>";
     exit();
@@ -130,9 +131,12 @@ $error = '';
         <div id="product-card" class="relative bg-white shadow-lg rounded-lg overflow-hidden card">
             <div class="bg-powderBlue h-70 flex items-center justify-center flex-1 cursor-pointer"
                 onclick="toggleDetails()">
-                <img id="product-image" src="<?= htmlspecialchars($product['image']); ?>"
-                    alt="<?= htmlspecialchars($product['name']); ?>"
-                    class="h-40 shadow-lg shadow-gray-500/50 rounded-lg">
+                <?php
+                            $image_src = "data:image/jpeg;base64," . $image_data; // Tambahkan prefix data URI
+                            ?>
+                            <img  id="product-image" src="<?= $image_src ?>" alt="<?= htmlspecialchars($row['name']); ?>"
+                            class="h-40 shadow-lg shadow-gray-500/50 rounded-lg">
+                   
             </div>
             <div id="product-details" class="product-details bg-white shadow-lg">
                 <div class="p-2">
@@ -257,7 +261,7 @@ $error = '';
                 form.action = 'placeOrder.php'; // Arahkan ke placeOrder.php
 
                 // Tambahkan data produk ke form
-            
+
                 var user_id = <?= json_encode($_SESSION['user_id'] ?? null); ?>;
                 var source = "detail_product";
                 // Format data sesuai yang diterima di placeOrder.php

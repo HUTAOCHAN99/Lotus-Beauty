@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
 
@@ -99,14 +100,19 @@ WHERE p.status = 'active'"; // Tambahkan kondisi status active
 
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
             <?php while ($row = $result->fetch_assoc()): ?>
+
                 <div
                     class="bg-white p-4 rounded-lg shadow-md transition-transform duration-200 transform hover:scale-105 flex flex-col items-center">
                     <a href="Detail_Product.php?product_id=<?php echo $row['product_id']; ?>" class="w-full">
                         <!-- Gambar produk di tengah -->
                         <div class="flex justify-center">
-                            <img src="<?php echo htmlspecialchars($row['image']); ?>"
-                                alt="<?php echo htmlspecialchars($row['name']); ?>"
-                                class="w-full h-40 object-cover mb-4 rounded">
+                            <?php
+                            $image_data = base64_encode($row['image']); // Konversi data binary ke base64
+                            $image_src = "data:image/jpeg;base64," . $image_data; // Tambahkan prefix data URI
+                            ?>
+                            <img src="<?= $image_src ?>" alt="<?= htmlspecialchars($row['name']); ?>"
+                                class="h-40 shadow-lg shadow-gray-500/50 rounded-lg">
+                         
                         </div>
 
                         <!-- Nama, Kategori, dan Harga di kiri -->

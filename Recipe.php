@@ -32,14 +32,15 @@ GROUP BY nama_resep");
                 echo "<p>Tidak ada resep yang ditemukan.</p>";
             } else {
                 while ($row = $result->fetch_assoc()):
-                    $image_url = !empty($row['image_url']) ? htmlspecialchars($row['image_url']) : 'path/to/default-image.png';
+                    $image_data = !empty($row['image_url']) ? base64_encode($row['image_url']) : null; // Konversi data biner ke base64 jika ada
+                    $image_src = $image_data ? "data:image/jpeg;base64," . $image_data : 'path/to/default-image.png'; // Default gambar jika tidak ada
                     $prescription_id = $row['prescription_id'];
                     ?>
                     <div
                         class="bg-white p-4 rounded-lg shadow-md flex flex-col items-center transition-transform duration-300 transform hover:scale-105">
                         <a href="List_Recipe.php?prescription_id=<?php echo $prescription_id; ?>"
                             class="block text-center text-sm font-semibold text-black">
-                            <img src="<?php echo $image_url; ?>" alt="<?php echo htmlspecialchars($row['nama_resep']); ?>"
+                            <img src="<?= $image_src ?>" alt="<?= htmlspecialchars($row['nama_resep']); ?>"
                                 class="w-16 h-16 mb-3 mx-auto">
                             <?php echo htmlspecialchars($row['nama_resep']); ?>
                         </a>
