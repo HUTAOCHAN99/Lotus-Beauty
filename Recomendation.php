@@ -66,7 +66,11 @@
                     foreach ($products as $product) {
                         echo '<div class="swiper-slide swiper-slide-recommendation">';
                         echo '<div class="product-card">';
-                        echo '<img src="' . htmlspecialchars($product['image']) . '" alt="' . htmlspecialchars($product['name']) . '" class="w-full h-40 object-cover rounded-md">';
+
+                      
+                        $image_data = base64_encode($product['image']); // Konversi data binary ke base64
+                        $image_src = "data:image/jpeg;base64," . $image_data; // Tambahkan prefix data URI
+                        echo '<img src="' . $image_src . '" alt="' . htmlspecialchars($product['name']) . '" class="w-full h-40 object-cover rounded-md">';
                         echo '<div class="mt-4">';
                         echo '<h3 class="text-sm font-semibold text-gray-800">' . htmlspecialchars($product['name']) . '</h3>';
                         echo '<div class="mt-2">';

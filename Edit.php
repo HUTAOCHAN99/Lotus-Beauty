@@ -21,6 +21,12 @@ if ($type === 'product') {
     $query = "SELECT * FROM product WHERE product_id = ?";
 } elseif ($type === 'recipe') {
     $query = "SELECT * FROM prescription WHERE prescription_id = ?";
+
+    $products = [];
+    $productResult = $konek->query("SELECT product_id, name FROM product");
+    while ($row = $productResult->fetch_assoc()) {
+        $products[] = $row;
+    }
 } else {
     die("Tipe tidak dikenali.");
 }
@@ -40,9 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Ambil data form
         $name = htmlspecialchars(trim($_POST['name']));
         $category = htmlspecialchars(trim($_POST['category']));
+        $description = isset($_POST['description_p']) ? htmlspecialchars(trim($_POST['description_p'])) : '';
         $price = floatval($_POST['price']);
         $stock = intval($_POST['stock']);
         $status = htmlspecialchars(trim($_POST['status']));
+
 
         // Proses upload gambar (jika ada)
         if (!empty($_FILES['image']['tmp_name'])) {
@@ -61,23 +69,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // Update query
-        $update_query = "UPDATE product SET name = ?, category = ?, price = ?, stock = ?, status = ?, image = ? WHERE product_id = ?";
+        $update_query = "UPDATE product SET name = ?, category = ?, price = ?, description = ? , stock = ?, status = ?, image = ? WHERE product_id = ?";
         $editproses = $konek->prepare($update_query);
 
-        // Bind parameter (gunakan send_long_data untuk data biner)
-        $editproses->bind_param("ssdisbi", $name, $category, $price, $stock, $status, $null, $id);
+        // Dengan gambar
+        $editproses->bind_param("ssdsisbi", $name, $category, $price, $description, $stock, $status, $null, $id);
+        $editproses->send_long_data(6, $image_data);
 
-        // Kirim data gambar secara manual
-        $editproses->send_long_data(5, $image_data); // Parameter ke-6 (indeks 5 dalam array bind_param)
 
-        // Mengeksekusi query dan menampilkan hasil
         if ($editproses->execute()) {
             echo "<script>
-                    alert('Produk berhasil diperbarui!');
+                Swal.fire({
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Produk berhasil diperbarui!',
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
                     window.location.href = 'all_product.php';
-                  </script>";
+                });
+            </script>";
         } else {
-            echo "<script>alert('Gagal memperbarui produk. Error: " . $editproses->error . "');</script>";
+            echo "<script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal memperbarui produk',
+                    text: 'Error: " . $editproses->error . "'
+                });
+            </script>";
         }
     }
     // Bagian untuk menangani recipe
@@ -88,6 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $usage_instructions = htmlspecialchars(trim($_POST['usage_instructions']));
         $desc_recipe = htmlspecialchars(trim($_POST['desc_recipe']));
         $status = htmlspecialchars(trim($_POST['status']));
+        $product_ids = isset($_POST['selected_product_ids']) ? explode(',', $_POST['selected_product_ids']) : [];
+
 
         if (!empty($_FILES['image']['tmp_name'])) {
             // Pastikan file yang diunggah adalah gambar
@@ -106,27 +127,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Query pembaruan
         $update_query = "UPDATE prescription 
-               SET nama_resep = ?, doctor_name = ?, usage_instructions = ?, desc_recipe = ?, status = ?, image_url = ?
-               WHERE prescription_id = ?";
+                 SET nama_resep = ?, doctor_name = ?, usage_instructions = ?, desc_recipe = ?, status = ?, product_id = ?, image_url = ?
+                 WHERE prescription_id = ?";
         $editproses = $konek->prepare($update_query);
 
-        // Bind parameter (gunakan send_long_data untuk data biner jika diperlukan)
-        $editproses->bind_param("sssssbi", $nama_resep, $doctor_name, $usage_instructions, $desc_recipe, $status, $null, $id);
-
-        // Kirim data gambar secara manual jika ada
-        if (!empty($_FILES['image']['tmp_name'])) {
-            $editproses->send_long_data(5, $image_data); // Indeks ke-5 untuk gambar
+        foreach ($product_ids as $product_id) {
+            if (!in_array($product_id, array_column($products, 'product_id'))) {
+                echo "<script>alert('Produk dengan ID $product_id tidak valid.');</script>";
+                exit;
+            }
+            $editproses->bind_param("sssssibi", $nama_resep, $doctor_name, $usage_instructions, $desc_recipe, $status, $product_id, $null, $id);
+        
+            // Kirim data gambar secara manual jika ada
+            if (!empty($image_data)) {
+                $editproses->send_long_data(6, $image_data); // Indeks ke-6 untuk gambar
+            }
+        
+            if (!$editproses->execute()) {
+                echo "<script>
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal memperbarui resep',
+                        text: 'Error: " . $editproses->error . "'
+                    });
+                </script>";
+                exit;
+            }
         }
 
-        // Eksekusi query dan tampilkan hasil
-        if ($editproses->execute()) {
-            echo "<script>
-          alert('Resep berhasil diperbarui!');
-          window.location.href = 'all_recipe.php';
-        </script>";
-        } else {
-            echo "<script>alert('Gagal memperbarui resep. Error: " . $editproses->error . "');</script>";
-        }
     }
 }
 
@@ -144,6 +172,8 @@ $konek->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit <?= ucfirst($type); ?></title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body class="bg-gray-100">
@@ -158,13 +188,37 @@ $konek->close();
                 </div>
                 <div class="mb-4">
                     <label for="category" class="block text-gray-700">Category</label>
-                    <input type="text" name="category" id="category" value="<?= htmlspecialchars($data['category']); ?>"
-                        class="w-full px-4 py-2 border rounded-lg">
+                    <select name="category" id="category" class="w-full px-4 py-2 border rounded-lg">
+                        <option value="">-- Pilih Kategori Herbal --</option>
+                        <?php
+                        // list kategori
+                        $categories = [
+                            "Herbal untuk Perawatan Kulit",
+                            "Herbal untuk Perawatan Rambut",
+                            "Herbal untuk Kesehatan Kuku",
+                            "Herbal untuk Perawatan Tubuh",
+                            "Herbal untuk Perawatan Mata",
+                            "Herbal untuk Detoksifikasi",
+                            "Herbal untuk Vitalitas dan Keseimbangan Hormon",
+                            "Herbal untuk Pengharum Tubuh Alami",
+                        ];
+                        foreach ($categories as $category): ?>
+                            <option value="<?= htmlspecialchars($category); ?>" <?= $data['category'] === $category ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($category); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
+
                 <div class="mb-4">
                     <label for="price" class="block text-gray-700">Price</label>
                     <input type="number" name="price" id="price" value="<?= htmlspecialchars($data['price']); ?>"
                         class="w-full px-4 py-2 border rounded-lg">
+                </div>
+                <div class="mb-4">
+                    <label for="description_p" class="block text-gray-700">Description</label>
+                    <textarea name="description_p" id="description_p" rows="4"
+                        class="w-full px-4 py-2 border rounded-lg"><?= $description = isset($_POST['description_p']) ? htmlspecialchars(trim($_POST['description_p'])) : ''; ?></textarea>
                 </div>
                 <div class="mb-4">
                     <label for="stock" class="block text-gray-700">Stock</label>
@@ -217,12 +271,89 @@ $konek->close();
                         <option value="inactive" <?= $data['status'] === 'inactive' ? 'selected' : ''; ?>>Inactive</option>
                     </select>
                 </div>
+
+
+
+
+                <!-- Pilih Produk Herbal -->
+                <div class="mb-4">
+                    <label class="block text-gray-700">Pilih Produk Herbal</label>
+
+                    <!-- Dropdown Pilihan Produk Herbal -->
+                    <div class="relative">
+                        <select id="productSelect" class="w-full px-4 py-2 border rounded-lg">
+                            <option value="">-- Pilih Produk --</option>
+                            <?php foreach ($products as $product): ?>
+                                <option value="<?php echo $product['product_id']; ?>">
+                                    <?php echo htmlspecialchars($product['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <span class="error-message">Minimal satu produk herbal wajib dipilih.</span>
+
+                    <!-- Placeholder Produk yang Terpilih -->
+                    <div id="selectedProducts" class="mt-4 flex flex-wrap"></div>
+
+                    <!-- Input Tersembunyi untuk Menyimpan Produk Terpilih -->
+                    <input type="hidden" name="selected_product_ids" id="selectedProductIds">
+
+                </div>
+
+
+
+
+                <script>
+                    const selectedProducts = [];
+                    const selectedProductsContainer = document.getElementById('selectedProducts');
+                    const productSelect = document.getElementById('productSelect');
+                    const selectedProductIdsInput = document.getElementById('selectedProductIds');
+
+                    productSelect.addEventListener('change', function () {
+                        const selectedOption = this.options[this.selectedIndex];
+                        const productId = selectedOption.value;
+                        const productName = selectedOption.text;
+
+                        if (productId && !selectedProducts.some(product => product.id === productId)) {
+                            selectedProducts.push({ id: productId, name: productName });
+                            updateSelectedProductsDisplay();
+                        }
+
+                        // Reset dropdown to placeholder option
+                        this.selectedIndex = 0;
+                    });
+
+                    function updateSelectedProductsDisplay() {
+                        selectedProductsContainer.innerHTML = '';
+                        selectedProducts.forEach(product => {
+                            const productDiv = document.createElement('div');
+                            productDiv.className = 'selected-product';
+                            productDiv.innerHTML = `
+                            <span>${product.name}</span>
+                            <span class="remove-product" onclick="removeProduct('${product.id}')">×</span>
+                        `;
+                            selectedProductsContainer.appendChild(productDiv);
+                        });
+
+                        // Update the hidden input value with selected product IDs
+                        selectedProductIdsInput.value = selectedProducts.map(product => product.id).join(',');
+                    }
+
+                    function removeProduct(productId) {
+                        const index = selectedProducts.findIndex(product => product.id === productId);
+                        if (index > -1) {
+                            selectedProducts.splice(index, 1);
+                            updateSelectedProductsDisplay();
+                        }
+                    }
+                </script>
+                
                 <div class="mb-4">
                     <label for="image" class="block text-gray-700">Image</label>
                     <?php if (!empty($data['image_url'])): ?>
                         <?php
-                        $image_data = base64_encode($data['image_url']); 
-                        $image_src = "data:image/jpeg;base64," . $image_data; 
+                        $image_data = base64_encode($data['image_url']);
+                        $image_src = "data:image/jpeg;base64," . $image_data;
                         ?>
                         <img src="<?= $image_src ?>" alt="Recipe Image" class="h-40 shadow-lg shadow-gray-500/50 rounded-lg">
                     <?php endif; ?>

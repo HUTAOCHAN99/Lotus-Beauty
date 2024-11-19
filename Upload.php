@@ -27,11 +27,14 @@ while ($row = $doctorResult->fetch_assoc()) {
 
 // Kategori herbal
 $herbalCategories = [
-    'Herbal untuk Perawatan Kulit',
-    'Herbal untuk Perawatan Rambut',
-    'Herbal untuk Detoksifikasi',
-    'Herbal untuk Kesehatan Umum',
-    'Herbal untuk Mengurangi Stres'
+    "Herbal untuk Perawatan Kulit",
+    "Herbal untuk Perawatan Rambut",
+    "Herbal untuk Kesehatan Kuku",
+    "Herbal untuk Perawatan Tubuh",
+    "Herbal untuk Perawatan Mata",
+    "Herbal untuk Detoksifikasi",
+    "Herbal untuk Vitalitas dan Keseimbangan Hormon",
+    "Herbal untuk Pengharum Tubuh Alami",
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

@@ -9,9 +9,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        #home{
+        #home {
             z-index: 1200;
         }
+
         /* Pastikan navbar selalu berada di lapisan atas */
         nav {
             z-index: 1000;
@@ -132,6 +133,7 @@
 
     <!-- Carousel Promosi -->
     <!-- Carousel Promosi -->
+
     <div class="flex justify-between items-center px-8 py-4">
         <h2 class="text-2xl font-bold">Promo Menarik Untukmu</h2>
         <a href="event.php" class="text-orange-500 hover:text-slate-500 transition">Lihat Semua</a>
@@ -141,12 +143,29 @@
     <div class="swiper-container home-swiper home m-auto max-w-4xl rounded-lg shadow-lg overflow-hidden relative p-4">
         <div class="swiper-wrapper">
             <?php
-            $directory = "src/images/carousel/";
-            $images = glob($directory . "*.{jpg,jpeg,png,gif}", GLOB_BRACE);
-            foreach ($images as $image) {
-                echo '<div class="swiper-slide">';
-                echo '<img src="' . $image . '" alt="Gambar Promo" class="w-full h-auto object-cover rounded-lg">';
-                echo '</div>';
+            function renderProductpromo($products)
+            {
+                // $directory = "src/images/carousel/";
+                // $images = glob($directory . "*.{jpg,jpeg,png,gif}", GLOB_BRACE);
+                foreach ($products as $product) {
+                    $image_data = base64_encode($product['image']); // Konversi data binary ke base64
+                    $image = "data:image/jpeg;base64," . $image_data; // Tambahkan prefix data URI
+                    echo '<div class="swiper-slide">';
+                    echo '<img src="' . $image . '" alt="Gambar Promo" class="w-full h-auto object-cover rounded-lg">';
+                    echo '</div>';
+                }
+            }
+
+            $query = "SELECT * FROM product ORDER BY terjual DESC LIMIT 10"; // Ambil 10 produk terlaris
+            $result = $konek->query($query);
+            if ($result->num_rows > 0) {
+                $products = [];
+                while ($row = $result->fetch_assoc()) {
+                    $products[] = $row;
+                }
+                renderProductpromo($products);
+            } else {
+                echo "Tidak ada produk yang ditemukan.";
             }
             ?>
         </div>
