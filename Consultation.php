@@ -3,18 +3,7 @@ ob_start(); // Mulai output buffering
 session_start();
 
 // Koneksi ke database
-function getConnection()
-{
-    $hostname = "localhost";
-    $username_db = "root";
-    $password_db = "";
-    $database = "lotusbeauty";
-    $konek = new mysqli($hostname, $username_db, $password_db, $database);
-    if ($konek->connect_error) {
-        die("Koneksi gagal: " . $konek->connect_error);
-    }
-    return $konek;
-}
+include 'db.php';
 
 // Ambil username dari session
 $username = isset($_SESSION['username']) ? $_SESSION['username'] : '';
@@ -34,8 +23,6 @@ $stmt->execute();
 $stmt->bind_result($userRole, $userId);
 $stmt->fetch();
 $stmt->close();
-
-// Mengarahkan pengguna berdasarkan r
 
 // Mengarahkan pengguna berdasarkan role dengan mengirimkan nilai $type
 if ($userRole === 'dokter') {
@@ -94,8 +81,9 @@ $konek->close();
 <!-- HTML dan form di sini -->
 
 <?php
-// Handle the message sending
+// menghandle form atau chat terkirim 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text']) && isset($_POST['recipient_id'])) {
+    // variabel pesan dan penerima
     $messageText = $_POST['message_text'];
     $recipientId = $_POST['recipient_id'];
     $konek = getConnection();
@@ -104,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text']) && is
     $insertStmt->bind_param("iis", $userId, $recipientId, $messageText);
 
     if ($insertStmt->execute()) {
-        // Redirect to prevent form resubmission
+        // mengarahakan ke halaman sesuai dengan paramater penerima
         header("Location: consultation.php?" . ($selectedRole === 'dokter' ? "doctor_id=" : ($selectedRole === 'apoteker' ? "apoteker_id=" : "cs_id=")) . $recipientId);
         exit();
     } else {
@@ -131,7 +119,6 @@ ob_end_flush(); // Hentikan output buffering
 <body class="bg-gray-100 ">
 
     <?php
-    // Handle the message sending
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text']) && isset($_POST['recipient_id'])) {
         $messageText = $_POST['message_text'];
         $recipientId = $_POST['recipient_id'];
@@ -139,9 +126,7 @@ ob_end_flush(); // Hentikan output buffering
         $insertQuery = "INSERT INTO messages (user_id, recipient_id, message_text, created_at) VALUES (?, ?, ?, NOW())";
         $insertStmt = $konek->prepare($insertQuery);
         $insertStmt->bind_param("iis", $userId, $recipientId, $messageText);
-
         if ($insertStmt->execute()) {
-            // Redirect to prevent form resubmission
             header("Location: consultation.php?" . ($selectedRole === 'dokter' ? "doctor_id=" : ($selectedRole === 'apoteker' ? "apoteker_id=" : "cs_id=")) . $recipientId);
             exit();
         } else {

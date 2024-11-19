@@ -35,8 +35,8 @@ $current_user_role = $_SESSION['role']; // Mendapatkan role pengguna yang sedang
           <img src="img/icon/customer-icon.jpg" alt="Customer Icon" class="w-12 h-12">
         </div>
         <div class="ml-4">
-          <h3 class="text-lg font-semibold text-gray-700">Chat with Customer</h3>
-          <p class="text-sm text-gray-500">If you're a customer, choose to connect with a doctor, pharmacist, or CS</p>
+          <h3 class="text-lg font-semibold text-gray-700">Chat dengan Customer</h3>
+          <p class="text-sm text-gray-500">Jika anda adalah customer, pilih untuk terhubung dengan seorang dokter, apoteker,atau customer service</p>
         </div>
       </a>
       <?php endif; ?>

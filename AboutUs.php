@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
-        /* Update pada animasi transisi untuk tim */
+        /* Styling transisi untuk tim card */
         .open {
             opacity: 1;
             transform: translateY(0);
@@ -24,21 +24,21 @@
             display: block;
         }
 
-        /* Optional: Hide the team section initially */
+        /* untuk pertama kali halaman dibukan card akan disembunyikan */
         #team-section {
             display: none;
         }
 
-        /* Hover animation for the chevron */
+        /* animasi card saat chev down dan chev up ditekan*/
         #open-team-button i,
         #close-team-button i {
-            transition: transform 0.3s ease-in-out;
+            transition: transform 0.3s ease-in-out;//tampilkan atau sembunyikan secara bergantian
         }
+
 
         #open-team-button:hover i,
         #close-team-button:hover i {
             transform: translateY(-5px);
-            /* Makes the chevron move upwards */
         }
 
         /* Update pada animasi bounce untuk teks */
@@ -106,7 +106,7 @@
         <button id="open-team-button"
             class="absolute bottom-12 left-1/2 transform -translate-x-1/2 text-gray-800 text-3xl hover:text-gray-600 transition duration-300 flex items-center">
             <i id="open-icon" class="fas fa-chevron-down mr-2"></i>
-            <span class="biock sm:hidden md:block">Buka Tim</span> <!-- Teks disembunyikan pada layar kecil -->
+            <span class="biock sm:hidden md:block">Buka Tim</span> <!-- Teks disembunyikan pada layar kecil(seperti android) -->
         </button>
 
         <!-- Team Section -->
@@ -186,53 +186,51 @@
             <button id="close-team-button"
                 class="absolute bottom-16 left-1/2 transform -translate-x-1/2 text-gray-800 text-3xl hover:text-gray-600 transition duration-300 flex items-center hidden">
                 <i id="close-icon" class="fas fa-chevron-up mr-2"></i>
-                <span class="block sm:hidden md:block">Tutup Tim</span> <!-- Teks disembunyikan pada layar kecil -->
+                <span class="block sm:hidden md:block">Tutup Tim</span> <!-- Teks disembunyikan pada layar kecil (seperti android)-->
             </button>
         </div>
     </div>
     <?php include 'Footer.php'; ?>
     <script>
         document.getElementById('open-team-button').addEventListener('click', function () {
+            // inisialisasi const
             const teamSection = document.getElementById('team-section');
             const openButton = document.getElementById('open-team-button');
             const closeButton = document.getElementById('close-team-button');
 
-            // Show the team section and toggle buttons
-            teamSection.style.display = 'block';
-            teamSection.classList.remove('close');
-            teamSection.classList.add('open');
+            // mengatur agar tombol bisa diperlihatkan secara bergantian  
+            teamSection.style.display = 'block'; //saat team diperlihatkan 
+            teamSection.classList.remove('close'); //class close akan dihapus 
+            teamSection.classList.add('open'); // class bukan akan ditambahkan
 
-            // Hide Open button and show Close button
-            openButton.classList.add('hidden');
-            closeButton.classList.remove('hidden');
+            openButton.classList.add('hidden'); // tambahkan hidden class pada open button
+            closeButton.classList.remove('hidden');//hapus class hidden close button 
 
-            // Scroll to the first team member
+            // setelah dibukan makan langsung menuju ke card anggota 1
             document.getElementById('team-member1').scrollIntoView({
                 behavior: 'smooth',
                 block: 'start'
             });
         });
 
+        // kebalikan dari penjelasan di atas 
         document.getElementById('close-team-button').addEventListener('click', function () {
             const teamSection = document.getElementById('team-section');
             const openButton = document.getElementById('open-team-button');
             const closeButton = document.getElementById('close-team-button');
 
-            // Hide the team section and toggle buttons
             teamSection.classList.remove('open');
             teamSection.classList.add('close');
 
             setTimeout(function () {
                 teamSection.style.display = 'none';
 
-                // After closing animation, scroll to the about-us section
                 document.getElementById('about-us-section').scrollIntoView({
                     behavior: 'smooth',
                     block: 'start'
                 });
-            }, 1000); // Wait for the transition to complete
+            }, 1000); //tunggu transisi dahulu baru tutup halaman dan menuju ke bagian about team
 
-            // Show Open button and hide Close button
             openButton.classList.remove('hidden');
             closeButton.classList.add('hidden');
         });

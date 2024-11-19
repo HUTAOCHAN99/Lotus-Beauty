@@ -5,11 +5,7 @@ if (!isset($_SESSION['reset_email'])) {
     exit();
 }
 
-$hostname = "localhost";
-$username_db = "root";
-$password_db = "";
-$database = "lotusbeauty";
-$konek = new mysqli($hostname, $username_db, $password_db, $database);
+include 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_password = $_POST['new_password'];

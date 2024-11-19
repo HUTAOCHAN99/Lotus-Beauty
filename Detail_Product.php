@@ -1,6 +1,6 @@
 <?php
-// Koneksi database
-include('db.php'); // Pastikan ini menghubungkan ke database Anda
+
+include('db.php');
 
 // Ambil product_id dari URL
 $product_id = isset($_GET['product_id']) ? (int) $_GET['product_id'] : 0;
@@ -19,10 +19,10 @@ $reviewQuery->bind_param("i", $product_id);
 $reviewQuery->execute();
 $reviews = $reviewQuery->get_result();
 
-// Periksa apakah produk ditemukan
+// Cek apakah produk ditemukan
 if ($result->num_rows > 0) {
     $product = $result->fetch_assoc();
-    $image_data = base64_encode($product['image']); // Asumsikan kolom `image` menyimpan data gambar
+    $image_data = base64_encode($product['image']);
 } else {
     echo "<p>Produk tidak ditemukan.</p>";
     exit();
@@ -196,10 +196,10 @@ $error = '';
                 document.getElementById('buyModal').classList.add('hidden');
             }
 
-            // Function to add product to cart
+            // fUNGSI tambah ke cart
             function addToCart() {
                 var quantity = document.getElementById('order-quantity').value;
-                var productId = <?= $product_id ?>; // Mendapatkan product_id dari PHP
+                var productId = <?= $product_id ?>; 
 
                 var formData = new FormData();
                 formData.append('product_id', productId);

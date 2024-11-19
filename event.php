@@ -22,7 +22,6 @@
         </a>
         <!-- Nama Halaman -->
         <h1 class="text-gray-800 font-bold text-lg">Promo</h1>
-        <!-- Placeholder untuk spasi antara tombol kembali dan nama halaman -->
         <div class="w-10"></div>
     </nav>
 

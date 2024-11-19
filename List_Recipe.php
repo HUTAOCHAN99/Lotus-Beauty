@@ -13,9 +13,8 @@
 
     <section class="max-w-8xl mx-auto p-4">
         <?php
-        include('db.php'); // Koneksi database
-        
-        // Memeriksa koneksi database
+        include('db.php');
+
         if ($konek->connect_error) {
             die("Koneksi database gagal: " . $konek->connect_error);
         }

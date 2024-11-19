@@ -1,6 +1,6 @@
 <?php
-// Koneksi database
-include('db.php'); // Pastikan ini menghubungkan ke database Anda
+
+include('db.php');
 
 // Ambil product_id dari URL
 $product_id = isset($_GET['product_id']) ? (int)$_GET['product_id'] : 0;

@@ -2,13 +2,12 @@
 session_start();
 include 'db.php';
 
-// Ensure the user is logged in
 if (!isset($_SESSION['username'])) {
     header("Location: Landing_Page.php");
     exit();
 }
 
-// Retrieve user information from the database
+// Ambil user information from the database
 $username = $_SESSION['username'];
 $sql = "SELECT * FROM users WHERE username = '$username'";
 $result = $konek->query($sql);
@@ -64,7 +63,6 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
         .nav-icon {
             margin-right: 0.5rem;
             font-size: 1.25rem;
-            /* Adjust icon size */
         }
 
         .back-button,
@@ -90,7 +88,6 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
     </style>
 
     <script>
-        // Check if success parameter is set and show alert
         window.onload = function () {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('success')) {
@@ -144,7 +141,7 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
             </table>
         </div>
 
-        <!-- Navigation Links -->
+        <!--Links Navigasi -->
         <div class="dashboard-card">
             <h3 class="card-title">Navigasi</h3>
             <ul class="space-y-2 pl-">
@@ -155,7 +152,7 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
                 <li><a href="setting.php" class="nav-link"><i class="ri-settings-3-fill nav-icon"></i> Pengaturan
                         Akun</a></li>
 
-                <!-- Additional options for admin -->
+                <!-- Pengaturan tambahan untuk Admin-->
                 <?php if ($user['role'] == 'admin'): ?>
                     <!-- Hanya admin yang dapat melihat Manajemen Pengguna -->
                     <li><a href="user_management.php" class="nav-link"><i class="ri-admin-fill nav-icon"></i> Manajemen
@@ -178,12 +175,12 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
                     <div class="dashboard-card flex space-x-4 mt-6 p-4 border border-gray-300 rounded-lg shadow-md">
                         <a href="upload.php?category=resep"
                             class="flex items-center bg-blue-500 text-white rounded-lg px-4 py-2 transition duration-300 ease-in-out hover:bg-blue-600 transform hover:scale-105">
-                            <i class="ri-upload-2-line mr-2"></i> <!-- Ikon untuk Upload Resep -->
+                            <i class="ri-upload-2-line mr-2"></i> 
                             Upload Resep
                         </a>
                         <a href="upload.php?category=obat-herbal"
                             class="flex items-center bg-green-500 text-white rounded-lg px-4 py-2 transition duration-300 ease-in-out hover:bg-green-600 transform hover:scale-105">
-                            <i class="ri-upload-2-line mr-2"></i> <!-- Ikon untuk Upload Obat Herbal -->
+                            <i class="ri-upload-2-line mr-2"></i> 
                             Upload Obat Herbal
                         </a>
                     </div>
@@ -197,7 +194,7 @@ $success = isset($_GET['success']) ? $_GET['success'] : '';
             class="dashboard-card flex items-center justify-between p-4 border border-gray-300 rounded-lg shadow-md mt-6">
             <a href="logout.php"
                 class="flex items-center text-red-600 bg-red-100 hover:bg-red-500 rounded-md px-4 py-2 transition duration-300 ease-in-out">
-                <i class="ri-logout-box-line mr-2"></i> <!-- Ikon Logout -->
+                <i class="ri-logout-box-line mr-2"></i>
                 Logout
             </a>
             <a href="Home.php"

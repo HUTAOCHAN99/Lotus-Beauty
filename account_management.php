@@ -1,5 +1,7 @@
 <?php
 // Fungsi untuk koneksi menggunakan PDO
+// memilih PDO karena lebih fleksibel dan fitur lebih banyak dibanding mysqli 
+// selain itu untuk penulisan param tidak harus berurutan 
 function getConnection()
 {
     $hostname = "localhost";
@@ -22,11 +24,14 @@ $pdo = getConnection();
 if (isset($_GET['action']) && $_GET['action'] === 'ban' && isset($_GET['user_id'])) {
     $user_id = $_GET['user_id'];
 
+    // penulisan stmt adalah berupa inisialisasi prepared statetement yang bertujuan memisahkan logika query 
+    // data yang dimaksukkan 
+
     // Update status user menjadi 'inactive'
     $stmt = $pdo->prepare("UPDATE users SET status = 'inactive' WHERE user_id = ?");
+    // execute untuk bisa tanpa parameter atau dengan parameter
     $stmt->execute([$user_id]);
 
-    // Redirect back to account management after the ban
     header("Location: account_management.php?ban_success=1");
     exit();
 }
@@ -44,11 +49,9 @@ if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['user_
         $stmt = $pdo->prepare("DELETE FROM users WHERE user_id = ?");
         $stmt->execute([$user_id]);
 
-        // Redirect back to account management after deletion
         header("Location: account_management.php?delete_success=1");
         exit();
     } catch (PDOException $e) {
-        // Redirect back with an error message
         header("Location: account_management.php?delete_error=1");
         exit();
     }

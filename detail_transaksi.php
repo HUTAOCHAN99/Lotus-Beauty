@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('db.php'); // Pastikan koneksi database terhubung
+include('db.php');
 
 if (!isset($_GET['transaksi_id'])) {
     echo "ID Transaksi tidak ditemukan.";

@@ -51,13 +51,10 @@
             font-size: 3rem;
             font-weight: bold;
             color: #7C4B3A;
-            /* Terracota color */
             position: relative;
             text-shadow:
                 1px 1px 2px rgba(255, 255, 255, 0.7),
-                /* Light highlight for the top left */
                 -1px -1px 2px rgba(0, 0, 0, 0.4);
-            /* Dark shadow for bottom right */
         }
     </style>
 </head>

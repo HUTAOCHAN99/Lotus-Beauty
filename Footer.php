@@ -19,7 +19,7 @@
 <body>
     <footer class="bg-PewterBlue text-white pl-4 pr-4 py-10">
         <div class="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Address and Join as Reseller -->
+
             <div class="flex flex-col justify-between">
                 <div>
                     <h2 class="text-xl font-bold">LotusBeauty</h2>
@@ -35,7 +35,6 @@
                 <button class="mt-4 px-6 py-2 bg-white text-green-900 font-semibold rounded">Join as reseller</button>
             </div>
 
-            <!-- Explore Links -->
             <?php
             // Mendapatkan nama file saat ini menggunakan basename
             $currentPage = basename($_SERVER['PHP_SELF']);
@@ -84,7 +83,7 @@
 
 
 
-            <!-- Stay Connected and Social Media -->
+            <!-- LiNK SOSIAL MEDIA -->
             <div class="flex flex-col justify-between">
                 <div>
                     <h3 class="text-lg font-bold">Stay Connected</h3>

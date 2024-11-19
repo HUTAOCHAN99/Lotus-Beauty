@@ -47,12 +47,12 @@ $csResult = $konek->query($csQuery);
 $apotekerQuery = "SELECT user_id, username FROM users WHERE role = 'apoteker'";
 $apotekerResult = $konek->query($apotekerQuery);
 
-// Handle the message sending
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['message_text'])) {
     $messageText = $_POST['message_text'];
     $recipientId = $_POST['user_id'];
     $doctorId = $_SESSION['user_id'];
-    $type = $_POST['type']; // Ambil `type` dari POST
+    $type = $_POST['type'];
 
     $insertQuery = "INSERT INTO messages (user_id, recipient_id, message_text, created_at) VALUES (?, ?, ?, NOW())";
     $insertStmt = $konek->prepare($insertQuery);
